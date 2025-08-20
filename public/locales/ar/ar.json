@@ -1,0 +1,1446 @@
+{
+  "privacy": {
+    "title": "سياسة الخصوصية",
+    "lastUpdated": "آخر تحديث",
+    "introduction": "تصف سياسة الخصوصية هذه كيفية جمع معلوماتك الشخصية واستخدامها والكشف عنها.",
+    "collection": {
+      "title": "المعلومات التي نجمعها",
+      "description": "نجمع المعلومات الشخصية التي تقدمها لنا مباشرة."
+    },
+    "use": {
+      "title": "كيف نستخدم معلوماتك",
+      "description": "نستخدم المعلومات التي نجمعها لتقديم خدماتنا وتحسينها."
+    },
+    "disclosure": {
+      "title": "مشاركة المعلومات",
+      "description": "قد نشارك معلوماتك مع مزودي خدمات طرف ثالث."
+    },
+    "security": {
+      "title": "الأمان",
+      "description": "ننفذ تدابير أمنية لحماية معلوماتك."
+    },
+    "childrenPolicy": {
+      "title": "خصوصية الأطفال",
+      "description": "خدماتنا ليست موجهة للأطفال دون سن 13."
+    },
+    "options": {
+      "title": "خياراتك",
+      "description": "يمكنك تحديث أو تصحيح معلوماتك في أي وقت."
+    },
+    "contact": {
+      "title": "اتصل بنا",
+      "description": "إذا كانت لديك أسئلة حول هذه السياسة، يرجى الاتصال بنا."
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "حلول رعاية صحية شاملة للعيادات الحديثة",
+      "description": "في [اسم عيادتك]، نقدم مجموعة من الخدمات المتقدمة المصممة لتبسيط عمليات العيادة، وتعزيز رعاية المرضى، ودفع النمو. من جدولة المواعيد الذكية إلى الفواتير القوية وإعداد التقارير، اكتشف كيف يمكن لحلولنا تحويل ممارستك."
+    },
+    "mainServices": {
+      "title": "خدماتنا الأساسية",
+      "appointment": {
+        "title": "جدولة المواعيد الذكية",
+        "description": "قم بتحسين سير العمل في عيادتك مع نظام الجدولة الذكي لدينا. قلل من حالات عدم الحضور، وإدارة ممارسين متعددين، وتقديم حجز عبر الإنترنت لراحة المريض.",
+        "features": [
+          "تحديثات التوفر في الوقت الفعلي",
+          "تذكيرات وتأكيدات آلية",
+          "دعم متعدد الممارسين والمواقع",
+          "متكامل مع سجلات المرضى"
+        ]
+      },
+      "patient": {
+        "title": "إدارة المرضى الشاملة",
+        "description": "قم بمركزة بيانات المرضى، وتتبع التاريخ الطبي، وتحسين التواصل مع نظام إدارة المرضى البديهي لدينا. تأكد من رعاية مخصصة وفعالة لكل مريض.",
+        "features": [
+          "سجلات صحية إلكترونية آمنة (EHR)",
+          "بوابة المريض للوصول السهل",
+          "أدوات التواصل (SMS، البريد الإلكتروني)",
+          "إدارة الموافقة والوثائق"
+        ]
+      },
+      "reporting": {
+        "title": "التقارير والتحليلات المتقدمة",
+        "description": "احصل على رؤى قابلة للتنفيذ حول أداء عيادتك مع أدوات التقارير القوية لدينا. راقب المقاييس الرئيسية، وتحديد الاتجاهات، واتخاذ قرارات مدعومة بالبيانات لتحقيق نتائج أفضل.",
+        "features": [
+          "لوحات معلومات قابلة للتخصيص",
+          "تقارير مالية وتشغيلية",
+          "تحليل ديموغرافيات المرضى والعلاج",
+          "معايير الأداء"
+        ]
+      },
+      "billing": {
+        "title": "الفواتير والفوترة المبسطة",
+        "description": "بسّط عملية الفواتير الخاصة بك مع الفواتير الآلية، وإدارة مطالبات التأمين، ومعالجة الدفع الآمنة. قلل من العبء الإداري وحسن دورات الإيرادات.",
+        "features": [
+          "إنشاء فواتير آلي",
+          "تقديم مطالبات التأمين",
+          "بوابة دفع آمنة عبر الإنترنت",
+          "تقارير مالية مفصلة"
+        ]
+      }
+    },
+    "additionalServices": {
+      "title": "خدمات إضافية لتعزيز ممارستك",
+      "telemedicine": {
+        "title": "حلول الطب عن بُعد المتكاملة",
+        "description": "وسع نطاق وصولك مع استشارات افتراضية آمنة ومريحة. قدم الرعاية عن بُعد، وحسن وصول المرضى، ووسع عروض خدماتك."
+      },
+      "multiClinic": {
+        "title": "إدارة العيادات المتعددة",
+        "description": "قم بإدارة مواقع العيادات المتعددة بسهولة من منصة واحدة. مركز البيانات، وحدد العمليات، واحصل على نظرة شاملة لممارستك بأكملها."
+      },
+      "customIntegrations": {
+        "title": "التكاملات المخصصة ووصول API",
+        "description": "قم بالاتصال مع أنظمتك الحالية وتطبيقات الطرف الثالث بسلاسة. يسمح API المرن لدينا بتكاملات مخصصة مصممة خصيصًا لاحتياجات عيادتك الفريدة."
+      }
+    },
+    "pricing": {
+      "title": "خطط تسعير مرنة لكل حجم عيادة",
+      "description": "اختر الخطة التي تناسب احتياجات عيادتك. تتضمن جميع الخطط الوصول إلى ميزاتنا الأساسية، مع خيارات قابلة للتطوير للممارسات النامية.",
+      "plans": {
+        "basic": {
+          "title": "الخطة الأساسية",
+          "description": "مثالية للعيادات الصغيرة والممارسين الأفراد.",
+          "price": "49$",
+          "period": "\/شهر",
+          "features": [
+            "جدولة المواعيد",
+            "إدارة المرضى",
+            "تقارير أساسية",
+            "دعم عبر البريد الإلكتروني"
+          ]
+        },
+        "pro": {
+          "title": "الخطة الاحترافية",
+          "description": "مثالية للعيادات النامية مع ممارسين متعددين.",
+          "price": "99$",
+          "period": "\/شهر",
+          "features": [
+            "جميع ميزات الخطة الأساسية",
+            "تقارير متقدمة",
+            "تكامل الطب عن بُعد",
+            "دعم ذو أولوية"
+          ]
+        },
+        "enterprise": {
+          "title": "الخطة المؤسسية",
+          "description": "حلول مخصصة لمنظمات الرعاية الصحية الكبيرة.",
+          "price": "مخصص",
+          "period": "",
+          "features": [
+            "جميع ميزات الخطة الاحترافية",
+            "إدارة العيادات المتعددة",
+            "تكاملات مخصصة",
+            "مدير حساب مخصص"
+          ]
+        }
+      }
+    },
+    "learnMoreLink": "اعرف المزيد"
+  },
+  "hero": {
+    "title": "حلول رعاية أسنان شاملة لابتسامة صحية",
+    "subtitle": "عيادتك لأسنان مشرقة",
+    "description": "في عيادتنا، نجمع بين أحدث التقنيات والرعاية الرحيمة لتقديم تجربة أسنان لا مثيل لها. صحة فمك هي أولويتنا.",
+    "bookAppointment": "احجز موعدًا الآن",
+    "callNow": "اتصل بنا",
+    "hipaaCompliant": "متوافق مع HIPAA",
+    "adaCertified": "معتمد من ADA"
+  },
+  "clinicLocations": {
+    "attsa": {
+      "name": "عيادة أطسا",
+      "address": "شارع الجمهورية، أطسا، الفيوم",
+      "hours": {
+        "weekdays": "الاثنين - الخميس: 9:00 صباحًا - 8:00 مساءً",
+        "friday": "الجمعة: 9:00 صباحًا - 5:00 مساءً",
+        "emergency": "حالات الطوارئ: متوفرة على مدار الساعة طوال أيام الأسبوع"
+      }
+    },
+    "fayoum": {
+      "name": "عيادة الفيوم",
+      "address": "شارع جمال عبد الناصر، الفيوم",
+      "hours": {
+        "weekdays": "الاثنين - الخميس: 9:00 صباحًا - 8:00 مساءً",
+        "friday": "الجمعة: 9:00 صباحًا - 5:00 مساءً",
+        "emergency": "حالات الطوارئ: متوفرة على مدار الساعة طوال أيام الأسبوع"
+      }
+    }
+  },
+  "services": {
+    "title": "خدماتنا",
+    "description": "رعاية شاملة للأسنان مصممة خصيصاً لاحتياجاتك.",
+    "preventiveCare": {
+      "title": "الرعاية الوقائية",
+      "description": "فحوصات منتظمة، تنظيف، وخطط وقائية للحفاظ على صحة أسنانك."
+    },
+    "cosmeticDentistry": {
+      "title": "طب الأسنان التجميلي",
+      "description": "تبييض الأسنان، قشور الأسنان، وتصحيح الابتسامة لتحويل مظهرك."
+    },
+    "restorativeDentistry": {
+      "title": "طب الأسنان الترميمي",
+      "description": "حشوات، تيجان، جسور، وزراعة الأسنان لاستعادة وظيفة وجمال أسنانك."
+    },
+    "orthodontics": {
+      "title": "تقويم الأسنان",
+      "description": "تقويم الأسنان التقليدي، التقويم الشفاف، وغيرها من الحلول لابتسامة مستقيمة."
+    },
+    "oralSurgery": {
+      "title": "جراحة الفم",
+      "description": "خلع الأسنان، جراحة الفك، وغيرها من الإجراءات الجراحية المتخصصة."
+    },
+    "emergencyCare": {
+      "title": "رعاية الطوارئ",
+      "description": "رعاية سريعة وفعالة لآلام الأسنان، الإصابات، وغيرها من حالات الطوارئ."
+    },
+    "pricing": {
+      "title": "اختر خطتك",
+      "description": "اختر الخطة المثالية لاحتياجات عيادتك",
+      "plans": {
+        "basic": {
+          "name": "أساسي",
+          "description": "مثالي للعيادات الصغيرة",
+          "price": "99$",
+          "period": "/شهر",
+          "features": {
+            "1": "حتى 2 مقدمي خدمة",
+            "2": "سجلات المرضى",
+            "3": "تقارير أساسية"
+          },
+          "button": "ابدأ الآن"
+        },
+        "professional": {
+          "name": "احترافي",
+          "description": "للعيادات النامية",
+          "price": "199$",
+          "period": "/شهر",
+          "badge": "الأكثر شعبية",
+          "features": {
+            "1": "حتى 5 مقدمي خدمة",
+            "2": "جميع الميزات الأساسية",
+            "3": "تقارير متقدمة",
+            "4": "الطب عن بُعد",
+            "5": "دعم أولوية"
+          },
+          "button": "ابدأ الآن"
+        },
+        "enterprise": {
+          "name": "مؤسسي",
+          "description": "للمؤسسات الكبيرة",
+          "price": "مخصص",
+          "period": "",
+          "features": {
+            "1": "مقدمي خدمة غير محدودين",
+            "2": "جميع الميزات الاحترافية",
+            "3": "إدارة عيادات متعددة",
+            "4": "تكاملات مخصصة",
+            "5": "مدير حساب مخصص"
+          },
+          "button": "اتصل بالمبيعات"
+        }
+      },
+      "cta": {
+        "title": "هل أنت مستعد لتحويل عيادتك؟",
+        "description": "انضم إلى آلاف مقدمي الرعاية الصحية الذين يبسطون عملياتهم باستخدام منصتنا.",
+        "startTrial": "ابدأ التجربة المجانية",
+        "scheduleDemo": "جدولة عرض توضيحي"
+      }
+    }
+  },
+  "testimonials": {
+    "testimonial1": {
+      "name": "أحمد محمد",
+      "text": "أفضل عيادة أسنان في الفيوم! فريق عمل ودود ومحترف للغاية. أوصي بهم بشدة.",
+      "treatment": "تبييض الأسنان"
+    },
+    "testimonial2": {
+      "name": "فاطمة علي",
+      "text": "كنت خائفة جدًا من أطباء الأسنان، لكنهم جعلوني أشعر بالراحة التامة. شكراً لكم على ابتسامتي الجديدة!",
+      "treatment": "تقويم الأسنان"
+    },
+    "testimonial3": {
+      "name": "يوسف خالد",
+      "text": "خدمة ممتازة ورعاية فائقة. لقد قاموا بعمل رائع في زراعة الأسنان الخاصة بي. أنا سعيد جدًا بالنتائج.",
+      "treatment": "زراعة الأسنان"
+    }
+  },
+  "story": {
+    "title": "قصتنا",
+    "paragraph1": "تأسست عيادتنا في عام 2005 برؤية بسيطة: إنشاء عيادة أسنان يشعر فيها المرضى بالراحة والتقدير ويتلقون أعلى مستويات الجودة في الرعاية. على مر السنين، نمت عيادتنا، لكن قيمنا الأساسية بقيت كما هي.",
+    "paragraph2": "نحن نؤمن ببناء علاقات دائمة مع مرضانا، وفهم احتياجاتهم الفريدة، وتمكينهم بالمعرفة حول صحة فمهم. فريقنا متحمس لطب الأسنان وملتزم بالتعلم المستمر لتقديم أحدث التطورات في علوم طب الأسنان.",
+    "paragraph3": "من عيادة صغيرة إلى مزود رعاية أسنان رائد في المجتمع، نحن فخورون بالرحلة التي قطعناها وممتنون للثقة التي يضعها مرضانا فينا. نتطلع إلى سنوات عديدة أخرى من خدمتكم وعائلاتكم."
+  },
+  "mission": {
+    "title": "مهمتنا",
+    "description": "تبسيط رعاية الأسنان، تمكين المرضى، وتحسين الابتسامات من خلال الابتكار والخدمة الرحيمة.",
+    "simplify": {
+      "title": "تبسيط رعاية الأسنان",
+      "description": "جعل زيارات الأسنان سهلة وخالية من التوتر من خلال عمليات مبسطة وتواصل واضح."
+    },
+    "empower": {
+      "title": "تمكين المرضى",
+      "description": "تثقيف المرضى وإشراكهم في قرارات علاجهم لتحقيق نتائج أفضل لصحة الفم."
+    },
+    "enhance": {
+      "title": "تحسين الابتسامات",
+      "description": "استخدام التقنيات المتقدمة والرعاية الشخصية لتحقيق ابتسامات جميلة وصحية."
+    }
+  },
+  "team": {
+    "title": "تعرف على فريقنا المتفاني",
+    "member1": {
+      "name": "د. أحمد حسن",
+      "role": "المؤسس وكبير أطباء الأسنان",
+      "bio": "أسس الدكتور حسن العيادة برؤية للرعاية المتمحورة حول المريض. مع أكثر من 20 عامًا من الخبرة، وهو مكرس لتقنيات طب الأسنان المتقدمة."
+    },
+    "member2": {
+      "name": "د. سارة خان",
+      "role": "أخصائية تقويم الأسنان",
+      "bio": "تتخصص الدكتورة خان في تقويم الأسنان، وتخلق ابتسامات مثالية للمرضى من جميع الأعمار. نهجها اللطيف يجعل كل زيارة مريحة."
+    },
+    "member3": {
+      "name": "د. عمر شريف",
+      "role": "جراح الفم",
+      "bio": "الدكتور شريف هو خبيرنا في جراحة الفم، ويقدم إجراءات آمنة وفعالة بأقصى درجات الدقة والعناية."
+    }
+  },
+  "cta": {
+    "title": "هل أنت مستعد لتجربة رعاية أسنان استثنائية؟",
+    "description": "اتصل بنا اليوم لتحديد موعدك والانضمام إلى عائلتنا من الابتسامات السعيدة والصحية.",
+    "contact": "اتصل بنا",
+    "getStarted": "ابدأ الآن"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة حسابك والعيادة وتفضيلات التطبيق",
+    "profile": {
+      "title": "الملف الشخصي",
+      "personalInfo": "المعلومات الشخصية",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "dateOfBirth": "تاريخ الميلاد",
+      "gender": "الجنس",
+      "selectGender": "اختر الجنس",
+      "male": "ذكر",
+      "female": "أنثى",
+      "other": "آخر",
+      "preferNotToSay": "أفضل عدم القول",
+      "address": "العنوان",
+      "street": "الشارع",
+      "city": "المدينة",
+      "state": "الولاية",
+      "selectState": "اختر الولاية",
+      "zipCode": "الرمز البريدي",
+      "country": "الدولة",
+      "specialization": "التخصص",
+      "licenseNumber": "رقم الترخيص",
+      "bio": "السيرة الذاتية",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح!",
+      "updateError": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+    "patients": {
+      "name": "الاسم",
+      "phone": "الهاتف",
+      "age": "العمر",
+      "status": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "last_visit": "آخر زيارة",
+      "actions": "الإجراءات",
+      "view": "عرض",
+      "edit": "تعديل",
+      "my_profile": "ملفي الشخصي",
+      "patients": "المرضى",
+      "view_and_manage_personal_information": "عرض وإدارة معلوماتك الشخصية",
+      "manage_patient_records": "إدارة سجلات ومعلومات المرضى",
+      "add_patient": "إضافة مريض",
+      "search_patients": "البحث عن مرضى...",
+      "export": "تصدير",
+    "completeSelected": "إكمال المحدد",
+    "cancelSelected": "إلغاء المحدد",
+      "delete": "حذف"
+    },
+    "patient_detail": {
+      "patient_id": "معرف المريض",
+      "edit_patient": "تعديل المريض",
+      "delete_patient": "حذف المريض",
+      "overview": "نظرة عامة",
+      "personal_information": "المعلومات الشخصية",
+      "full_name": "الاسم الكامل",
+      "age": "العمر",
+      "date_of_birth": "تاريخ الميلاد",
+      "gender": "الجنس",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "address": "العنوان",
+      "allergies": "الحساسية",
+      "add_allergy": "إضافة حساسية",
+      "no_allergies_recorded": "لم يتم تسجيل أي حساسية.",
+      "medical_conditions": "الحالات الطبية",
+      "add_condition": "إضافة حالة",
+      "no_medical_conditions_recorded": "لم يتم تسجيل أي حالات طبية.",
+      "appointments": "المواعيد",
+      "schedule_new": "جدولة جديد",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "dentist": "طبيب الأسنان",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "no_appointments_scheduled": "لا توجد مواعيد مجدولة."
+    },
+    "patient_form": {
+      "first_name_required": "الاسم الأول مطلوب",
+      "last_name_required": "اسم العائلة مطلوب",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "phone_required": "الهاتف مطلوب",
+      "date_of_birth_required": "تاريخ الميلاد مطلوب",
+      "patient_updated_successfully": "تم تحديث المريض بنجاح!",
+      "patient_created_successfully": "تم إنشاء المريض بنجاح!"
+    },
+    "medications": {
+      "my_medications": "أدويتي",
+      "medications": "الأدوية",
+      "view_prescribed_medications": "عرض الأدوية الموصوفة لك واتبع التعليمات بعناية",
+      "manage_medication_inventory": "إدارة مخزون الأدوية والوصفات الطبية في عيادتك"
+    },
+    "billing": {
+      "title": "الفواتير والمدفوعات",
+      "description": "إدارة فواتير المرضى والفواتير وسجلات الدفع"
+    },
+    "staff_scheduling": {
+      "title": "جدولة الموظفين",
+      "description": "إدارة جداول الموظفين عبر العيادات",
+      "add_schedule": "إضافة جدول",
+      "clinic": "العيادة",
+      "select_clinic": "اختر عيادة",
+      "staff_member": "عضو فريق العمل",
+      "delete_confirmation": "هل أنت متأكد أنك تريد حذف هذا الجدول؟",
+      "all_staff": "جميع الموظفين",
+      "shift_type": "نوع المناوبة",
+      "all_shifts": "جميع المناوبات",
+      "morning": "صباحاً",
+      "afternoon": "ظهراً",
+      "evening": "مساءً",
+      "night": "ليلاً",
+      "full_day": "يوم كامل",
+      "status": "الحالة",
+      "all_status": "جميع الحالات",
+      "scheduled": "مجدول",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "no_show": "لم يحضر",
+      "view_mode": "طريقة العرض",
+      "calendar": "التقويم",
+      "list": "القائمة",
+      "schedule_list": "قائمة الجداول",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "actions": "الإجراءات"
+    },
+      "admin_dashboard": {
+        "title": "لوحة تحكم المشرف للعيادات",
+        "multi_clinic_dashboard": "لوحة تحكم متعددة العيادات",
+        "manage_clinics": "إدارة العيادات",
+        "refresh_data": "تحديث البيانات",
+        "refreshing": "جاري التحديث...",
+        "total_clinics": "إجمالي العيادات",
+        "total_patients": "إجمالي المرضى",
+        "total_revenue": "إجمالي الإيرادات",
+        "total_appointments": "إجمالي المواعيد",
+        "search_placeholder": "ابحث عن العيادات بالاسم أو الموقع...",
+        "sort_by_name": "فرز حسب الاسم",
+        "sort_by_patients": "فرز حسب المرضى",
+        "sort_by_revenue": "فرز حسب الإيرادات",
+        "sort_by_appointments": "فرز حسب المواعيد",
+        "all_clinics": "جميع العيادات",
+        "active_only": "النشطة فقط",
+        "inactive_only": "غير النشطة فقط",
+        "clinic": "العيادة",
+        "location": "الموقع",
+        "patients": "المرضى",
+        "appointments": "المواعيد",
+        "revenue": "الإيرادات",
+        "status": "الحالة",
+        "actions": "الإجراءات",
+        "no_clinics_found": "لم يتم العثور على عيادات",
+        "no_clinics_available": "لا توجد عيادات متاحة",
+        "loading_clinics": "جاري تحميل العيادات...",
+        "try_again": "حاول مرة أخرى",
+        "retrying": "جاري إعادة المحاولة...",
+        "access_denied": "تم رفض الوصول",
+        "access_denied_message": "تحتاج إلى صلاحيات المسؤول للوصول إلى هذه الصفحة. يرجى الاتصال بالمسؤول إذا كنت تعتقد أن هذا خطأ.",
+        "go_to_dashboard": "اذهب إلى لوحة التحكم",
+        "go_to_home": "اذهب إلى الصفحة الرئيسية",
+        "error_loading_data": "خطأ في تحميل البيانات",
+        "failed_to_fetch_clinic_data": "فشل في جلب بيانات العيادة. يرجى المحاولة مرة أخرى.",
+        "failed_to_fetch_clinic_details": "فشل في جلب تفاصيل العيادة. يرجى المحاولة مرة أخرى."
+      },
+      "uploadSuccess": "تم تحميل صورة الملف الشخصي بنجاح!",
+      "uploadError": "فشل تحميل الصورة الرمزية. يرجى المحاولة مرة أخرى.",
+      "fileSizeError": "يجب ألا يتجاوز حجم الملف 5 ميغابايت",
+      "saveChanges": "حفظ التغييرات"
+    },
+    "clinic": {
+      "title": "العيادة",
+      "noClinicSelected": "لم يتم تحديد عيادة",
+      "selectClinicToManage": "يرجى تحديد عيادة لإدارة إعداداتها.",
+      "basicInfo": "معلومات أساسية",
+      "clinicName": "اسم العيادة",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "website": "الموقع الإلكتروني",
+      "address": "العنوان",
+      "operatingHours": "ساعات العمل",
+      "day": "اليوم",
+      "open": "فتح",
+      "close": "إغلاق",
+      "closed": "مغلق",
+      "services": "الخدمات",
+      "addService": "إضافة خدمة",
+      "emergencyContact": "جهة اتصال الطوارئ",
+      "updateSuccess": "تم تحديث إعدادات العيادة بنجاح!",
+      "updateError": "فشل تحديث إعدادات العيادة. يرجى المحاولة مرة أخرى.",
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت",
+      "sunday": "الأحد",
+      "active": "نشط"
+    },
+    "security": {
+      "title": "الأمان",
+      "changePassword": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+      "passwordMinLength": "يجب أن لا تقل كلمة المرور عن 8 أحرف",
+      "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة.",
+      "changePasswordSuccess": "تم تغيير كلمة المرور بنجاح!",
+      "changePasswordError": "فشل تغيير كلمة المرور. يرجى التحقق من كلمة المرور الحالية.",
+      "twoFactorAuth": "المصادقة الثنائية",
+      "twoFactorAuthDescription": "أضف طبقة إضافية من الأمان إلى حسابك.",
+      "twoFactorEnabled": "المصادقة الثنائية مفعلة",
+      "twoFactorDisabled": "المصادقة الثنائية معطلة",
+      "enable2FA": "تفعيل المصادقة الثنائية",
+      "disable2FA": "تعطيل المصادقة الثنائية",
+      "scanQRCode": "امسح رمز الاستجابة السريعة هذا باستخدام تطبيق المصادقة الخاص بك.",
+      "enterVerificationCode": "أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة الخاص بك.",
+      "verify": "تحقق",
+      "enableSuccess": "تم تفعيل المصادقة الثنائية بنجاح!",
+      "disableSuccess": "تم تعطيل المصادقة الثنائية.",
+      "enableError": "رمز التحقق غير صالح. يرجى المحاولة مرة أخرى.",
+      "disableError": "فشل تعطيل المصادقة الثنائية.",
+      "securityLog": "سجل الأمان",
+      "recentActivity": "نشاط الحساب الأخير",
+      "action": "الإجراء",
+      "date": "التاريخ",
+      "ipAddress": "عنوان IP",
+      "device": "الجهاز",
+      "location": "الموقع",
+      "login": "تسجيل الدخول",
+      "passwordChanged": "تم تغيير كلمة المرور"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "saveSuccess": "تم حفظ إعدادات الإشعارات بنجاح!",
+      "saveError": "فشل حفظ إعدادات الإشعارات. يرجى المحاولة مرة أخرى.",
+      "globalSettings": "إعدادات الإشعارات العامة",
+      "masterToggle": "تبديل الإشعارات الرئيسي",
+      "enableAll": "تفعيل جميع الإشعارات",
+      "disableAll": "تعطيل جميع الإشعارات",
+      "quietHours": "ساعات الهدوء",
+      "quietHoursDescription": "كتم الإشعارات خلال هذه الساعات.",
+      "startTime": "وقت البدء",
+      "endTime": "وقت الانتهاء",
+      "deliveryFrequency": "تكرار التسليم",
+      "immediate": "فوري",
+      "hourly": "ملخص كل ساعة",
+      "daily": "ملخص يومي",
+      "notificationChannels": "قنوات الإشعارات",
+      "email": "البريد الإلكتروني",
+      "sms": "رسائل نصية",
+      "push": "إشعارات الدفع",
+      "inApp": "داخل التطبيق",
+      "notificationPreferences": "تفضيلات الإشعارات",
+      "appointments": "المواعيد",
+      "patients": "المرضى",
+      "system": "النظام",
+      "marketing": "التسويق",
+      "appointmentReminders": "تذكيرات المواعيد",
+      "appointmentRemindersDesc": "احصل على إشعارات حول المواعيد القادمة",
+      "appointmentConfirmations": "تأكيدات المواعيد",
+      "appointmentConfirmationsDesc": "استقبل تأكيدات عند حجز المواعيد",
+      "appointmentCancellations": "إلغاء المواعيد",
+      "appointmentCancellationsDesc": "احصل على إشعارات عند إلغاء المواعيد",
+      "newPatientRegistration": "تسجيل مريض جديد",
+      "newPatientRegistrationDesc": "إشعارات عند تسجيل مرضى جدد",
+      "patientMessages": "رسائل المرضى",
+      "patientMessagesDesc": "احصل على إشعارات عندما يرسل المرضى رسائل",
+      "systemUpdates": "تحديثات النظام",
+      "systemUpdatesDesc": "تحديثات النظام الهامة وإشعارات الصيانة",
+      "securityAlerts": "تنبيهات الأمان",
+      "securityAlertsDesc": "الإشعارات والتنبيهات المتعلقة بالأمان",
+      "promotionalOffers": "العروض الترويجية",
+      "promotionalOffersDesc": "رسائل البريد الإلكتروني التسويقية والمحتوى الترويجي",
+      "newsletter": "النشرة الإخبارية",
+      "newsletterDesc": "نشرة إخبارية شهرية مع نصائح وتحديثات"
+    },
+    "billing": {
+      "title": "الفواتير",
+      "currentPlan": "الخطة الحالية",
+      "nextBillingDate": "تاريخ الفاتورة التالي",
+      "paymentMethod": "طريقة الدفع",
+      "billingAddress": "عنوان الفوترة",
+      "updatePaymentMethod": "تحديث طريقة الدفع",
+      "cancelSubscription": "إلغاء الاشتراك",
+      "invoiceHistory": "سجل الفواتير",
+      "invoice": "فاتورة",
+      "date": "التاريخ",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "download": "تنزيل",
+      "paid": "مدفوع",
+      "pending": "قيد الانتظار",
+      "failed": "فشل",
+      "upgradePlan": "ترقية الخطة",
+      "changePlan": "تغيير الخطة",
+      "current": "الحالية",
+      "recommended": "موصى به",
+      "upgradeSuccess": "تمت الترقية بنجاح إلى خطة {planName}!",
+      "upgradeError": "فشل تغيير الخطة. يرجى المحاولة مرة أخرى.",
+      "cancelSuccess": "تم إلغاء الاشتراك بنجاح. يمكنك الاستمرار في استخدام الخدمة حتى نهاية فترة الفوترة الخاصة بك.",
+      "cancelError": "فشل إلغاء الاشتراك. يرجى المحاولة مرة أخرى.",
+      "cancelModalTitle": "إلغاء الاشتراك",
+      "cancelModalMessage": "هل أنت متأكد أنك تريد إلغاء اشتراكك؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirmCancel": "نعم، إلغاء الاشتراك",
+      "keepSubscription": "الاحتفاظ بالاشتراك",
+      "perMonth": "/ شهر",
+      "perYear": "/ سنة",
+      "basicPlan": "الأساسية",
+      "professionalPlan": "المحترفة",
+      "enterprisePlan": "المؤسسة",
+      "basicFeatures": [
+        "ما يصل إلى 100 موعد شهريًا",
+        "إدارة أساسية للمرضى",
+        "دعم عبر البريد الإلكتروني"
+      ],
+      "professionalFeatures": [
+        "مواعيد غير محدودة",
+        "إدارة متقدمة للمرضى",
+        "تقارير وتحليلات",
+        "دعم ذو أولوية عبر البريد الإلكتروني",
+        "دعم متعدد العيادات"
+      ],
+      "enterpriseFeatures": [
+        "كل شيء في الخطة المحترفة",
+        "تكاملات مخصصة",
+        "مدير حساب مخصص",
+        "دعم عبر الهاتف",
+        "تقارير مخصصة"
+      ]
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "helpAndSupport": "المساعدة والدعم",
+      "exportData": "تصدير البيانات"
+    },
+    "scheduleCalendar": {
+      "today": "اليوم",
+      "months": {
+        "january": "يناير",
+        "february": "فبراير",
+        "march": "مارس",
+        "april": "أبريل",
+        "may": "مايو",
+        "june": "يونيو",
+        "july": "يوليو",
+        "august": "أغسطس",
+        "september": "سبتمبر",
+        "october": "أكتوبر",
+        "november": "نوفمبر",
+        "december": "ديسمبر"
+      },
+      "days": {
+        "sun": "الأحد",
+        "mon": "الإثنين",
+        "tue": "الثلاثاء",
+        "wed": "الأربعاء",
+        "thu": "الخميس",
+        "fri": "الجمعة",
+        "sat": "السبت"
+    }
+  },
+  "appointmentCard": {
+    "unknownPatient": "مريض غير معروف",
+    "unknownDentist": "غير معروف",
+    "at": "في",
+    "minutes": "دقائق",
+    "viewDetails": "عرض التفاصيل",
+    "confirm": "تأكيد",
+    "complete": "إكمال",
+    "cancel": "إلغاء",
+    "status": {
+      "scheduled": "مجدول",
+      "confirmed": "مؤكد",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "no-show": "لم يحضر"
+    }
+  },
+  "scheduleForm": {
+    "title": "تفاصيل الجدول الزمني",
+    "staffMember": "عضو الفريق",
+    "selectStaff": "اختر عضوًا من الفريق",
+    "date": "التاريخ",
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "shiftType": "نوع المناوبة",
+    "status": "الحالة",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أضف أي ملاحظات ذات صلة...",
+    "recurring": "جدول متكرر",
+    "notifications": "الإشعارات",
+    "enableNotifications": "تمكين الإشعارات",
+    "reminderTime": "وقت التذكير (بالدقائق قبل)",
+    "channels": "القنوات",
+    "email": "البريد الإلكتروني",
+    "sms": "رسالة نصية",
+    "inApp": "داخل التطبيق",
+    "frequency": "التكرار",
+    "interval": "الفاصل الزمني",
+    "daysOfWeek": "أيام الأسبوع",
+    "endDate": "تاريخ الانتهاء",
+    "save": "حفظ الجدول الزمني",
+    "cancel": "إلغاء",
+    "validation": {
+      "staffRequired": "عضو الفريق مطلوب",
+      "dateRequired": "التاريخ مطلوب",
+      "startTimeRequired": "وقت البدء مطلوب",
+      "endTimeRequired": "وقت الانتهاء مطلوب",
+      "endTimeAfterStart": "يجب أن يكون وقت الانتهاء بعد وقت البدء",
+      "dayRequired": "اختر يومًا واحدًا على الأقل للجداول الأسبوعية المتكررة",
+      "endDateRequired": "تاريخ الانتهاء مطلوب للجداول المتكررة"
+    },
+    "shiftTypes": {
+      "morning": "صباحي",
+      "afternoon": "بعد الظهر",
+      "evening": "مسائي",
+      "night": "ليلي",
+      "fullDay": "يوم كامل"
+    },
+    "statuses": {
+      "scheduled": "مجدول",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "noShow": "لم يحضر"
+    },
+    "frequencies": {
+      "daily": "يومي",
+      "weekly": "أسبوعي",
+      "monthly": "شهري"
+    },
+    "days": {
+      "sun": "الأحد",
+      "mon": "الإثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت"
+    }
+  },
+  "appointmentCalendar": {
+    "month": "شهر",
+    "week": "أسبوع",
+    "today": "اليوم",
+    "weekOf": "أسبوع من",
+    "dayNames": {
+      "sun": "الأحد",
+      "mon": "الإثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت"
+    }
+  },
+  "timeSlotPicker": {
+    "loading": "جاري تحميل المواعيد المتاحة...",
+    "error": "فشل تحميل المواعيد المتاحة",
+    "tryAgain": "حاول مرة أخرى",
+    "noSlots": "لا توجد مواعيد متاحة في {{date}}",
+    "refresh": "تحديث",
+    "morning": "صباحًا",
+    "afternoon": "مساءً",
+    "availableTimes": "الأوقات المتاحة في {{date}}",
+    "selected": "المحدد: {{time}} في {{date}}",
+    "duration": "المدة: {{duration}} دقيقة",
+    "timezoneInfo": "المواعيد حسب توقيت {{timeZone}}",
+    "slotDurationInfo": "مدة كل موعد {{duration}} دقيقة",
+    "arrivalInfo": "يرجى الحضور قبل 15 دقيقة من الموعد المحدد"
+  },
+  "billingDetailsSection": {
+    "invoiceTitle": "فاتورة رقم {{invoiceNumber}}",
+    "overdue": "متأخرة",
+    "print": "طباعة",
+    "downloadPDF": "PDF",
+    "addPayment": "إضافة دفعة",
+    "fromClinic": "من: {{clinicName}}",
+    "toPatient": "إلى: {{patientName}}",
+    "invoiceInfo": "معلومات الفاتورة",
+    "invoiceDate": "تاريخ الفاتورة",
+    "dueDate": "تاريخ الاستحقاق",
+    "paidDate": "تاريخ الدفع",
+    "dentist": "طبيب الأسنان",
+    "appointment": "الموعد",
+    "treatment": "العلاج",
+    "invoiceItems": "بنود الفاتورة",
+    "itemDescription": "الوصف",
+    "itemQuantity": "الكمية",
+    "itemUnitPrice": "سعر الوحدة",
+    "itemTotal": "الإجمالي",
+    "summary": "ملخص",
+    "subtotal": "المجموع الفرعي",
+    "tax": "الضريبة",
+    "discount": "الخصم",
+    "totalAmount": "المبلغ الإجمالي",
+    "paidAmount": "المبلغ المدفوع",
+    "balanceDue": "الرصيد المستحق",
+    "paymentHistory": "سجل المدفوعات",
+    "paymentDate": "التاريخ",
+    "paymentMethod": "طريقة الدفع",
+    "paymentAmount": "المبلغ",
+    "paymentReference": "مرجع",
+    "noPaymentHistory": "لا يوجد سجل مدفوعات.",
+    "insuranceInfo": "معلومات التأمين",
+    "insuranceProvider": "شركة التأمين",
+    "insurancePolicyNumber": "رقم البوليصة",
+    "insuranceCoverage": "التغطية",
+    "notes": "ملاحظات",
+    "noNotes": "لا توجد ملاحظات إضافية.",
+    "paymentStatus": {
+      "pending": "قيد الانتظار",
+      "partial": "جزئي",
+      "paid": "مدفوع",
+      "overdue": "متأخر"
+    }
+  },
+  "billingForm": {
+    "title": "إنشاء فاتورة جديدة",
+    "editTitle": "تعديل الفاتورة",
+    "patient": "مريض",
+    "selectPatient": "اختر مريض",
+    "appointment": "موعد",
+    "selectAppointment": "اختر موعد (اختياري)",
+    "treatmentRecord": "سجل العلاج",
+    "selectTreatment": "اختر علاج (اختياري)",
+    "invoiceItems": "بنود الفاتورة",
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "total": "المجموع",
+    "addItem": "إضافة بند",
+    "removeItem": "إزالة بند",
+    "summary": "ملخص",
+    "subtotal": "المجموع الفرعي",
+    "discount": "مبلغ الخصم",
+    "taxRate": "نسبة الضريبة (%)",
+    "taxAmount": "مبلغ الضريبة",
+    "totalAmount": "المبلغ الإجمالي",
+    "paymentInformation": "معلومات الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "selectPaymentMethod": "اختر طريقة الدفع",
+    "cash": "نقداً",
+    "creditCard": "بطاقة ائتمان",
+    "debitCard": "بطاقة خصم",
+    "check": "شيك",
+    "bankTransfer": "تحويل بنكي",
+    "insurance": "تأمين",
+    "insuranceProvider": "شركة التأمين",
+    "insurancePolicyNumber": "رقم بوليصة التأمين",
+    "insuranceCoverageAmount": "مبلغ تغطية التأمين",
+    "dueDate": "تاريخ الاستحقاق",
+    "notes": "ملاحظات",
+    "save": "حفظ الفاتورة",
+    "saving": "جاري الحفظ...",
+    "update": "تحديث الفاتورة",
+    "updating": "جاري التحديث...",
+    "cancel": "إلغاء",
+    "validation": {
+      "patientRequired": "المريض مطلوب",
+      "itemDescriptionRequired": "الوصف مطلوب",
+      "itemQuantityMin": "يجب أن تكون الكمية 1 على الأقل",
+      "itemUnitPriceMin": "يجب أن يكون سعر الوحدة إيجابيًا",
+      "itemTotalMin": "يجب أن يكون المجموع إيجابيًا",
+      "atLeastOneItem": "مطلوب بند واحد على الأقل",
+      "subtotalMin": "يجب أن يكون المجموع الفرعي إيجابيًا",
+      "taxRateMin": "يجب أن تكون نسبة الضريبة بين 0 و 100",
+      "taxAmountMin": "يجب أن يكون مبلغ الضريبة إيجابيًا",
+      "discountAmountMin": "يجب أن يكون مبلغ الخصم إيجابيًا",
+      "totalAmountMin": "يجب أن يكون المبلغ الإجمالي إيجابيًا",
+      "dueDateRequired": "تاريخ الاستحقاق مطلوب"
+    }
+  },
+  "billingDetails": {
+      "invoiceTitle": "فاتورة رقم {{invoiceNumber}}",
+      "paymentStatus": {
+        "pending": "قيد الانتظar",
+        "partial": "مدفوع جزئياً",
+        "paid": "مدفوع",
+        "overdue": "متأخرة"
+      },
+      "overdue": "متأخرة",
+      "print": "طباعة",
+      "downloadPDF": "تحميل PDF",
+      "addPayment": "إضافة دفعة",
+      "fromClinic": "من: {{clinicName}}",
+      "billTo": "إلى: {{patientName}}",
+      "invoiceDetailsTitle": "تفاصيل الفاتورة",
+      "invoiceDate": "تاريخ الفاتورة",
+      "dueDate": "تاريخ الاستحقاق",
+      "paidDate": "تاريخ الدفع",
+      "provider": "المزود",
+      "dentistName": "د. {{firstName}} {{lastName}}",
+      "appointment": "الموعد",
+      "treatment": "العلاج",
+      "insuranceInfoTitle": "معلومات التأمين",
+      "insuranceProvider": "شركة التأمين",
+      "policyNumber": "رقم البوليصة",
+      "coverageAmount": "مبلغ التغطية",
+      "invoiceItemsTitle": "بنود الفاتورة",
+      "itemDescription": "الوصف",
+      "itemQuantity": "الكمية",
+      "itemUnitPrice": "سعر الوحدة",
+      "itemTotal": "الإجمالي",
+      "subtotal": "المجموع الفرعي",
+      "discount": "الخصم",
+      "tax": "الضريبة",
+      "totalAmount": "المبلغ الإجمالي",
+      "paidAmount": "المبلغ المدفوع",
+      "balanceDue": "الرصيد المستحق",
+      "paymentHistoryTitle": "سجل المدفوعات",
+      "paymentReference": "مرجع: {{reference}}",
+      "notesTitle": "ملاحظات",
+      "pdfDownloadInfo": "سيتم تنفيذ وظيفة تنزيل ملف PDF هنا"
+    },
+    "medicationForm": {
+      "title": "نموذج الدواء",
+      "medicationName": "اسم الدواء",
+      "medicationNamePlaceholder": "أدخل اسم الدواء",
+      "genericName": "الاسم العام",
+      "genericNamePlaceholder": "أدخل الاسم العام",
+      "dosage": "الجرعة",
+      "dosagePlaceholder": "مثال: 500 ملغ",
+      "frequency": "التكرار",
+      "frequencyPlaceholder": "مثال: 3 مرات يوميًا",
+      "duration": "المدة",
+      "durationPlaceholder": "مثال: 7-10 أيام",
+      "category": "الفئة",
+      "activeMedication": "دواء نشط",
+      "instructions": "التعليمات",
+      "instructionsPlaceholder": "أدخل تعليمات خاصة لهذا الدواء",
+      "sideEffects": "الآثار الجانبية",
+      "addSideEffect": "إضافة",
+      "sideEffectPlaceholder": "أدخل الأثر الجانبي",
+      "contraindications": "موانع الاستعمال",
+      "addContraindication": "إضافة",
+      "contraindicationPlaceholder": "أدخل موانع الاستعمال",
+      "cancel": "إلغاء",
+      "updateMedication": "تحديث الدواء",
+      "createMedication": "إنشاء دواء",
+      "validation": {
+        "medicationNameRequired": "اسم الدواء مطلوب",
+        "dosageRequired": "الجرعة مطلوبة",
+        "frequencyRequired": "التكرار مطلوب",
+        "durationRequired": "المدة مطلوبة",
+        "sideEffectRequired": "الأثر الجانبي مطلوب",
+        "contraindicationRequired": "موانع الاستعمال مطلوبة"
+      },
+      "successUpdate": "تم تحديث الدواء بنجاح",
+      "successCreate": "تم إنشاء الدواء بنجاح",
+      "errorSave": "فشل حفظ الدواء",
+      "categories": {
+        "antibiotic": "مضاد حيوي",
+        "painkiller": "مسكن للألم",
+        "anti-inflammatory": "مضاد للالتهابات",
+        "anesthetic": "مخدر",
+        "antiseptic": "مطهر",
+        "other": "أخرى"
+      }
+    },
+    "medicationList": {
+      "title": "الأدوية",
+      "selectTitle": "اختر دواء",
+      "myTitle": "أدويتي",
+      "addMedication": "إضافة دواء",
+      "searchPlaceholder": "ابحث عن الأدوية...",
+      "filterByCategory": "تصفية حسب الفئة",
+      "categories": {
+        "all": "جميع الفئات",
+        "antibiotic": "مضادات حيوية",
+        "painkiller": "مسكنات",
+        "anti-inflammatory": "مضادات الالتهاب",
+        "anesthetic": "مخدرات",
+        "antiseptic": "مطهرات",
+        "other": "أخرى"
+      },
+      "patientInfoTitle": "الأدوية الموصوفة لك",
+      "patientInfoText": "فيما يلي الأدوية التي تم وصفها لك. يرجى اتباع تعليمات الجرعة والتكرار بعناية.",
+      "noMedicationsFound": "لم يتم العثور على أدوية",
+      "noMedicationsMatchFilters": "لا توجد أدوية تطابق عوامل التصفية الحالية.",
+      "noMedicationsPrescribed": "لا توجد أدوية موصوفة",
+      "noMedicationsPrescribedInfo": "ليس لديك حاليًا أي أدوية موصوفة. اتصل بطبيب الأسنان إذا كان لديك أي مخاوف.",
+      "genericName": "الاسم العام: {{name}}",
+      "dosage": "الجرعة:",
+      "frequency": "التكرار:",
+      "duration": "المدة:",
+      "instructions": "التعليمات:",
+      "sideEffects": "الآثار الجانبية:",
+      "moreItems": "+{{count}} المزيد",
+      "select": "اختر",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "previousPage": "السابق",
+      "nextPage": "التالي",
+      "pageInfo": "صفحة {{currentPage}} من {{totalPages}}",
+      "editMedication": "تعديل الدواء",
+      "addModalTitle": "إضافة دواء جديد",
+      "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذا الدواء؟",
+      "deleteSuccess": "تم حذف الدواء بنجاح",
+      "deleteError": "فشل حذف الدواء",
+      "fetchError": "فشل في جلب الأدوية",
+      "createFirstMedication": "إنشاء الدواء الأول"
+    },
+    "prescriptions": {
+      "title": "الوصفات الطبية",
+      "patientPrescriptions": "وصفات المريض الطبية",
+      "newPrescription": "وصفة طبية جديدة",
+      "editPrescription": "تعديل الوصفة الطبية",
+      "prescriptionDetails": "تفاصيل الوصفة الطبية",
+      "searchPlaceholder": "ابحث عن طريق المريض، طبيب الأسنان، أو الدواء...",
+      "filterByStatus": "تصفية حسب الحالة",
+      "allStatus": "جميع الحالات",
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة",
+      "expired": "منتهية الصلاحية",
+      "prescriptionNumber": "وصفة طبية #{{id}}",
+      "issued": "صادرة في: {{date}}",
+      "expires": "تنتهي في: {{date}}",
+      "diagnosis": "التشخيص",
+      "medications": "الأدوية",
+      "dosage": "الجرعة: {{dosage}}",
+      "frequency": "التكرار: {{frequency}}",
+      "duration": "المدة: {{duration}}",
+      "refills": "{{current}}/{{max}} إعادة صرف",
+      "noPrescriptionsFound": "لم يتم العثور على وصفات طبية",
+      "noPatientPrescriptions": "هذا المريض ليس لديه وصفات طبية حالية أو سابقة.",
+      "noFilteredPrescriptions": "لا توجد وصفات طبية تطابق فلاتر البحث الحالية.",
+      "createFirstPrescription": "إنشاء أول وصفة طبية",
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "صفحة {{currentPage}} من {{totalPages}}",
+      "fetchError": "فشل في جلب الوصفات الطبية.",
+      "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذه الوصفة الطبية؟",
+      "deleteSuccess": "تم حذف الوصفة الطبية بنجاح.",
+      "deleteError": "فشل في حذف الوصفة الطبية."
+  },
+  "prescriptionForm": {
+    "patientLabel": "المريض *",
+    "selectPatient": "اختر مريضًا",
+    "relatedAppointmentLabel": "الموعد ذو الصلة",
+    "selectAppointment": "اختر موعدًا (اختياري)",
+    "noSpecificAppointment": "لا يوجد موعد محدد",
+    "diagnosisLabel": "التشخيص *",
+    "diagnosisPlaceholder": "أدخل التشخيص",
+    "medicationsLabel": "الأدوية *",
+    "addMedication": "إضافة دواء",
+    "medicationItem": "الدواء {{index}}",
+    "selectMedicationButton": "اختر",
+    "medicationIdPlaceholder": "معرف الدواء (استخدم زر الاختيار)",
+    "dosageLabel": "الجرعة",
+    "dosagePlaceholder": "مثال: 500 ملغ",
+    "frequencyLabel": "التكرار",
+    "frequencyPlaceholder": "مثال: 3 مرات يوميًا",
+    "durationLabel": "المدة",
+    "durationPlaceholder": "مثال: 7 أيام",
+    "instructionsLabel": "التعليمات",
+    "instructionsPlaceholder": "تعليمات خاصة",
+    "expiryDateLabel": "تاريخ انتهاء الصلاحية *",
+    "maxRefillsLabel": "الحد الأقصى لإعادة الصرف",
+    "additionalNotesLabel": "ملاحظات إضافية",
+    "notesPlaceholder": "أي ملاحظات أو تعليمات إضافية",
+    "cancelButton": "إلغاء",
+    "updateButton": "تحديث الوصفة الطبية",
+    "createButton": "إنشاء وصفة طبية",
+    "validation": {
+      "patientRequired": "المريض مطلوب",
+      "medicationRequired": "الدواء مطلوب",
+      "dosageRequired": "الجرعة مطلوبة",
+      "frequencyRequired": "التكرار مطلوب",
+      "durationRequired": "المدة مطلوبة",
+      "atLeastOneMedication": "مطلوب دواء واحد على الأقل",
+      "diagnosisRequired": "التشخيص مطلوب",
+      "expiryDateRequired": "تاريخ انتهاء الصلاحية مطلوب"
+    },
+    "successUpdate": "تم تحديث الوصفة الطبية بنجاح",
+    "successCreate": "تم إنشاء الوصفة الطبية بنجاح",
+    "errorSave": "فشل حفظ الوصفة الطبية"
+  },
+  "prescriptionDetails": {
+    "title": "وصفة طبية #{{id}}",
+    "expired": "منتهية الصلاحية",
+    "addRefill": "إضافة إعادة صرف",
+    "patientInfo": "معلومات المريض",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "prescriptionInfo": "تفاصيل الوصفة الطبية",
+    "diagnosis": "التشخيص",
+    "notes": "ملاحظات",
+    "issuedDate": "تاريخ الإصدار",
+    "expiryDate": "تاريخ انتهاء الصلاحية",
+    "maxRefills": "الحد الأقصى لإعادة الصرف",
+    "medications": "الأدوية",
+    "genericName": "الاسم العلمي: {{name}}",
+    "dosage": "الجرعة",
+    "frequency": "التكرار",
+    "duration": "المدة",
+    "instructions": "التعليمات",
+    "refillHistory": "سجل إعادة الصرف ({{count}}/{{max}})",
+    "refillTitle": "إعادة صرف #{{number}}",
+    "noRefills": "لم يتم إصدار أي إعادة صرف حتى الآن.",
+    "providerInfo": "معلومات مقدم الخدمة",
+    "prescribingDentist": "طبيب الأسنان الذي وصف الدواء",
+    "dentistPrefix": "د.",
+    "clinic": "العيادة",
+    "relatedAppointment": "الموعد ذو الصلة",
+    "close": "إغلاق",
+    "modal": {
+      "title": "إضافة إعادة صرف",
+      "addingRefill": "إضافة إعادة صرف #{{count}} من {{max}}",
+      "patient": "المريض: {{name}}",
+      "notesLabel": "ملاحظات (اختياري)",
+      "notesPlaceholder": "أضف أي ملاحظات حول إعادة الصرف هذه...",
+      "cancel": "إلغاء",
+      "submit": "إضافة إعادة صرف"
+    },
+    "toasts": {
+      "refillSuccess": "تمت إضافة إعادة الصرف بنجاح",
+      "refillError": "فشل في إضافة إعادة الصرف"
+    },
+    "status": {
+      "active": "نشط",
+      "completed": "مكتمل",
+      "cancelled": "ملغاة"
+    }
+  },
+  "hero": {
+    "title": "Contact Us",
+    "description": "We're here to help! Reach out to us with any questions or inquiries."
+  },
+  "contactForm": {
+    "title": "Send us a Message",
+    "description": "Fill out the form below and we'll get back to you as soon as possible.",
+    "name": "Your Name",
+    "namePlaceholder": "Enter your name",
+    "email": "Your Email",
+    "emailPlaceholder": "Enter your email",
+    "subject": "Subject",
+    "subjectPlaceholder": "Enter the subject",
+    "message": "Your Message",
+    "messagePlaceholder": "Enter your message",
+    "sending": "Sending...",
+    "send": "Send Message",
+    "success": "Message sent successfully!",
+    "error": "Failed to send message. Please try again later."
+  },
+  "contactInfo": {
+    "title": "Our Contact Information",
+    "address": {
+      "title": "Address",
+      "line1": "123 Clinic Street",
+      "line2": "Medical City, MC 12345"
+    },
+    "contactDetails": {
+      "title": "Contact Details",
+      "phone": "Phone: +1 (123) 456-7890",
+      "email": "Email: info@clinic.com"
+    },
+    "businessHours": {
+      "title": "Business Hours",
+      "days": "Monday - Friday:",
+      "hours": "9:00 AM - 5:00 PM"
+    }
+  }
+},
+    "paymentForm": {
+    "title": "إضافة دفعة",
+    "invoiceSummary": "ملخص الفاتورة",
+    "invoiceNumber": "رقم الفاتورة:",
+    "patient": "المريض:",
+    "totalAmount": "المبلغ الإجمالي:",
+    "paidAmount": "المبلغ المدفوع:",
+    "currentBalance": "الرصيد الحالي:",
+    "newBalance": "الرصيد الجديد:",
+    "paymentAmount": "مبلغ الدفعة *",
+    "paymentAmountPlaceholder": "0.00",
+    "fullPayment": "دفعة كاملة",
+    "partialPayment50": "50%",
+    "partialPayment25": "25%",
+    "paymentMethod": "طريقة الدفع *",
+    "selectPaymentMethod": "اختر طريقة الدفع",
+    "cash": "نقداً",
+    "creditCard": "بطاقة ائتمان",
+    "debitCard": "بطاقة خصم",
+    "check": "شيك",
+    "bankTransfer": "تحويل بنكي",
+    "insurancePayment": "دفعة تأمين",
+    "other": "أخرى",
+    "paymentDate": "تاريخ الدفعة *",
+    "referenceNumber": "الرقم المرجعي",
+    "referencePlaceholder": "معرف المعاملة، رقم الشيك، إلخ.",
+    "paymentNotes": "ملاحظات الدفع",
+    "notesPlaceholder": "ملاحظات إضافية حول هذه الدفعة...",
+    "paymentPreview": "معاينة الدفعة",
+    "previewAmount": "مبلغ الدفعة:",
+    "previewRemaining": "الرصيد المتبقي:",
+    "previewStatus": "الحالة الجديدة:",
+    "errorAmountExceedsBalance": "لا يمكن أن يتجاوز مبلغ الدفعة الرصيد المستحق البالغ ${{balance}}",
+    "infoFullSettlement": "هذه الدفعة ستسوي الفاتورة بالكامل.",
+    "infoPartialPayment": "هذه دفعة جزئية. سيكون الرصيد المتبقي ${{balance}}.",
+    "cancel": "إلغاء",
+    "addPayment": "إضافة دفعة",
+    "processing": "قيد المعالجة...",
+    "validation": {
+      "amountRequired": "يجب أن يكون مبلغ الدفعة أكبر من 0",
+      "amountMax": "لا يمكن أن يتجاوز المبلغ 1,000,000 دولار",
+      "methodRequired": "طريقة الدفع مطلوبة",
+      "notesMax": "لا يمكن أن تتجاوز الملاحظات 500 حرف",
+      "dateRequired": "تاريخ الدفع مطلوب"
+    },
+    "successMessage": "تمت إضافة الدفعة بنجاح",
+    "errorMessage": "فشل في إضافة الدفعة"
+  },
+  "billingList": {
+    "title": "سجلات الفواتير",
+    "searchPlaceholder": "البحث عن طريق المريض, رقم الفاتورة...",
+    "allStatus": "كل الحالات",
+    "pending": "قيد الانتظار",
+    "partial": "جزئي",
+    "paid": "مدفوع",
+    "overdue": "متأخر",
+    "addRecord": "إضافة فاتورة جديدة",
+    "invoiceNumber": "رقم الفاتورة",
+    "patient": "المريض",
+    "date": "التاريخ",
+    "dueDate": "تاريخ الاستحقاق",
+    "total": "الإجمالي",
+    "paidAmount": "المبلغ المدفوع",
+    "balance": "الرصيد",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "noRecords": "لم يتم العثور على سجلات فواتير.",
+    "loading": "جارٍ تحميل سجلات الفواتير...",
+    "addPayment": "إضافة دفعة",
+    "viewDetails": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "deleteConfirmation": "هل أنت متأكد أنك تريد حذف سجل الفاتورة هذا؟",
+    "deleteSuccess": "تم حذف سجل الفاتورة بنجاح",
+    "deleteError": "فشل حذف سجل الفاتورة",
+    "fetchError": "فشل في جلب سجلات الفواتير",
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة"
+  },
+  "appointments": {
+    "title": "المواعيد",
+    "description": "إدارة وعرض جميع المواعيد",
+    "total": "الإجمالي",
+    "newAppointment": "موعد جديد",
+    "selectDate": "اختر تاريخ",
+    "searchPlaceholder": "البحث بالمريض أو الطبيب أو الخدمة...",
+    "allStatuses": "جميع الحالات",
+    "allDates": "جميع التواريخ",
+    "thisWeek": "هذا الأسبوع",
+    "patient": "المريض",
+    "dateTime": "التاريخ والوقت",
+    "service": "الخدمة",
+    "dentist": "طبيب الأسنان",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "view": "عرض",
+    "complete": "إكمال",
+    "cancel": "إلغاء",
+    "export": "تصدير",
+    "scheduled": "مجدول",
+    "confirmed": "مؤكد",
+    "completed": "مكتمل",
+    "cancelled": "ملغي",
+    "noshow": "لم يحضر",
+    "unknownPatient": "مريض غير معروف",
+    "unknownDentist": "طبيب غير معروف",
+    "noAppointmentsFound": "لم يتم العثور على مواعيد",
+    "noPatientRecord": "لم يتم العثور على سجل مريض لحسابك",
+    "errorLoadingPatient": "خطأ في تحميل معلومات المريض",
+    "errorFetching": "خطأ في جلب المواعيد",
+    "invalidResponse": "استجابة غير صالحة من الخادم",
+    "appointmentCancelledSuccess": "تم إلغاء الموعد بنجاح",
+    "appointmentCompletedSuccess": "تم إكمال الموعد بنجاح",
+    "errorCancelling": "خطأ في إلغاء الموعد",
+    "errorCompleting": "خطأ في إكمال الموعد"
+  },
+  "contactForm": {
+    "title": "أرسل لنا رسالة",
+    "description": "املأ النموذج أدناه وسنعاود الاتصال بك في أقرب وقت ممكن.",
+    "name": {
+      "label": "اسمك",
+      "placeholder": "أدخل اسمك"
+    },
+    "email": {
+      "label": "بريدك الإلكتروني",
+      "placeholder": "أدخل بريدك الإلكتروني"
+    },
+    "phone": {
+      "label": "رقم الهاتف",
+      "placeholder": "أدخل رقم هاتفك"
+    },
+    "subject": {
+      "label": "الموضوع",
+      "placeholder": "أدخل الموضوع"
+    },
+    "message": {
+      "label": "رسالتك",
+      "placeholder": "أدخل رسالتك"
+    },
+    "subjectOptions": {
+      "select": "اختر موضوعاً",
+      "general": "استفسار عام",
+      "sales": "المبيعات",
+      "support": "الدعم الفني",
+      "demo": "طلب عرض توضيحي",
+      "partnership": "شراكة"
+    },
+    "submit": "إرسال الرسالة",
+    "sending": "جاري الإرسال...",
+    "success": "تم إرسال الرسالة بنجاح!",
+    "error": "فشل في إرسال الرسالة. يرجى المحاولة مرة أخرى لاحقاً.",
+    "successMessage": "شكراً لك على رسالتك. سنعاود الاتصال بك قريباً!"
+  },
+  "form": {
+    "successMessage": "شكراً لك على رسالتك. سنعاود الاتصال بك قريباً!"
+  },
+  "contactInfo": {
+    "title": "معلومات الاتصال",
+    "address": {
+      "title": "العنوان",
+      "value": "123 شارع العيادة<br>المدينة الطبية، MC 12345"
+    },
+    "contactDetails": {
+      "title": "تفاصيل الاتصال",
+      "email": "البريد الإلكتروني",
+      "emailValue": "info@clinic.com",
+      "phone": "الهاتف",
+      "phoneValue": "+1 (123) 456-7890",
+      "support": "الدعم الفني",
+      "supportValue": "support@clinic.com"
+    },
+    "businessHours": {
+      "title": "ساعات العمل",
+      "weekdays": "الاثنين - الجمعة",
+      "weekdaysValue": "9:00 صباحاً - 5:00 مساءً",
+      "weekends": "عطلة نهاية الأسبوع",
+      "closed": "مغلق"
+    }
+  },
+  "info": {
+    "followUs": "تابعنا"
+  },
+  "terms": {
+    "title": "شروط الخدمة",
+    "lastUpdated": "آخر تحديث: 1 يناير 2024",
+    "introduction": {
+      "p1": "مرحباً بك في منصة إدارة الرعاية الصحية الخاصة بنا. تحدد هذه الشروط والأحكام القواعد واللوائح لاستخدام خدماتنا."
+    },
+    "accounts": {
+      "title": "حسابات المستخدمين",
+      "content": "أنت مسؤول عن الحفاظ على سرية حسابك وكلمة المرور وتقييد الوصول إلى جهاز الكمبيوتر الخاص بك."
+    },
+    "intellectualProperty": {
+      "title": "حقوق الملكية الفكرية",
+      "content": "الخدمة ومحتواها الأصلي وميزاتها ووظائفها هي وستبقى الملكية الحصرية لشركتنا."
+    },
+    "links": {
+      "title": "روابط لمواقع أخرى",
+      "content": "قد تحتوي خدمتنا على روابط لمواقع ويب أو خدمات طرف ثالث لا نملكها أو نتحكم فيها."
+    },
+    "termination": {
+      "title": "الإنهاء",
+      "content": "يجوز لنا إنهاء أو تعليق حسابك ومنع الوصول إلى الخدمة فوراً، دون إشعار مسبق أو مسؤولية."
+    },
+    "indemnification": {
+      "title": "التعويض",
+      "content": "توافق على الدفاع عن الشركة وتعويضها وحمايتها من وضد أي وجميع المطالبات والأضرار والالتزامات والخسائر والمسؤوليات والتكاليف أو الديون والنفقات."
+    },
+    "limitationOfLiability": {
+      "title": "تحديد المسؤولية",
+      "content": "لن تكون الشركة أو مديروها أو موظفوها أو شركاؤها أو وكلاؤها أو مورديها أو الشركات التابعة لها مسؤولة عن أي أضرار غير مباشرة أو عرضية أو خاصة أو تبعية أو عقابية."
+    },
+    "disclaimer": {
+      "title": "إخلاء المسؤولية",
+      "content": "يتم توفير المعلومات الموجودة على هذا الموقع على أساس 'كما هي'. إلى أقصى حد يسمح به القانون، تستبعد هذه الشركة جميع التمثيلات والضمانات والشروط والأحكام."
+    },
+    "governingLaw": {
+      "title": "القانون الحاكم",
+      "content": "يجب تفسير هذه الشروط وحكمها بموجب قوانين الولاية القضائية التي تقع فيها شركتنا."
+    }
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "عذراً، الصفحة التي تبحث عنها غير موجودة. ربما تم نقلها أو حذفها أو أدخلت عنوان URL خاطئ.",
+    "goToHomepage": "الذهاب للصفحة الرئيسية",
+    "contactSupport": "اتصل بالدعم الفني"
+  },
+  "contact": {
+    "hero": {
+      "title": "تواصل معنا",
+      "description": "نحن هنا لمساعدتك في تطوير ممارستك الطبية. تواصل معنا لأي أسئلة أو دعم أو لجدولة عرض توضيحي."
+    },
+    "map": {
+      "title": "موقعنا",
+      "placeholder": "مكان تكامل الخريطة"
+    },
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "questions": {
+        "gettingStarted": {
+          "question": "كم من الوقت يستغرق البدء في استخدام المنصة؟",
+          "answer": "يمكنك التسجيل والبدء في استخدام الميزات الأساسية فوراً. للتنفيذ الكامل مع ترحيل البيانات، يكمل فريقنا العملية عادة خلال 1-2 أسبوع."
+        },
+        "training": {
+          "question": "هل تقدمون تدريباً للمستخدمين الجدد؟",
+          "answer": "نعم، نقدم تدريباً شاملاً لجميع العملاء الجدد. يشمل ذلك جلسات مباشرة ودروس فيديو ووثائق مفصلة لمساعدة فريقك على التعلم بسرعة."
+        },
+        "security": {
+          "question": "هل بياناتي آمنة على منصتكم؟",
+          "answer": "بالتأكيد. نطبق تدابير أمنية رائدة في الصناعة تشمل التشفير من النهاية إلى النهاية والمراجعات الأمنية المنتظمة والامتثال لـ HIPAA لضمان حماية بياناتك دائماً."
+        },
+        "integration": {
+          "question": "هل يمكنني التكامل مع أنظمتي الحالية؟",
+          "answer": "نعم، تقدم منصتنا قدرات API قوية وتكاملات جاهزة مع أنظمة EHR الشائعة وبرامج المحاسبة وأدوات الرعاية الصحية الأخرى. يمكن لفريقنا المساعدة في التكاملات المخصصة حسب الحاجة."
+        }
+      }
+    },
+    "cta": {
+      "title": "هل أنت مستعد للبدء؟",
+      "description": "حوّل ممارستك الطبية بمنصة الإدارة الشاملة الخاصة بنا.",
+      "startTrial": "ابدأ النسخة التجريبية المجانية",
+      "contactUs": "اتصل بنا"
+    }
+  }
+}

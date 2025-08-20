@@ -1,0 +1,10 @@
+export { default as User } from './User';
+export { default as Patient } from './Patient';
+export { default as Clinic } from './Clinic';
+export { default as Appointment } from './Appointment';
+export { default as TreatmentRecord } from './TreatmentRecord';
+export { default as Notification } from './Notification';
+export { default as Medication } from './Medication';
+export { default as Prescription } from './Prescription';
+export { default as Billing } from './Billing';
+export { default as StaffSchedule } from './StaffSchedule';
