@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import { AuthenticatedRequest, JWTPayload } from '../types';
+import Patient from '../models/Patient';
+import { AuthenticatedRequest, JWTPayload, IUser } from '../types';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -10,6 +11,8 @@ export const protect = asyncHandler(async (req: Request, res: Response, next: Ne
   let token;
 
   // Get token from header
+  console.log(req.headers.authorization);
+  
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
@@ -35,7 +38,7 @@ export const protect = asyncHandler(async (req: Request, res: Response, next: Ne
     }
 
     // Grant access to protected route
-    (req as unknown as AuthenticatedRequest).user = user;
+    (req as AuthenticatedRequest).user = user as any;
     next();
   } catch (error) {
     return next(new AppError('Not authorized to access this route', 401));
@@ -93,7 +96,7 @@ export const optionalAuth = async (
       const user = await User.findById(decoded.id).select('-password');
       
       if (user && user.isActive) {
-        (req as unknown as AuthenticatedRequest).user = user;
+        (req as AuthenticatedRequest).user = user as any;
       }
     }
 
@@ -197,6 +200,152 @@ export const patientOwnerOrStaff = (patientIdField: string = 'id') => {
       message: 'Access denied. Insufficient permissions.'
     });
   };
+};
+
+// Middleware for appointment access - allows staff/admin or patients accessing their own appointments
+export const appointmentAccessControl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authReq = req as unknown as AuthenticatedRequest;
+    if (!authReq.user) {
+      res.status(401).json({
+        success: false,
+        message: 'Access denied. User not authenticated.'
+      });
+      return;
+    }
+
+    // Staff and admin can access all appointments
+    if (['admin', 'dentist', 'staff'].includes(authReq.user.role)) {
+      next();
+      return;
+    }
+
+    // For patients, check if they're accessing their own appointments
+    if (authReq.user.role === 'patient') {
+      const patientId = req.query.patientId as string;
+      
+      // If no patientId is provided, deny access (patients can't see all appointments)
+      if (!patientId) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Patients must specify a patient ID.'
+        });
+        return;
+      }
+
+      // Check if the patient record belongs to this user
+      const patient = await Patient.findById(patientId);
+      if (!patient) {
+        res.status(404).json({
+          success: false,
+          message: 'Patient not found.'
+        });
+        return;
+      }
+
+      // Check if this patient belongs to the authenticated user
+      if (patient.userId && patient.userId.toString() === authReq.user._id.toString()) {
+        next();
+        return;
+      } else {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only access your own appointments.'
+        });
+        return;
+      }
+    }
+
+    res.status(403).json({
+      success: false,
+      message: 'Access denied. Insufficient permissions.'
+    });
+  } catch (error) {
+    console.error('Appointment access control error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during access control check.'
+    });
+  }
+};
+
+// Middleware for individual appointment access - allows staff/admin or patients accessing their own appointments
+export const appointmentDetailAccessControl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authReq = req as unknown as AuthenticatedRequest;
+    if (!authReq.user) {
+      res.status(401).json({
+        success: false,
+        message: 'Access denied. User not authenticated.'
+      });
+      return;
+    }
+
+    // Staff and admin can access all appointments
+    if (['admin', 'dentist', 'staff'].includes(authReq.user.role)) {
+      next();
+      return;
+    }
+
+    // For patients, check if they're accessing their own appointment
+    if (authReq.user.role === 'patient') {
+      const appointmentId = req.params.id;
+      
+      if (!appointmentId) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required.'
+        });
+        return;
+      }
+
+      // Import Appointment model dynamically to avoid circular dependencies
+      const { default: Appointment } = await import('../models/Appointment');
+      
+      // Find the appointment and check if it belongs to this patient
+      const appointment = await Appointment.findById(appointmentId).populate('patientId', '_id userId');
+      
+      if (!appointment) {
+        res.status(404).json({
+          success: false,
+          message: 'Appointment not found.'
+        });
+        return;
+      }
+
+      // Check if this appointment belongs to the authenticated user
+      const appointmentPatient = appointment.patientId as any;
+      if (appointmentPatient && appointmentPatient.userId && appointmentPatient.userId.toString() === authReq.user._id.toString()) {
+        next();
+        return;
+      } else {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only access your own appointments.'
+        });
+        return;
+      }
+    }
+
+    res.status(403).json({
+      success: false,
+      message: 'Access denied. Insufficient permissions.'
+    });
+  } catch (error) {
+    console.error('Appointment detail access control error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during access control check.'
+    });
+  }
 };
 
 // Middleware to check clinic access

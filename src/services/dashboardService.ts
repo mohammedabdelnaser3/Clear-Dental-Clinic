@@ -57,7 +57,7 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
     // If no clinicId is provided, get overall statistics for admin users
     if (!clinicId) {
       try {
-        const overallStats = await api.get('/clinics/statistics/overall');
+        const overallStats = await api.get('/api/v1/clinics/statistics/overall');
         
         const dashboardData: DashboardStats = {
           appointments: {
@@ -131,12 +131,12 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
     
     // Fetch data from multiple endpoints in parallel with error handling
     const results = await Promise.allSettled([
-      api.get('/appointments/statistics', { params }),
-      api.get('/patients/statistics', { params }),
-      api.get('/billing/stats/revenue', { params }),
-      api.get('/appointments/today', { params }),
-      api.get('/appointments/upcoming', { params: { ...params, days: 7 } }),
-      api.get('/patients/recent', { params: { ...params, limit: 5 } })
+      api.get('/api/v1/appointments/statistics', { params }),
+      api.get('/api/v1/patients/statistics', { params }),
+      api.get('/api/v1/billing/stats/revenue', { params }),
+      api.get('/api/v1/appointments/today', { params }),
+      api.get('/api/v1/appointments/upcoming', { params: { ...params, days: 7 } }),
+      api.get('/api/v1/patients/recent', { params: { ...params, limit: 5 } })
     ]);
     
     // Extract successful responses or provide empty defaults
@@ -208,54 +208,73 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
   try {
     // If no clinicId is provided, get overall activities for admin users
     if (!clinicId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return {
+          success: true,
+          data: [],
+          message: 'Please log in to view activities'
+        };
+      }
       try {
-        // Use Promise.allSettled to handle partial failures
-        const results = await Promise.allSettled([
-          api.get('/appointments/recent/overall', { params: { limit } }),
-          api.get('/patients/recent/overall', { params: { limit } })
-        ]);
-        
-        // Extract successful responses
-        const recentAppointments = results[0].status === 'fulfilled' ? results[0].value : { data: { data: [] } };
-        const recentPatients = results[1].status === 'fulfilled' ? results[1].value : { data: { data: [] } };
-        
-        const activities: RecentActivity[] = [];
+        const userResponse = await api.get('/api/v1/auth/me');
+        const userRole = userResponse.data?.role;
+        if (userRole === 'admin' || userRole === 'dentist') {
+          // Use Promise.allSettled to handle partial failures
+          const results = await Promise.allSettled([
+            api.get('/api/v1/appointments/recent/overall', { params: { limit } }),
+            api.get('/api/v1/patients/recent/overall', { params: { limit } })
+          ]);
+          
+          // Extract successful responses
+          const recentAppointments = results[0].status === 'fulfilled' ? results[0].value : { data: { data: [] } };
+          const recentPatients = results[1].status === 'fulfilled' ? results[1].value : { data: { data: [] } };
+          
+          const activities: RecentActivity[] = [];
 
-        // Add recent appointments
-        if (recentAppointments.data.data) {
-          recentAppointments.data.data.forEach((appointment: any) => {
+          // Add recent appointments
+          if (recentAppointments.data.data) {
+            recentAppointments.data.data.forEach((appointment: any) => {
+              activities.push({
+                id: appointment._id,
+                type: 'appointment',
+                title: `Appointment with ${appointment.patient?.firstName} ${appointment.patient?.lastName}`,
+                description: `${appointment.treatmentType} - ${appointment.status}`,
+                timestamp: appointment.createdAt,
+                status: appointment.status
+              });
+            });
+          }
+
+        // Add recent patients
+        if (recentPatients.data.data) {
+          recentPatients.data.data.forEach((patient: any) => {
             activities.push({
-              id: appointment._id,
-              type: 'appointment',
-              title: `Appointment with ${appointment.patient?.firstName} ${appointment.patient?.lastName}`,
-              description: `${appointment.treatmentType} - ${appointment.status}`,
-              timestamp: appointment.createdAt,
-              status: appointment.status
+              id: patient._id,
+              type: 'patient',
+              title: `New Patient: ${patient.firstName} ${patient.lastName}`,
+              description: `Registered on ${new Date(patient.createdAt).toLocaleDateString()}`,
+              timestamp: patient.createdAt
             });
           });
         }
 
-      // Add recent patients
-      if (recentPatients.data.data) {
-        recentPatients.data.data.forEach((patient: any) => {
-          activities.push({
-            id: patient._id,
-            type: 'patient',
-            title: `New Patient: ${patient.firstName} ${patient.lastName}`,
-            description: `Registered on ${new Date(patient.createdAt).toLocaleDateString()}`,
-            timestamp: patient.createdAt
-          });
-        });
-      }
+          // Sort by timestamp (most recent first)
+          activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-        // Sort by timestamp (most recent first)
-        activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-        return {
-          success: true,
-          data: activities.slice(0, limit),
-          message: 'Overall recent activities retrieved successfully'
-        };
+          return {
+            success: true,
+            data: activities.slice(0, limit),
+            message: 'Overall recent activities retrieved successfully'
+          };
+        } else {
+          // Return empty activities for non-admin/non-dentist users
+          return {
+            success: true,
+            data: [],
+            message: 'Access restricted: Overall activities are only available for admin or dentist roles'
+          };
+        }
       } catch (authError: any) {
         // If authentication fails, return empty activities with appropriate message
         console.warn('Failed to fetch overall activities, likely due to authentication:', authError.response?.status);
@@ -272,8 +291,8 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     
     // Fetch recent data from multiple endpoints
     const [recentAppointments, recentPatients] = await Promise.all([
-      api.get('/appointments/recent', { params }),
-      api.get('/patients/recent', { params })
+      api.get('/api/v1/appointments/recent', { params }),
+      api.get('/api/v1/patients/recent', { params })
     ]);
 
     const activities: RecentActivity[] = [];
@@ -327,7 +346,7 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
 export const getBillingSummary = async (clinicId?: string): Promise<ApiResponse<any>> => {
   try {
     const params = clinicId ? { clinicId } : {};
-    const response = await api.get('/billing/summary', { params });
+    const response = await api.get('/api/v1/billing/summary', { params });
     return response.data;
   } catch (error: any) {
     console.error('Error fetching billing summary:', error);
@@ -343,7 +362,7 @@ export const getBillingSummary = async (clinicId?: string): Promise<ApiResponse<
 export const getOverdueBills = async (clinicId?: string): Promise<ApiResponse<any[]>> => {
   try {
     const params = clinicId ? { clinicId } : {};
-    const response = await api.get('/billing/overdue', { params });
+    const response = await api.get('/api/v1/billing/overdue', { params });
     return response.data;
   } catch (error: any) {
     console.error('Error fetching overdue bills:', error);

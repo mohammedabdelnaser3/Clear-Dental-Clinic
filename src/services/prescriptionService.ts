@@ -119,7 +119,7 @@ export interface PrescriptionStats {
 }
 
 class PrescriptionService {
-  private baseURL = '/prescriptions';
+  private baseURL = '/api/v1/prescriptions';
 
   // Get all prescriptions with filters
   async getPrescriptions(filters: PrescriptionFilters = {}) {
@@ -131,8 +131,23 @@ class PrescriptionService {
       }
     });
 
-    const response = await api.get(`${this.baseURL}?${params.toString()}`);
-    return response;
+    try {
+      const response = await api.get(`${this.baseURL}?${params.toString()}`);
+      return response;
+    } catch (error: any) {
+      if (error.response && error.response.status === 403) {
+        return {
+          data: {
+            prescriptions: [],
+            totalRecords: 0,
+            totalPages: 0,
+            currentPage: 1
+          },
+          message: 'Access to prescriptions is restricted. Please contact an administrator for assistance.'
+        };
+      }
+      throw error;
+    }
   }
 
   // Get prescription by ID

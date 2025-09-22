@@ -14,14 +14,19 @@ import {
   sendAppointmentReminders,
   getAppointmentById,
   getRecentAppointments,
-  getRecentAppointmentsOverall
+  getRecentAppointmentsOverall,
+  checkAppointmentConflicts,
+  autoBookFirstAvailable,
+  getNextSlotAfterLastBooking
 } from '../controllers/appointmentController';
 import {
   authenticate,
   staffOrAdmin,
   dentistOrAdmin,
   checkClinicAccess,
-  patientOwnerOrStaff
+  patientOwnerOrStaff,
+  appointmentAccessControl,
+  appointmentDetailAccessControl
 } from '../middleware/auth';
 import {
   validateAppointmentCreation,
@@ -36,14 +41,127 @@ import { body, query } from 'express-validator';
 
 const router = Router();
 
-// All routes require authentication
+// Public routes (no authentication required)
+// Test route to verify public access works
+// router.get('/test-public', (req, res) => {
+//   res.json({ success: true, message: 'Public route works!', timestamp: new Date().toISOString() });
+// });
+
+// Get available time slots - public endpoint for booking flow
+router.get('/available-slots', [
+  query('date')
+    .isISO8601()
+    .withMessage('Date is required and must be a valid date'),
+  query('dentistId')
+    .optional()
+    .custom((value) => {
+      if (value === '' || value === undefined || value === null) {
+        return true; // Allow empty values
+      }
+      // If value is provided, validate it's a valid MongoDB ID
+      const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
+      return mongoIdRegex.test(value);
+    })
+    .withMessage('Dentist ID must be valid if provided'),
+  query('clinicId')
+    .isMongoId()
+    .withMessage('Valid clinic ID is required'),
+  query('duration')
+    .optional()
+    .isInt({ min: 15, max: 240 })
+    .withMessage('Duration must be between 15 and 240 minutes')
+], handleValidationErrors, getAvailableTimeSlots);
+
+// Get next slot after last booking - public endpoint for sequential booking
+router.get('/next-slot-after-last', [
+  query('date')
+    .isISO8601()
+    .withMessage('Date is required and must be a valid date'),
+  query('clinicId')
+    .isMongoId()
+    .withMessage('Valid clinic ID is required'),
+  query('duration')
+    .optional()
+    .isInt({ min: 15, max: 240 })
+    .withMessage('Duration must be between 15 and 240 minutes')
+], handleValidationErrors, getNextSlotAfterLastBooking);
+
+// Check appointment conflicts - public endpoint for booking validation
+router.get('/check-conflict', [
+  query('date')
+    .isISO8601()
+    .withMessage('Date is required and must be a valid date'),
+  query('timeSlot')
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('Time slot must be in HH:MM format'),
+  query('clinicId')
+    .isMongoId()
+    .withMessage('Valid clinic ID is required'),
+  query('dentistId')
+    .optional()
+    .isMongoId()
+    .withMessage('Dentist ID must be valid if provided'),
+  query('duration')
+    .optional()
+    .isInt({ min: 15, max: 240 })
+    .withMessage('Duration must be between 15 and 240 minutes'),
+  query('excludeAppointmentId')
+    .optional()
+    .isMongoId()
+    .withMessage('Exclude appointment ID must be valid if provided')
+], handleValidationErrors, checkAppointmentConflicts);
+
+// All routes below require authentication
 router.use(authenticate);
 
 // Create appointment
 router.post('/', validateAppointmentCreation, handleValidationErrors, createAppointment);
 
+// Auto-book first available appointment for a date
+router.post('/auto-book', [
+  body('patientId')
+    .isMongoId()
+    .withMessage('Invalid patient ID'),
+  body('clinicId')
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  body('serviceType')
+    .trim()
+    .notEmpty()
+    .withMessage('Service type is required'),
+  body('date')
+    .isISO8601()
+    .withMessage('Please provide a valid date')
+    .custom((value) => {
+      const appointmentDate = new Date(value);
+      const today = new Date();
+      
+      // Simple timezone-safe date comparison using date strings
+      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
+      const todayDateStr = today.toISOString().split('T')[0];
+      
+      if (appointmentDateStr < todayDateStr) {
+        throw new Error('Appointment date cannot be in the past');
+      }
+      return true;
+    }),
+  body('duration')
+    .optional()
+    .isInt({ min: 15, max: 480 })
+    .withMessage('Duration must be between 15 and 480 minutes'),
+  body('notes')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Notes must not exceed 1000 characters'),
+  body('emergency')
+    .optional()
+    .isBoolean()
+    .withMessage('Emergency must be a boolean')
+], handleValidationErrors, autoBookFirstAvailable);
+
 // Get all appointments
-router.get('/', staffOrAdmin, [
+router.get('/', appointmentAccessControl, [
   ...validatePagination.slice(0, -1),
   query('status')
     .optional()
@@ -156,22 +274,7 @@ router.get('/recent/overall', dentistOrAdmin, [
   ...validatePagination.slice(0, -1)
 ], handleValidationErrors, getRecentAppointmentsOverall);
 
-// Get available time slots
-router.get('/available-slots', [
-  query('date')
-    .isISO8601()
-    .withMessage('Date is required and must be a valid date'),
-  query('dentistId')
-    .isMongoId()
-    .withMessage('Valid dentist ID is required'),
-  query('clinicId')
-    .isMongoId()
-    .withMessage('Valid clinic ID is required'),
-  query('duration')
-    .optional()
-    .isInt({ min: 15, max: 240 })
-    .withMessage('Duration must be between 15 and 240 minutes')
-], handleValidationErrors, getAvailableTimeSlots);
+
 
 // Send appointment reminders (admin only)
 router.post('/send-reminders', dentistOrAdmin, [
@@ -186,7 +289,7 @@ router.post('/send-reminders', dentistOrAdmin, [
 ], handleValidationErrors, sendAppointmentReminders);
 
 // Get appointment by ID (staff/admin or patient if it's their appointment)
-router.get('/:id', staffOrAdmin, [
+router.get('/:id', appointmentDetailAccessControl, [
   ...createMongoIdValidation('id')
 ], handleValidationErrors, getAppointmentById);
 

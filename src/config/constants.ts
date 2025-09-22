@@ -1,5 +1,5 @@
 // API Configuration
-export const API_URL = import.meta.env.VITE_API_URL || 'https://api.smartclinic.example.com';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Authentication
 export const TOKEN_KEY = 'smartclinic_token';

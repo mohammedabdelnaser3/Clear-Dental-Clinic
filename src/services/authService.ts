@@ -148,17 +148,45 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   }
 };
 
-// Validate token (lightweight check)
+// Validate token (lightweight check with client-side expiration check)
 export const validateToken = async (): Promise<boolean> => {
   try {
     const token = localStorage.getItem('token');
     if (!token) return false;
     
-    // Use the lightweight validate endpoint
+    // First check token expiration client-side to avoid unnecessary API calls
+    try {
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      
+      // If token is expired, don't make API call
+      if (tokenPayload.exp < currentTime) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        return false;
+      }
+      
+      // If token expires in the next 5 minutes, consider it as requiring refresh
+      const fiveMinutesFromNow = currentTime + (5 * 60);
+      if (tokenPayload.exp < fiveMinutesFromNow) {
+        // Try to refresh token proactively
+        const refreshResult = await refreshToken();
+        return !!refreshResult?.token;
+      }
+      
+    } catch (decodeError) {
+      // If token is malformed, remove it and make API call to be sure
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      return false;
+    }
+    
+    // Use the lightweight validate endpoint for server-side validation
     await api.get('/api/v1/auth/validate');
     return true;
   } catch (_error) {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     return false;
   }
 };

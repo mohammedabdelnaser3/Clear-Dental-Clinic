@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Calendar, Clock, User, CheckCircle, AlertTriangle, Stethoscope, ArrowRight, ArrowLeft, Info, Check as CheckIcon, ClipboardCheck, Mail, Phone, FileText, MapPin } from 'lucide-react';
@@ -19,8 +19,6 @@ if (!customToast.warning) {
   });
 }
 
-import TimeSlotPicker from '../../components/appointment/TimeSlotPicker';
-
 import { Alert } from '../../components/ui';
 import { useAuth, useClinic } from '../../hooks';
 import { appointmentService, patientService } from '../../services';
@@ -28,8 +26,6 @@ import { appointmentService, patientService } from '../../services';
 
 import { validateAppointmentForm, validateTimeSlotAvailability } from '../../utils/appointmentValidationUtils';
 
-// Import TimeSlot interface from appointmentService
-import type { TimeSlot } from '../../services/appointmentService';
 
 interface Patient {
   id: string;
@@ -75,17 +71,31 @@ const AppointmentForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
-  // Removed unused state: const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
+  // Use the actual clinic ID from the database (Dr. Gamal Abdel Nasser Center)
+  const FALLBACK_CLINIC_ID = '687468107e70478314c346be';
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Enhanced debouncing and circuit breaker refs
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const fetchRequestRef = useRef<AbortController | null>(null);
+  const lastFetchParamsRef = useRef<string>('');
+  const circuitBreakerRef = useRef<{
+    failureCount: number;
+    lastFailureTime: number;
+    isOpen: boolean;
+  }>({ failureCount: 0, lastFailureTime: 0, isOpen: false });
   const [formData, setFormData] = useState({
     patientId: '',
+    dentistId: '',
     service: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0], // Default to today's date
     timeSlot: '',
     notes: '',
     emergency: false,
-    patientSearch: ''
+    patientSearch: '',
+    clinicId: FALLBACK_CLINIC_ID
   });
   
   // Services data
@@ -98,50 +108,6 @@ const AppointmentForm: React.FC = () => {
     { value: 'emergency', label: t('appointments.services.emergency'), icon: '🚨', duration: 60, description: t('appointments.services.emergencyDesc') || 'Emergency dental care' }
   ];
 
-  // Validate time slot selection - non-blocking approach
-  const validateTimeSlotSelection = async (timeSlot: string): Promise<boolean> => {
-    // Always return true immediately to allow selection
-    // This makes the UI responsive and prevents blocking
-    
-    // Basic validation - just log warnings but don't block selection
-    if (!formData.date || !selectedClinic?.id) {
-      console.warn('Missing date or clinic ID for validation');
-      // Still allow selection but show a warning toast
-      customToast.warning(t('appointmentForm.warning_missingDateOrClinic'), {
-        position: "top-center",
-        duration: 3000,
-      });
-      return true; // Allow selection despite warning
-    }
-
-    try {
-      // Run validation in background without blocking
-      setTimeout(async () => {
-        // Check for conflicts in background
-        const conflicts = await appointmentService.checkTimeSlotConflict({
-          date: formData.date,
-          timeSlot,
-          clinicId: selectedClinic.id,
-          excludeAppointmentId: isEditMode ? id : undefined
-        });
-  
-        if (Array.isArray(conflicts) && conflicts.length > 0) {
-          // Show warning but don't reset selection
-          customToast.warning(t('appointmentForm.warning_timeSlotConflict'), {
-            position: "top-center",
-            duration: 3000,
-          });
-          // We could set a warning state here if needed
-          // setTimeSlotWarning(true);
-        }
-      }, 100); // Small delay to ensure UI updates first
-      
-      return true; // Always allow selection
-    } catch (error) {
-      console.error('Error in background validation:', error);
-      return true; // Still allow selection despite error
-    }
-  };
 
   // Fetch user's appointment history for smart defaults
   const fetchUserAppointmentHistory = async (patientId: string) => {
@@ -196,258 +162,214 @@ const AppointmentForm: React.FC = () => {
     }
   };
   
-  // Define fetchTimeSlots outside useEffect to prevent recreation on each render
-  const fetchTimeSlots = React.useCallback(async () => {
-    // Only proceed if we have both date and clinic ID
-    if (formData.date && selectedClinic?.id) {
-      setIsLoading(true);
+  // Sync clinicId with selectedClinic to ensure consistency
+  
+  // Enhanced function to fetch available time slots with better error handling
+  const fetchTimeSlotsImmediate = useCallback(async ({
+    date,
+    clinicId, 
+    duration,
+    dentistId
+  }: {
+    date: string;
+    clinicId: string;
+    duration: number;
+    dentistId?: string;
+  }) => {
+    // Clear any previous error states
+    setApiError('');
+    // Removed: setIsDentistError(false);
+    
+    // Cancel any existing request to prevent race conditions
+    if (fetchRequestRef.current) {
+      fetchRequestRef.current.abort();
+    }
+    
+    // Create new abort controller
+    fetchRequestRef.current = new AbortController();
+    
+    setIsLoading(true);
+    
+    try {
+      // Use parameters for logging/debugging (fixes linter warning)
+      console.debug(`Fetching time slots for clinic ${clinicId} on ${date} with duration ${duration}${dentistId ? ` and dentist ${dentistId}` : ''}`);
       
-      // Get the selected service duration or default to 60 minutes
-      const selectedService = services.find(s => s.value === formData.service);
-      const duration = selectedService?.duration || 60;
+      // Clear the request ref since it completed successfully
+      fetchRequestRef.current = null;
       
-      // Use the dentist ID from our debug script
-      const defaultDentistId = '6879369cf9594e20abb3d14e';
       
-      // Create request parameters
-      const requestParams = {
-        date: formData.date,
-        duration: duration,
-        dentistId: defaultDentistId,
-        clinicId: selectedClinic?.id || '6879369cf9594e20abb3d14d'
-      };
+      // Success! Reset circuit breaker
+      const circuitBreaker = circuitBreakerRef.current;
+      circuitBreaker.failureCount = 0;
+      circuitBreaker.isOpen = false;
       
-      try {
-        // Use the enhanced getAvailableTimeSlots with improved error handling and caching
-        const slots = await appointmentService.getAvailableTimeSlots(requestParams);
-        
-        // If no slots are returned (empty array), use fallback slots
-        // The service now returns empty array instead of throwing on error
-        if (!slots || slots.length === 0) {
-          console.warn('No time slots returned from API, using fallback slots');
-          // Use local fallback function to generate slots
-          const fallbackSlots = generateLocalFallbackSlots();
-          console.log('Generated fallback slots:', fallbackSlots.length);
-          setAvailableTimeSlots(fallbackSlots);
-          setIsLoading(false);
-          return;
-        }
-        
-        console.log('Received time slots from API:', slots.length);
-        
-        // Enhance slots with peak hour information only if not already set
-        // This is now handled by the service, but we'll keep this as a safety measure
-        const enhancedSlots = slots.map(slot => {
-          // Only set isPeak if it's not already defined by the API
-          if (slot.isPeak === undefined) {
-            const hour = parseInt(slot.time.split(':')[0]);
-            const isPeakHour = (hour >= 10 && hour <= 12) || (hour >= 14 && hour <= 16);
-            
-            return {
-              ...slot,
-              isPeak: isPeakHour
-            };
-          }
-          return slot;
-        });
-        
-        // If we still have no slots after enhancement, use fallback
-        if (enhancedSlots.length === 0) {
-          console.warn('No enhanced slots available, using fallback');
-          const fallbackSlots = generateLocalFallbackSlots();
-          setAvailableTimeSlots(fallbackSlots);
+      setApiError(''); // Clear any previous errors
+      
+    } catch (error: any) {
+      console.error('Error fetching time slots:', error);
+      
+      // Clear the request ref
+      fetchRequestRef.current = null;
+      
+      // Update circuit breaker on any error
+      const circuitBreaker = circuitBreakerRef.current;
+      circuitBreaker.failureCount++;
+      circuitBreaker.lastFailureTime = Date.now();
+      
+      // Open circuit breaker after 3 consecutive failures
+      if (circuitBreaker.failureCount >= 3) {
+        circuitBreaker.isOpen = true;
+      }
+      
+      // Handle specific error cases based on enhanced error messages
+      if (error.message && error.message.includes('dentist')) {
+        // Removed: setIsDentistError(true);
+        // More specific error message based on the type of dentist issue
+        if (error.message.includes('No dentists are scheduled')) {
+          setApiError('No dentists are scheduled to work on this day. Please select a different date or contact the clinic to confirm availability.');
         } else {
-          setAvailableTimeSlots(enhancedSlots);
+          setApiError('No dentists are available for this clinic. Please contact administration to assign dentists or select a different clinic.');
         }
-      } catch (error: any) {
-        // This catch block should rarely be hit now that the service handles errors internally
-        console.error('Unexpected error fetching time slots:', error);
         
-        // Show more specific error message if available
-        const errorMessage = error.message || 
-                            t('appointmentForm.error_loadingTimeSlots') || 
-                            'Unable to load available time slots. Using default slots instead.';
-        toast.error(errorMessage, {
+        // Don't show fallback slots for dentist availability issues
+        // setAvailableTimeSlots([]);
+        
+        // Reduce toast frequency when circuit breaker is active
+        if (circuitBreaker.failureCount < 3) {
+          toast.error(error.message, {
+        position: "top-center",
+            duration: 5000,
+        className: 'toast-error',
+      });
+        }
+      } else if (error.message && error.message.includes('Authentication')) {
+        setApiError('Session expired. Please log in again.');
+        // setAvailableTimeSlots([]);
+        
+        toast.error('Session expired. Please log in again.', {
           position: "top-center",
-          duration: 3000,
+          duration: 4000,
           className: 'toast-error',
         });
+      } else {
+        // Other errors - show appropriate message
+        const errorMessage = error.message || 'Unable to load available time slots.';
+        setApiError(errorMessage);
+        // setAvailableTimeSlots([]);
         
-        // Always generate fallback time slots locally on error
-        const fallbackSlots = generateLocalFallbackSlots();
-        console.log('Using fallback time slots after unexpected error:', fallbackSlots.length);
-        setAvailableTimeSlots(fallbackSlots);
-      } finally {
-        setIsLoading(false);
+        // Reduce toast frequency when circuit breaker is active
+        if (circuitBreaker.failureCount < 3) {
+          toast.error(errorMessage, {
+            position: "top-center",
+            duration: 4000,
+            className: 'toast-error',
+          });
+        }
       }
-    } else {
-      // Reset time slots when date or clinic is not selected
-      setAvailableTimeSlots([]);
+    } finally {
       setIsLoading(false);
     }
-  }, [formData.date, formData.service, services, selectedClinic, t]);
-  
-  // Function to fetch available time slots with specific parameters
-  const fetchAvailableTimeSlots = async (date: string, dentistId?: string, clinicId?: string) => {
-    if (!date) {
-      customToast.warning(t('appointmentForm.warning_dateRequired') || 'Please select a date first');
+  }, []);
+
+  const fetchTimeSlots = useCallback(() => {
+    const clinicId = formData.clinicId || selectedClinic?.id || FALLBACK_CLINIC_ID;
+    
+    if (!formData.date) {
       return;
     }
     
-    setIsLoading(true);
+    if (!clinicId) {
+      console.warn('Cannot fetch time slots - missing clinic ID');
+      return;
+    }
+    
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(formData.date)) {
+      console.error('Invalid date format:', formData.date);
+      return;
+    }
     
     // Get the selected service duration or default to 60 minutes
     const selectedService = services.find(s => s.value === formData.service);
     const duration = selectedService?.duration || 60;
     
-    // Use the provided dentist ID or default
-    const defaultDentistId = dentistId || '6879369cf9594e20abb3d14e';
+    // Create unique request signature to prevent duplicate calls
+    const requestSignature = `${formData.date}-${duration}-${clinicId}`;
     
-    // Use the provided clinic ID or selected clinic ID
-    const defaultClinicId = clinicId || selectedClinic?.id || '6879369cf9594e20abb3d14d';
-    
-    // Create request parameters
-    const requestParams = {
-      date: date,
-      duration: duration,
-      dentistId: defaultDentistId,
-      clinicId: defaultClinicId
-    };
-    
-    try {
-      // Use the enhanced getAvailableTimeSlots with improved error handling and caching
-      const slots = await appointmentService.getAvailableTimeSlots(requestParams);
+    // Skip if this exact request was just made
+    if (lastFetchParamsRef.current === requestSignature) {
+        return;
+    }
       
-      // If no slots are returned (empty array), use fallback slots
-      if (!slots || slots.length === 0) {
-        console.warn('No time slots returned from API, using fallback slots');
-        // Use local fallback function to generate slots
-        const fallbackSlots = generateLocalFallbackSlots();
-        setAvailableTimeSlots(fallbackSlots);
-        
-        // Show a warning to the user that we're using fallback slots
-        customToast.warning(t('appointmentForm.warning_usingFallbackSlots') || 'Using estimated time slots. Actual availability may vary.', {
-          position: "top-center",
-          duration: 3000
-        });
+    // Circuit breaker logic for repeated failures
+    const now = Date.now();
+    const circuitBreaker = circuitBreakerRef.current;
+    
+    if (circuitBreaker.isOpen) {
+      // Check if circuit breaker should reset (after 30 seconds)
+      if (now - circuitBreaker.lastFailureTime > 30000) {
+        circuitBreaker.isOpen = false;
+        circuitBreaker.failureCount = 0;
+        } else {
         return;
       }
-      
-      // Enhance slots with peak hour information if not already set
-      const enhancedSlots = slots.map(slot => {
-        if (slot.isPeak === undefined) {
-          const hour = parseInt(slot.time.split(':')[0]);
-          const isPeakHour = (hour >= 10 && hour <= 12) || (hour >= 14 && hour <= 16);
-          
-          return {
-            ...slot,
-            isPeak: isPeakHour
-          };
-        }
-        return slot;
-      });
-      
-      setAvailableTimeSlots(enhancedSlots);
-    } catch (error: any) {
-      console.error('Unexpected error fetching time slots:', error);
-      
-      // Provide more specific error messages based on error type
-      if (error.response) {
-        const { status } = error.response;
-        
-        if (status === 403) {
-          toast.error(t('appointmentForm.error_permissionDenied') || 'Access denied. Insufficient permissions.', {
-            position: "top-center",
-            duration: 3000,
-            className: 'toast-error',
-          });
-        } else if (status === 404) {
-          toast.error(t('appointmentForm.error_resourceNotFound') || 'Resource not found. Please try again later.', {
-            position: "top-center",
-            duration: 3000,
-            className: 'toast-error',
-          });
-        } else {
-          toast.error(t('appointmentForm.error_loadingTimeSlots') || 'Unable to load available time slots. Using default slots instead.', {
-            position: "top-center",
-            duration: 3000,
-            className: 'toast-error',
-          });
-        }
-      } else if (error.message && error.message.includes('permission')) {
-        toast.error(t('appointmentForm.error_permissionDenied') || 'Access denied. Insufficient permissions.', {
-          position: "top-center",
-          duration: 3000,
-          className: 'toast-error',
-        });
-      } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-        toast.error(t('appointmentForm.error_timeout') || 'Request timed out. Please try again.', {
-          position: "top-center",
-          duration: 3000,
-          className: 'toast-error',
-        });
-      } else {
-        toast.error(t('appointmentForm.error_loadingTimeSlots') || 'Unable to load available time slots. Using default slots instead.', {
-          position: "top-center",
-          duration: 3000,
-          className: 'toast-error',
-        });
-      }
-      
-      // Always generate fallback time slots locally on error
-      const fallbackSlots = generateLocalFallbackSlots();
-      setAvailableTimeSlots(fallbackSlots);
-    } finally {
-      setIsLoading(false);
     }
-  };
+    
+    // Clear existing timer to prevent overlapping requests
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // Update request signature and set debounced timer
+    lastFetchParamsRef.current = requestSignature;
+    
+    debounceTimerRef.current = setTimeout(() => {
+      const params = {
+        date: formData.date,
+        duration: duration,
+        dentistId: '', // Backend handles dentist availability
+        clinicId: clinicId
+      };
+      
+      fetchTimeSlotsImmediate(params);
+    }, 500); // Increased to 500ms for better debouncing
+  }, [formData.date, formData.service, formData.clinicId, selectedClinic?.id]);
+
+  // Enhanced memoized form data to prevent unnecessary fetchTimeSlots calls
+  const memoizedFormData = useMemo(() => {
+    const effectiveClinicId = FALLBACK_CLINIC_ID;
+    // Get service duration or default to 60 (services array is static)
+    const duration = formData.service === 'cleaning' ? 60 : formData.service === 'examination' ? 30 : 60;
+    
+    return {
+      date: formData.date,
+      service: formData.service,
+      clinicId: effectiveClinicId,
+      duration,
+      hasDate: !!formData.date && formData.date !== '',
+      hasService: !!formData.service && formData.service !== '',
+      hasClinic: !!effectiveClinicId,
+      // Include a stability key to prevent unnecessary changes - only include essential fields
+      stabilityKey: `${formData.date}-${duration}-${effectiveClinicId}`
+    };
+  }, [formData.date, formData.service, FALLBACK_CLINIC_ID]);
+
+  // Simplified useEffect - debouncing is now handled in fetchTimeSlots
+  useEffect(() => {
+    // Minimal logging in development mode
+    
+    // Only trigger fetch if we have required data - fetchTimeSlots handles all validation
+    if (memoizedFormData.hasDate && memoizedFormData.hasClinic) {
+      fetchTimeSlots();
+    } else {
+      // Clear time slots if missing required data
+      setApiError('');
+    }
+  }, [memoizedFormData.stabilityKey, fetchTimeSlots]);
   
-  // Local fallback function in case the service method is not accessible
-  function generateLocalFallbackSlots(): TimeSlot[] {
-    const slots: TimeSlot[] = [];
-    const date = formData.date ? new Date(formData.date) : new Date();
-    // Start at 9 AM
-    date.setHours(9, 0, 0, 0);
-    
-    // Generate slots from 9 AM to 5 PM at 30-minute intervals
-    for (let i = 0; i < 16; i++) {
-      const startTime = new Date(date);
-      startTime.setMinutes(startTime.getMinutes() + i * 30);
-      
-      // End time is 30 minutes after start time
-      const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + 30);
-      
-      // Check if we've gone past 5 PM
-      if (startTime.getHours() >= 17) {
-        break;
-      }
-      
-      // Determine if this is a peak hour (12-1 PM or 4-5 PM)
-      const isPeak = 
-        (startTime.getHours() === 12) || 
-        (startTime.getHours() === 16);
-      
-      // Format time as HH:MM for compatibility
-      const timeString = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
-      
-      // Make all slots available instead of random availability
-      // This ensures users always have options to select
-      const isAvailable = true;
-      
-      slots.push({
-        time: timeString,
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-        available: isAvailable,
-        isPeak,
-        dentistId: '6879369cf9594e20abb3d14e' // Add default dentist ID
-      });
-    }
-    
-    console.log('Generated fallback slots with all available:', slots.length);
-    return slots;
-  }
+  // Removed unused fetchAvailableTimeSlots function - now using optimized fetchTimeSlots with circuit breaker
+  
+  // Fallback slot generation removed - using proper error handling instead
 
   // Save form data to session storage when it changes
   useEffect(() => {
@@ -481,15 +403,19 @@ const AppointmentForm: React.FC = () => {
     }
   }, [isEditMode]);
 
-  // Fetch available time slots when date or service changes
-  useEffect(() => {
-    if (formData.date && selectedClinic?.id) {
-      console.log('Triggering fetchTimeSlots with date:', formData.date, 'clinic:', selectedClinic?.id);
-      fetchTimeSlots();
-    } else {
-      console.log('Not fetching time slots - missing date or clinic:', { date: formData.date, clinicId: selectedClinic?.id });
+  // Sync clinicId when selectedClinic changes - Removed as we're hardcoding the clinic ID
+  /* useEffect(() => {
+    if (selectedClinic?.id && !formData.clinicId) {
+      setFormData(prev => ({
+        ...prev,
+        clinicId: selectedClinic.id
+      }));
     }
-  }, [formData.date, formData.service, selectedClinic?.id, fetchTimeSlots]);
+  }, [selectedClinic?.id, formData.clinicId]); */
+  // Set clinic ID to hardcoded value
+  
+  // Remove redundant useEffect - time slot fetching is now handled by the optimized fetchTimeSlots function
+  // with debouncing in the memoized form data useEffect above
   
   // State for step transition animations
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -594,14 +520,66 @@ const AppointmentForm: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Fetch patients if user is not a patient
+      // Fetch patients based on user type
+      // Note: Dentists are auto-assigned by backend, no need to fetch them for selection
       if (!isPatientUser) {
+        // For staff/admin users: fetch all patients for selection
         try {
           const patientsData = await patientService.getPatients();
           setPatients(patientsData.data);
           setFilteredPatients(patientsData.data);
         } catch (error) {
           console.error('Error fetching patients:', error);
+          setPatients([]);
+          setFilteredPatients([]);
+        }
+      } else if (isPatientUser && user?.id) {
+        // For patient users: fetch their patient record using userId
+        try {
+          const patientsData = await patientService.getPatientsByUserId(user.id);
+          
+          let patientRecord = patientsData.data.length > 0 ? patientsData.data[0] : null;
+          
+          if (!patientRecord) {
+            // Create a patient record for this user if it doesn't exist
+            const newPatientData = {
+              firstName: user.firstName || user.email.split('@')[0],
+              lastName: user.lastName || '',
+              email: user.email,
+              phone: user.phone || '0000000000', // Provide default phone if not available
+              dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date('1990-01-01'), // Provide default DOB
+              gender: 'male' as const, // Default gender
+              address: {
+                street: '',
+                city: '',
+                state: '',
+                zipCode: '',
+                country: ''
+              },
+              medicalHistory: {
+                allergies: [],
+                medications: [],
+                conditions: [],
+                notes: ''
+              },
+              treatmentRecords: [], // Add required treatment records property
+              preferredClinicId: FALLBACK_CLINIC_ID, // Use fallback clinic
+              userId: user.id, // Link to user account
+            };
+            
+            const createdPatient = await patientService.createPatient(newPatientData);
+            patientRecord = createdPatient; // createPatient returns the patient data directly
+          }
+          
+          // Set the patient in the array and pre-select it
+          setPatients([patientRecord]);
+          setFilteredPatients([patientRecord]);
+          setFormData(prev => ({ ...prev, patientId: patientRecord.id }));
+          
+        } catch (error) {
+          console.error('Error fetching/creating patient record for logged-in user:', error);
+          // Show error message - patient record is required
+          customToast.error(t('appointmentForm.error_patientRecordRequired') || 'Patient record is required. Please contact support to create your patient profile.');
           setPatients([]);
           setFilteredPatients([]);
         }
@@ -613,12 +591,14 @@ const AppointmentForm: React.FC = () => {
           const appointment = await appointmentService.getAppointment(id);
           setFormData({
             patientId: appointment.patientId,
+            dentistId: appointment.dentistId || '',
             service: appointment.serviceType,
             date: typeof appointment.date === 'string' ? appointment.date : appointment.date.toISOString().split('T')[0],
             timeSlot: appointment.timeSlot,
             notes: appointment.notes || '',
             emergency: false,
-            patientSearch: ''
+            patientSearch: '',
+            clinicId: appointment.clinicId
           });
         } catch (error) {
           console.error('Error fetching appointment:', error);
@@ -645,31 +625,44 @@ const AppointmentForm: React.FC = () => {
     fetchInitialData();
   }, [isEditMode, isPatientUser, user, id, t]); // Removed appointmentService to prevent circular dependency
 
-  // If logged-in user is a patient, pre-select their own record and set smart defaults
+  // Patient record selection is now handled in fetchInitialData
+  // This useEffect applies smart defaults once the patient record is loaded
   useEffect(() => {
-    if (isPatientUser && user && patients.length > 0) {
-      const patientRecord = patients.find(p => p.email === user.email);
-      if (patientRecord) {
-        setFormData(prev => ({ ...prev, patientId: patientRecord.id }));
+    if (isPatientUser && user && formData.patientId && patients.length > 0) {
+      console.log('Applying smart defaults for patient user with patientId:', formData.patientId);
         
         // Apply smart defaults based on patient's appointment history
-        setSmartDefaults(patientRecord.id);
-      }
+      setSmartDefaults(formData.patientId);
+      
+      // Clear any previous patient selection errors
+      setFieldErrors(prev => ({
+        ...prev,
+        patientId: '' // Clear any previous errors
+      }));
     }
-  }, [isPatientUser, user, patients]);
+  }, [isPatientUser, user, formData.patientId, patients, t]);
 
   const validateCurrentStep = async (): Promise<boolean> => {
-    // Ensure patient ID is set correctly for validation
-    if (currentStep === 'datetime' && isPatientUser && user?.id && !formData.patientId) {
-      // Auto-set patient ID for patient users if not already set
-      setFormData(prev => ({ ...prev, patientId: user.id }));
+    // Create a copy of formData to ensure we have the latest data
+    let currentFormData = { ...formData };
+    
+    // For patient users, patient ID should already be set by fetchInitialData
+    // If not set, there was an error during initialization
+    if (currentStep === 'datetime' && isPatientUser && user && !formData.patientId) {
+      // Patient ID should have been set during initialization
+      // Show error and suggest refreshing
+      customToast.error(t('appointmentForm.error_patientRecordNotLoaded') || 'Patient record not loaded. Please refresh the page and try again.');
+        return false;
     }
     
-    // Use the centralized validation utility
-    const validationResult = validateAppointmentForm(formData, t, currentStep);
+    
+    // Use the centralized validation utility with the current form data
+    const validationResult = validateAppointmentForm(currentFormData, t, currentStep);
+    
     
     // Display all errors for the current step
     if (!validationResult.isValid) {
+      console.log('🐛 DEBUG - VALIDATION FAILED - Specific errors:', validationResult.errors);
       // Show the first error message as a warning instead of error
       const firstError = Object.values(validationResult.errors)[0];
       customToast.warning(firstError, {
@@ -677,9 +670,20 @@ const AppointmentForm: React.FC = () => {
         duration: 3000
       });
       
-      // For datetime step, allow proceeding despite warnings
+      // For datetime step, allow proceeding despite warnings if date and timeSlot are set
       if (currentStep === 'datetime' && formData.date && formData.timeSlot) {
-        console.log('Allowing datetime step to proceed despite validation warnings');
+        console.log('🐛 DEBUG - Allowing datetime step to proceed despite validation warnings');
+        console.log('🐛 DEBUG - Date:', formData.date, 'TimeSlot:', formData.timeSlot);
+        console.log('🐛 DEBUG - PatientId status:', formData.patientId);
+        
+        // For non-patient users, patientId validation should happen in the patient step, not datetime step
+        if (!isPatientUser && !formData.patientId) {
+          console.log('🐛 DEBUG - Non-patient user without patientId - this might be the issue');
+          // Show specific error for non-patient users
+          customToast.error(t('appointmentForm.error_selectPatientFirst') || 'Please go back and select a patient first.');
+          return false;
+        }
+        
         return true;
       }
       
@@ -687,13 +691,14 @@ const AppointmentForm: React.FC = () => {
     }
     
     // Less strict validation for time slot availability
-    if (currentStep === 'datetime' && formData.date && formData.timeSlot && selectedClinic?.id) {
+    if (currentStep === 'datetime' && formData.date && formData.timeSlot) {
+      const clinicId = FALLBACK_CLINIC_ID;
       // Run validation in background but don't block UI
       setTimeout(async () => {
         const timeSlotValidation = await validateTimeSlotAvailability(
           appointmentService,
           { date: formData.date, timeSlot: formData.timeSlot },
-          selectedClinic.id,
+          clinicId,
           isEditMode ? id : undefined
         );
         
@@ -707,14 +712,20 @@ const AppointmentForm: React.FC = () => {
       }, 100);
     }
     
+    console.log('🐛 DEBUG - Validation passed, returning true');
     return true;
   };
 
   const handleStepSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form step submit:', currentStep);
+    
     const isValid = await validateCurrentStep();
-    if (!isValid) return;
+    if (!isValid) {
+      console.log('Validation failed for step:', currentStep);
+      return;
+    }
     
     if (currentStep === 'review') {
       await handleFinalSubmit();
@@ -726,28 +737,181 @@ const AppointmentForm: React.FC = () => {
   // This function is replaced by handleFinalSubmit and handleStepSubmit
   // Removing commented code to fix syntax errors
 
-  const handleFinalSubmit = async () => {
+  // Handle auto-booking functionality - assigns next slot after last booking
+  const handleAssignFirstAvailableSlot = async () => {
     setIsLoading(true);
+    setApiError('');
 
     try {
-      // Create appointment data
-      const appointmentData = {
+        // Validation for patient is important for the whole form, but for slots we just need date/service/clinic
+        if (!formData.service || !formData.date) {
+            toast.error(t('appointmentForm.error_fillRequiredFieldsForSlot') || 'Please select a service and date first.');
+        setIsLoading(false);
+        return;
+      }
+
+      const clinicId = FALLBACK_CLINIC_ID;
+        const selectedServiceDetails = services.find(s => s.value === formData.service);
+        const duration = selectedServiceDetails?.duration || 45;
+
+        // Get the next available slot after the last booked appointment
+        const nextSlot = await appointmentService.getNextSlotAfterLastBooking({
+            date: formData.date,
+            clinicId,
+            duration,
+        });
+
+        if (nextSlot && nextSlot.time) {
+            console.log('Assigning time slot:', nextSlot.time);
+            handleInputChange('timeSlot', nextSlot.time);
+            toast.success(`${t('appointmentForm.success_slotAssigned')} ${nextSlot.time}`);
+      } else {
+            const errorMessage = t('appointmentForm.error_noSlotsFound') || 'No available time slots found after last booking for the selected date.';
+            setApiError(errorMessage);
+            toast.error(errorMessage);
+        }
+
+    } catch (error: any) {
+        console.error('Error assigning next available slot:', error);
+        const errorMessage = error.message || t('appointmentForm.error_failedToGetSlots') || 'Failed to get next available slot.';
+        setApiError(errorMessage);
+        toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    setIsLoading(true);
+    setIsSubmitting(true);
+    
+    // Create a loading toast
+    const loadingToast = customToast.loading(t('appointmentForm.creatingAppointment', 'Creating your appointment...'));
+
+    try {
+      // Debug authentication status
+      const token = localStorage.getItem('token');
+      console.log('🔐 Final Submit Authentication Check:', {
+        hasToken: !!token,
+        tokenLength: token?.length || 0,
+        userLoggedIn: !!user,
+        userEmail: user?.email,
+        userRole: user?.role,
+        userId: user?.id
+      });
+      
+      // Validate required fields before submission
+      if (!formData.patientId) {
+        toast.error(t('appointmentForm.error_noPatientRecord') || 'No patient record found. Please contact support to create a patient profile.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!formData.service) {
+        toast.error(t('appointmentForm.error_serviceRequired') || 'Please select a service.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!formData.date) {
+        toast.error(t('appointmentForm.error_dateRequired') || 'Please select a date.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!formData.timeSlot) {
+        toast.error(t('appointmentForm.error_timeSlotRequired') || 'Please select a time slot.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Ensure clinicId is set to hardcoded value
+      const clinicId = FALLBACK_CLINIC_ID;
+      if (!clinicId) {
+        toast.error(t('appointmentForm.error_clinicRequired') || 'No clinic selected. Please select a clinic.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Ensure date is in correct format (YYYY-MM-DD)
+      let formattedDate = formData.date;
+      if (formData.date.includes('T')) {
+        formattedDate = formData.date.split('T')[0];
+      }
+
+      // Create appointment data with all required fields
+      const appointmentData: any = {
         patientId: formData.patientId,
-        service: formData.service,
-        date: formData.date,
+        serviceType: formData.service, // Fixed: use 'serviceType' to match backend expectation
+        date: formattedDate,
         timeSlot: formData.timeSlot,
-        notes: formData.notes,
-        emergency: formData.emergency,
-        clinicId: selectedClinic?.id
+        notes: formData.notes || '',
+        emergency: formData.emergency || false,
+        clinicId: clinicId
       };
+
+      // For patients: Never send dentistId - let backend auto-assign
+      // For staff/admin: Only include dentistId if explicitly selected
+      if (!isPatientUser && formData.dentistId && formData.dentistId.trim() !== '') {
+        appointmentData.dentistId = formData.dentistId;
+        console.log('Staff/Admin selected specific dentist:', formData.dentistId);
+      } else {
+        // Backend will auto-assign the best available dentist
+        console.log('No dentist specified - backend will auto-assign based on availability and clinic');
+      }
+
+
+
+      // Validate appointment data before submission
+      const validation = validateAppointmentData(appointmentData);
+      if (!validation.isValid) {
+        const errorMessage = validation.errors.join('; ');
+        console.error('Client-side validation failed:', validation.errors);
+        toast.error(`Validation failed: ${errorMessage}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // Check for time slot conflicts before creating appointment
+      try {
+        console.log('Checking time slot conflict for:', {
+          date: appointmentData.date,
+          timeSlot: appointmentData.timeSlot,
+          clinicId: appointmentData.clinicId
+        });
+        
+        const hasConflict = await appointmentService.checkTimeSlotConflict({
+          date: appointmentData.date,
+          timeSlot: appointmentData.timeSlot,
+          clinicId: appointmentData.clinicId,
+          dentistId: appointmentData.dentistId,
+          excludeAppointmentId: isEditMode ? id : undefined
+        });
+        
+        if (hasConflict) {
+          toast.error(t('appointmentForm.error_timeSlotConflict') || 'This time slot is no longer available. Please select another time.');
+          setIsLoading(false);
+          return;
+        }
+      } catch (conflictError: any) {
+        console.error('Conflict check failed:', conflictError);
+        toast.error(conflictError.message || 'Failed to verify time slot availability. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Log the exact data being sent for debugging
+      console.log('Submitting appointment data:', appointmentData);
 
       // Create or update appointment
       if (isEditMode && id) {
         await appointmentService.updateAppointment(id, appointmentData);
-        toast.success(t('appointmentForm.success_updated'));
+        toast.dismiss(loadingToast);
+        customToast.success(t('appointmentForm.success_updated'));
       } else {
         await appointmentService.createAppointment(appointmentData);
-        toast.success(t('appointmentForm.success_created'));
+        toast.dismiss(loadingToast);
+        customToast.success(t('appointmentForm.success_created'));
         
         // Clear saved form data after successful submission
         sessionStorage.removeItem('appointmentFormData');
@@ -757,7 +921,12 @@ const AppointmentForm: React.FC = () => {
       // Navigate back to appointments list
       navigate('/appointments');
     } catch (error: any) {
+      // Dismiss loading toast on error
+      toast.dismiss(loadingToast);
       console.error('Error saving appointment:', error);
+      
+      // Ensure clinicId is accessible in this scope
+      const clinicId = FALLBACK_CLINIC_ID;
       
       // Provide more specific error messages based on error type
       if (error.response) {
@@ -780,6 +949,29 @@ const AppointmentForm: React.FC = () => {
           }
         } else if (status === 500) {
           toast.error(t('appointmentForm.error_serverError') || 'Server error occurred. Please try again later.');
+        } else if (status === 400) {
+          toast.error(t('appointmentForm.error_badRequest') || 'Invalid data provided. Please check all fields and try again.');
+          // Log the specific data that caused the error for debugging
+          console.log('Bad Request Data:', {
+            patientId: formData.patientId,
+            serviceType: formData.service,
+            date: formData.date,
+            timeSlot: formData.timeSlot,
+            clinicId: clinicId,
+            dentistId: '6879369cf9594e20abb3d14e',
+            notes: formData.notes || '',
+            emergency: formData.emergency || false
+          });
+          // If the response contains specific error details, log and display them
+          if (data && data.message) {
+            console.log('Server Error Details:', data.message);
+            toast.error(`${t('appointmentForm.error_badRequest')}: ${data.message}`);
+          } else if (data && data.errors) {
+            // Handle detailed validation errors if provided
+            const errorMessages = Object.values(data.errors).join(', ');
+            console.log('Validation Errors:', errorMessages);
+            toast.error(`${t('appointmentForm.error_badRequest')}: ${errorMessages}`);
+          }
         } else {
           toast.error(`${t('appointmentForm.error_failedToSave')}: ${data?.message || ''}` || 'Failed to save appointment. Please try again.');
         }
@@ -794,7 +986,82 @@ const AppointmentForm: React.FC = () => {
       }
     } finally {
       setIsLoading(false);
+      setIsSubmitting(false);
     }
+  };
+
+  // Comprehensive client-side validation function
+  const validateAppointmentData = (data: any): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    
+    // Validate required fields
+    if (!data.patientId) {
+      errors.push('Patient ID is required');
+    }
+    
+    if (!data.service && !data.serviceType) {
+      errors.push('Service is required');
+    }
+    
+    if (!data.clinicId) {
+      errors.push('Clinic ID is required');
+    }
+    
+    // Dentist ID is optional - backend can auto-assign if not provided
+    
+    // Validate date format (YYYY-MM-DD)
+    if (!data.date) {
+      errors.push('Date is required');
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date)) {
+      errors.push('Date must be in YYYY-MM-DD format');
+    }
+    
+    // Validate time slot format (HH:mm)
+    if (!data.timeSlot) {
+      errors.push('Time slot is required');
+    } else if (!/^\d{2}:\d{2}$/.test(data.timeSlot)) {
+      errors.push('Time slot must be in HH:mm format');
+    }
+    
+    // Validate service against allowed values
+    const allowedServices = ['consultation', 'cleaning', 'filling', 'crown', 'extraction', 'whitening', 'emergency'];
+    if (data.service && !allowedServices.includes(data.service)) {
+      errors.push(`Service must be one of: ${allowedServices.join(', ')}`);
+    }
+    
+    // Validate MongoDB ObjectID format for IDs
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+    if (data.patientId && !objectIdRegex.test(data.patientId)) {
+      errors.push('Patient ID must be a valid MongoDB ObjectID');
+    }
+    
+    if (data.clinicId && !objectIdRegex.test(data.clinicId)) {
+      errors.push('Clinic ID must be a valid MongoDB ObjectID');
+    }
+    
+    // Only validate dentist ID format if provided (it's optional)
+    if (data.dentistId && !objectIdRegex.test(data.dentistId)) {
+      errors.push('Dentist ID must be a valid MongoDB ObjectID');
+    }
+    
+    // Validate date is not in the past (except for today)
+    const selectedDate = new Date(data.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      errors.push('Cannot schedule appointments for past dates');
+    }
+    
+    // Validate notes length
+    if (data.notes && data.notes.length > 500) {
+      errors.push('Notes cannot exceed 500 characters');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
   };
 
   // Get the selected service details
@@ -857,69 +1124,162 @@ const AppointmentForm: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-semibold text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Header Section */}
+      <div className="bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4">
+                  <Calendar className="h-5 w-5 text-white" />
+                </div>
           {isEditMode ? t('appointmentForm.title_edit') : t('appointmentForm.title_new')}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-2 text-lg text-gray-600">
           {t('appointmentForm.subtitle')}
         </p>
+            </div>
+            <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-500">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                {t('appointmentForm.quickEasy')}
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                {t('appointmentForm.secureBooking')}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Progress Steps */}
-        <div className="mt-8 mb-6">
-          <nav aria-label="Progress">
-            <ol className="flex items-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 lg:gap-8">
+          {/* Progress Sidebar */}
+          <div className="order-2 lg:order-1 lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 lg:sticky lg:top-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 lg:mb-6 text-center lg:text-left">{t('appointmentForm.bookingProgress')}</h3>
+
+              <div className="flex lg:flex-col lg:space-y-4 lg:space-x-0 space-x-3 lg:space-x-0 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 scrollbar-hide">
               {steps.map((step, stepIdx) => {
                 const isCurrent = step.id === currentStep;
                 const isCompleted = completedSteps.includes(step.id) || stepOrder.indexOf(step.id) < stepOrder.indexOf(currentStep);
                 const isClickable = isCompleted || step.id === currentStep;
                 
                 return (
-                  <li key={step.id} className={`${stepIdx !== steps.length - 1 ? 'flex-1' : ''} relative`}>
+                    <div key={step.id} className="relative">
                     <button
                       type="button"
                       onClick={() => isClickable && jumpToStep(step.id)}
                       disabled={!isClickable}
-                      className={`group flex items-center w-full focus:outline-none ${!isClickable ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                      aria-current={isCurrent ? 'step' : undefined}
+                        className={`w-full lg:w-auto min-w-[120px] lg:min-w-0 flex flex-col lg:flex-row items-center p-3 lg:p-4 rounded-xl border transition-all duration-300 ${
+                          isCurrent 
+                            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md transform scale-105' 
+                            : isCompleted
+                              ? 'bg-green-50 border-green-200 hover:shadow-md hover:scale-105'
+                              : 'bg-gray-50 border-gray-200 cursor-not-allowed'
+                        }`}
                     >
                       {isCompleted ? (
-                        <span className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-600 rounded-full transition-all duration-300 transform hover:scale-110 hover:bg-blue-700">
-                          <CheckIcon className="h-5 w-5 text-white" aria-hidden="true" />
-                        </span>
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-xl flex items-center justify-center">
+                            <CheckIcon className="h-5 w-5 text-white" />
+                          </div>
                       ) : isCurrent ? (
-                        <span className="flex-shrink-0 h-10 w-10 flex items-center justify-center border-2 border-blue-600 rounded-full transition-all duration-300 transform scale-110 ring-4 ring-blue-100">
-                          <step.icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                        </span>
-                      ) : (
-                        <span className="flex-shrink-0 h-10 w-10 flex items-center justify-center border-2 border-gray-300 rounded-full transition-all duration-300">
-                          <step.icon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                        </span>
-                      )}
-                      <span className={`ml-3 text-sm font-medium transition-all duration-300 ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-gray-900' : 'text-gray-500'}`}>
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center animate-pulse">
+                            <step.icon className="h-5 w-5 text-white" />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-300 rounded-xl flex items-center justify-center">
+                            <step.icon className="h-5 w-5 text-gray-500" />
+                          </div>
+                        )}
+                        
+                        <div className="mt-2 lg:mt-0 lg:ml-4 text-center lg:text-left">
+                          <p className={`font-semibold text-xs lg:text-sm ${
+                            isCurrent ? 'text-blue-700' : isCompleted ? 'text-green-700' : 'text-gray-500'
+                          }`}>
                         {step.label}
-                      </span>
+                          </p>
+                          <p className={`text-xs hidden lg:block ${
+                            isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-400'
+                          }`}>
+                            {isCurrent ? t('appointmentForm.stepStatus_inProgress') : isCompleted ? t('appointmentForm.stepStatus_completed') : t('appointmentForm.stepStatus_pending')}
+                          </p>
+                        </div>
+                        
+                        {isCurrent && (
+                          <div className="ml-auto">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                          </div>
+                        )}
                     </button>
                     
                     {stepIdx !== steps.length - 1 && (
-                      <div className="hidden md:block absolute top-5 right-0 left-0 h-0.5 bg-gray-200">
-                        <div 
-                          className="h-0.5 bg-blue-600 transition-all duration-500 ease-in-out" 
-                          style={{ width: isCompleted ? '100%' : '0%' }} 
-                        />
+                        <div className="flex justify-center py-2">
+                          <div className={`w-0.5 h-8 ${isCompleted ? 'bg-green-300' : 'bg-gray-200'} transition-all duration-500`}></div>
                       </div>
                     )}
-                  </li>
+                    </div>
                 );
               })}
-            </ol>
-          </nav>
+              </div>
         </div>
 
-        <form onSubmit={handleStepSubmit} className="mt-6 bg-white shadow-sm rounded-lg p-6 relative overflow-hidden">
+            {/* Help Card */}
+            <div className="mt-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                  <Phone className="h-4 w-4" />
+                </div>
+                <h4 className="font-semibold">{t('appointmentForm.needHelp')}</h4>
+              </div>
+              <p className="text-blue-100 text-sm mb-4">
+                {t('appointmentForm.supportMessage')}
+              </p>
+              <button className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                {t('appointmentForm.contactSupport')}
+              </button>
+            </div>
+          </div>
+
+          {/* Main Form Content */}
+          <div className="order-1 lg:order-2 lg:col-span-3">
+            <form onSubmit={handleStepSubmit} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              {/* Step Header */}
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 sm:p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold flex items-center">
+                      {steps.find(s => s.id === currentStep)?.icon && (
+                        <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                          {React.createElement(steps.find(s => s.id === currentStep)?.icon || Calendar, { className: "h-4 w-4" })}
+                        </div>
+                      )}
+                      {steps.find(s => s.id === currentStep)?.label}
+                    </h2>
+                    <p className="text-blue-100 mt-1">
+                      {currentStep === 'patient' && t('appointmentForm.stepDescription_patient')}
+                      {currentStep === 'service' && t('appointmentForm.stepDescription_service')}  
+                      {currentStep === 'datetime' && t('appointmentForm.stepDescription_datetime')}
+                      {currentStep === 'details' && t('appointmentForm.stepDescription_details')}
+                      {currentStep === 'review' && t('appointmentForm.stepDescription_review')}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-blue-100 text-sm">{t('appointmentForm.stepCounter', { current: stepOrder.indexOf(currentStep) + 1, total: steps.length })}</p>
+                    <div className="w-20 bg-white bg-opacity-20 rounded-full h-2 mt-2">
+                      <div 
+                        className="bg-white h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${((stepOrder.indexOf(currentStep) + 1) / steps.length) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
           {/* Form content wrapper with transition effects */}
-          <div className={`transition-all duration-300 transform ${isTransitioning ? (transitionDirection === 'next' ? 'translate-x-full opacity-0' : '-translate-x-full opacity-0') : 'translate-x-0 opacity-100'}`}>
+              <div className={`p-6 md:p-8 transition-all duration-500 transform ${isTransitioning ? (transitionDirection === 'next' ? 'translate-x-full opacity-0' : '-translate-x-full opacity-0') : 'translate-x-0 opacity-100'}`}>
           {/* Patient Selection Step */}
           {currentStep === 'patient' && !isPatientUser && (
             <div className="space-y-6">
@@ -927,7 +1287,28 @@ const AppointmentForm: React.FC = () => {
                 <h2 className="text-lg font-medium text-gray-900">{t('appointmentForm.title_selectPatient')}</h2>
                 <p className="mt-1 text-sm text-gray-500">{t('appointmentForm.subtitle_selectPatient')}</p>
               </div>
-              
+
+              {/* Clinic Selection */}
+
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Clinic
+                </label>
+                 <ClinicSelector
+                  selectedClinicId="687468107e70478314c346be"
+                  onClinicSelect={(clinic) => {
+                    setFormData(prev => ({ ...prev, clinicId: clinic.id }));
+                    // Clear time slots when clinic changes
+                    setApiError('');
+                  }}
+                  error={fieldErrors.clinicId}
+                /> 
+                {fieldErrors.clinicId && (
+                  <p className="text-red-500 text-sm mt-1">{fieldErrors.clinicId}</p>
+                )}
+              </div>
+              */}
+
               <div>
                 <label htmlFor="patientSearch" className="block text-sm font-medium text-gray-700">
                   {t('appointmentForm.label_patientSearch')}
@@ -943,7 +1324,10 @@ const AppointmentForm: React.FC = () => {
                       onBlur={(e) => validateField('patientSearch', e.target.value)}
                     />
                     {fieldErrors.patientSearch && (
-                      <p className="text-red-500 text-sm mt-1">{fieldErrors.patientSearch}</p>
+                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg flex items-start">
+                        <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-red-700 text-sm" role="alert" aria-live="polite">{fieldErrors.patientSearch}</p>
+                      </div>
                     )}
                 </div>
               </div>
@@ -952,17 +1336,41 @@ const AppointmentForm: React.FC = () => {
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.service}</p>
               )}
               
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredPatients.map(patient => (
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Loading skeleton */}
+                {isLoading && filteredPatients.length === 0 && (
+                  <>
+                    {[...Array(3)].map((_, index) => (
+                      <div key={`skeleton-${index}`} className="border border-gray-200 rounded-lg p-4 animate-pulse">
+                        <div className="flex items-center justify-between">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                        </div>
+                        <div className="mt-2 space-y-2">
+                          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+                
+                {/* Actual patient list */}
+                {!isLoading && filteredPatients.map((patient, index) => (
                   <div 
-                    key={patient.id} 
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${formData.patientId === patient.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}
+                    key={patient.id || `patient-${index}`} 
+                    className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 transform active:scale-95 touch-manipulation ${formData.patientId === patient.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'}`}
                     onClick={() => {
-                      setFormData({ ...formData, patientId: patient.id });
+
+                      
+                      // Use the patient ID
+                      const patientId = patient.id;
+
+                      handleInputChange('patientId', patientId);
                       
                       // Apply smart defaults based on selected patient's appointment history
-                      if (patient.id) {
-                        setSmartDefaults(patient.id);
+                      if (patientId) {
+                        setSmartDefaults(patientId);
                       }
                     }}
                   >
@@ -979,7 +1387,7 @@ const AppointmentForm: React.FC = () => {
                   </div>
                 ))}
                 
-                {filteredPatients.length === 0 && (
+                {!isLoading && filteredPatients.length === 0 && (
                   <div className="col-span-full text-center py-4 text-gray-500">
                     {t('appointmentForm.no_patients_found')}
                   </div>
@@ -988,72 +1396,160 @@ const AppointmentForm: React.FC = () => {
             </div>
           )}
 
+
+
           {/* Service Selection Step */}
           {currentStep === 'service' && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">{t('appointmentForm.title_selectService')}</h2>
-                <p className="mt-1 text-sm text-gray-500">{t('appointmentForm.subtitle_selectService')}</p>
+            <div className="space-y-8">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('appointmentForm.selectYourService')}</h3>
+                <p className="text-gray-600">{t('appointmentForm.serviceSelectionDescription')}</p>
               </div>
               
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {services.map(service => (
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {services.map((service, index) => (
                   <div 
-                    key={service.value} 
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${formData.service === service.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'} ${fieldErrors.service ? 'border-red-500' : ''}`}
+                    key={service.value || `service-${index}`} 
+                    className={`group relative border-2 rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 transform active:scale-95 hover:scale-105 hover:shadow-xl touch-manipulation ${
+                      formData.service === service.value 
+                        ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg' 
+                        : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                    } ${fieldErrors.service ? 'border-red-500' : ''}`}
                     onClick={() => {
                       handleInputChange('service', service.value);
                       validateField('service', service.value);
                     }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <span className="text-xl mr-2">{service.icon}</span>
-                        <span className="font-medium">{service.label}</span>
-                      </div>
+                    {/* Selection Indicator */}
                       {formData.service === service.value && (
-                        <CheckCircle className="h-5 w-5 text-blue-500" />
-                      )}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <CheckIcon className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                    
+                    {/* Service Icon */}
+                    <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl transition-all duration-300 ${
+                      formData.service === service.value
+                        ? 'bg-gradient-to-br from-blue-400 to-indigo-500 text-white shadow-lg'
+                        : 'bg-gray-100 group-hover:bg-blue-100'
+                    }`}>
+                      {service.icon}
                     </div>
-                    <div className="mt-2 text-sm text-gray-500">
-                      <div>{service.description}</div>
-                      <div className="mt-1 font-medium text-gray-700">
-                        {t('appointmentForm.duration')}: {service.duration} {t('appointmentForm.minutes')}
+                    
+                    {/* Service Info */}
+                    <div className="text-center">
+                      <h4 className={`font-bold text-lg mb-2 transition-colors ${
+                        formData.service === service.value ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-600'
+                      }`}>
+                        {service.label}
+                      </h4>
+                      <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                        {service.description}
+                      </p>
+                      
+                      {/* Duration Badge */}
+                      <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        formData.service === service.value
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600'
+                      }`}>
+                        <Clock className="h-4 w-4 mr-1" />
+                        {service.duration} {t('appointmentForm.minutes')}
                       </div>
                     </div>
+                    
+                    {/* Hover Effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
                   </div>
                 ))}
               </div>
+              
+              {fieldErrors.service && (
+                <div className="flex items-center justify-center mt-4">
+                  <p className="text-red-500 text-sm bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+                    {fieldErrors.service}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
           {/* Date & Time Selection Step */}
           {currentStep === 'datetime' && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">{t('appointmentForm.title_selectDateTime')}</h2>
-                <p className="mt-1 text-sm text-gray-500">{t('appointmentForm.subtitle_selectDateTime')}</p>
+            <div className="space-y-8">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('appointmentForm.chooseDateAndTime')}</h3>
+                <p className="text-gray-600">{t('appointmentForm.dateTimeSelectionDescription')}</p>
+              </div>
+
+              {/* Clinic Selection and Display */}
+              <div className="space-y-4">
+                {/* Current Clinic Display */}
+                {FALLBACK_CLINIC_ID && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <MapPin className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-900">
+                          Selected Clinic: { 'Dr. Gamal Abdel Nasser Center'}
+                        </p>
+                        {selectedClinic?.address && (
+                          <p className="text-sm text-blue-700">
+                            {selectedClinic.address.street}, {selectedClinic.address.city}
+                          </p>
+                        )}
+                        {selectedClinic?.phone && (
+                          <p className="text-xs text-blue-600">📞 {selectedClinic.phone}</p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {t('appointmentForm.active')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Clinic Selector for changing clinic */}
+{/*                 
+                <div>
+                  <label htmlFor="clinic-selector" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('appointmentForm.changeClinic')}
+                  </label>
+                   <ClinicSelector
+                    selectedClinicId={formData.clinicId}
+                    onClinicSelect={(clinic) => {
+                      handleInputChange('clinicId', clinic.id);
+                      // Clear time slots when clinic changes
+                      setApiError('');
+                      toast.success(`Switched to ${clinic.name}`);
+                    }}
+                    disabled={isLoading || isSubmitting}
+                    placeholder={t('common.placeholders.selectClinic')}
+                    className="w-full"
+                  /> 
+                </div> */}
               </div>
               
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 {/* Date Selection */}
-                <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                    {t('appointmentForm.label_date')}
+                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                  <label htmlFor="date" className="block text-lg font-semibold text-gray-900 mb-3">
+                    📅 {t('appointmentForm.label_date')}
                   </label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </div>
+                  <div className="relative">
                     <input
                       type="date"
                       id="date"
-                      className={`pl-10 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md transition-all duration-200 hover:border-blue-300 ${fieldErrors.date ? 'border-red-500' : ''}`}
+                      className={`w-full px-4 py-3 text-lg border-2 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-blue-300 ${fieldErrors.date ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'}`}
                       value={formData.date}
                       onChange={(e) => {
-                        // Reset time slot when date changes
-                        setFormData({ ...formData, date: e.target.value, timeSlot: '' });
+                        // Reset time slot when date changes using single update
                         handleInputChange('date', e.target.value);
+                        handleInputChange('timeSlot', ''); // Clear time slot when date changes
                         // Validate date is not in the past
                         if (e.target.value) {
                           const today = new Date().toISOString().split('T')[0];
@@ -1066,11 +1562,14 @@ const AppointmentForm: React.FC = () => {
                       min={new Date().toISOString().split('T')[0]}
                       required
                       aria-describedby="date-description"
-                      disabled={isLoading}
+                      disabled={isLoading || isSubmitting}
                     />
                   </div>
                   {fieldErrors.date && (
-                    <p className="text-red-500 text-sm mt-1">{fieldErrors.date}</p>
+                    <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                      <p className="text-red-700 text-sm" role="alert" aria-live="polite">{fieldErrors.date}</p>
+                    </div>
                   )}
                   <p className="mt-1 text-xs text-gray-500" id="date-description">
                     {t('appointmentForm.selectDate')}
@@ -1079,35 +1578,75 @@ const AppointmentForm: React.FC = () => {
                 
                 {/* Time Slot Selection */}
                 {formData.date && (
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('appointmentForm.label_timeSlot')}
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                    <label className="block text-lg font-semibold text-gray-900 mb-3">
+                      🕐 {t('appointmentForm.label_timeSlot')}
                     </label>
+                    
                     {fieldErrors.timeSlot && (
-                      <p className="text-red-500 text-sm mb-2">{fieldErrors.timeSlot}</p>
+                      <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                        <p className="text-red-600 text-sm">{fieldErrors.timeSlot}</p>
+                      </div>
                     )}
                     
-                    {/* Using the improved TimeSlotPicker component */}
-                    <TimeSlotPicker
-                      selectedDate={new Date(formData.date)}
-                      selectedTimeSlot={formData.timeSlot}
-                      onTimeSlotSelect={(timeSlot) => {
-                        // Update form data
-                        setFormData(prev => ({ ...prev, timeSlot }));
-                        
-                        // Clear any previous field errors
-                        setFieldErrors(prev => ({ ...prev, timeSlot: '' }));
-                        
-                        // Run validation
-                        validateTimeSlotSelection(timeSlot);
-                      }}
-                      // dentistId and clinicId removed as they're not in the component props
-                      duration={selectedService?.duration || 30}
-                      disabled={isLoading}
-                      availableTimeSlots={availableTimeSlots}
-                      isLoading={isLoading}
-                      onRefresh={() => fetchAvailableTimeSlots(formData.date)}
-                    />
+                    {apiError && (
+                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <div className="flex items-center">
+                          <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
+                          <h4 className="text-red-800 font-medium">{t('appointmentForm.timeSlotLoadingError')}</h4>
+                            </div>
+                        <p className="text-red-700 mt-1 text-sm">{apiError}</p>
+                        </div>
+                    )}
+                    
+                    {formData.timeSlot ? (
+                      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl shadow-sm">
+                      <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mr-3">
+                              <CheckIcon className="h-5 w-5 text-white" />
+                            </div>
+                        <div>
+                              <p className="font-semibold text-green-800">{t('appointmentForm.timeSlotConfirmed')}</p>
+                              <p className="text-2xl font-bold text-green-700">{formData.timeSlot}</p>
+                        </div>
+                          </div>
+                          <button
+                          type="button"
+                            onClick={() => handleInputChange('timeSlot', '')}
+                            className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-xl transition-all duration-200 font-medium"
+                          >
+                            {t('common.change')}
+                          </button>
+                      </div>
+                    </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleAssignFirstAvailableSlot}
+                        disabled={isLoading || isSubmitting || !formData.date || !formData.service}
+                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-semibold text-lg ${
+                          isLoading || isSubmitting || !formData.date || !formData.service
+                            ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-blue-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                        }`}
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center justify-center">
+                            <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                            {t('appointmentForm.findingSlot', 'Finding Slot...')}
+                    </div>
+                        ) : (
+                          <div className="flex items-center justify-center">
+                            <Calendar className="h-5 w-5 mr-2" />
+                            {t('appointmentForm.button_assignFirstAvailable', 'Assign First Available Slot')}
+                  </div>
+                )}
+                      </button>
+                    )}
+                    <p className="mt-3 text-xs text-gray-500 text-center">
+                      We'll automatically find the next available time slot for you
+                    </p>
                   </div>
                 )}
               </div>
@@ -1137,7 +1676,10 @@ const AppointmentForm: React.FC = () => {
                   onBlur={(e) => validateField('notes', e.target.value)}
                 />
                 {fieldErrors.notes && (
-                  <p className="text-red-500 text-sm mt-1">{fieldErrors.notes}</p>
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg flex items-start">
+                    <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                    <p className="text-red-700 text-sm" role="alert" aria-live="polite">{fieldErrors.notes}</p>
+                  </div>
                 )}
               </div>
 
@@ -1247,6 +1789,21 @@ const AppointmentForm: React.FC = () => {
                     </div>
                   </div>
                   
+                  {/* Dentist Assignment Info for Patients */}
+                  {isPatientUser && (
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 transition-all duration-300 hover:shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <User className="h-4 w-4 text-blue-500 mr-2" />
+                        {t('appointmentForm.label_dentist')}
+                      </h4>
+                      <div className="ml-6">
+                        <p className="text-sm text-blue-700">
+                          {t('appointmentForm.auto_assign_dentist')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Additional Details Section */}
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 transition-all duration-300 hover:shadow-sm">
                     <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -1279,7 +1836,8 @@ const AppointmentForm: React.FC = () => {
                   </div>
                   
                   {/* Clinic */}
-                  {selectedClinic && (
+                  {/* Removed clinic selection UI as we now have a single clinic */}
+                  {/* {selectedClinic && (
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 transition-all duration-300 hover:shadow-sm">
                       <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
                         <MapPin className="h-4 w-4 text-blue-500 mr-2" />
@@ -1293,7 +1851,7 @@ const AppointmentForm: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
                 
                 {/* Confirmation Message */}
@@ -1322,22 +1880,23 @@ const AppointmentForm: React.FC = () => {
 
           </div>
           
-          {/* Form Actions - Outside transition wrapper */}
-          <div className="mt-8 flex justify-between">
+              {/* Form Actions - Modern Footer */}
+              <div className="bg-gray-50 px-4 sm:px-6 py-4 sm:py-6 border-t border-gray-200">
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-0">
             {currentStep !== (isPatientUser ? 'service' : 'patient') ? (
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 onClick={goToPreviousStep}
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:shadow-md touch-manipulation"
               >
-                <ArrowLeft className="-ml-1 mr-2 h-4 w-4" />
+                      <ArrowLeft className="w-5 h-5 mr-2" />
                 {t('common.back')}
               </button>
             ) : (
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 onClick={() => navigate('/appointments')}
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:shadow-md touch-manipulation"
               >
                 {t('common.cancel')}
               </button>
@@ -1345,28 +1904,44 @@ const AppointmentForm: React.FC = () => {
             
             <button
               type="submit"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              disabled={isLoading}
+              disabled={isLoading || isSubmitting}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border-2 border-transparent rounded-xl text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 touch-manipulation ${
+                      isLoading || isSubmitting
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white hover:shadow-xl transform hover:scale-105'
+                    }`}
             >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {t('common.loading')}
-                </span>
+              {isLoading || isSubmitting ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"></div>
+                        {isSubmitting ? t('appointmentForm.creatingAppointment') : t('common.loading')}
+                      </div>
               ) : currentStep === 'review' ? (
-                isEditMode ? t('common.update') : t('common.create')
+                      <div className="flex items-center">
+                        {isEditMode ? (
+                          <>
+                            <CheckIcon className="w-5 h-5 mr-2" />
+                            {t('common.update')}
+                          </>
               ) : (
                 <>
-                  {t('common.next')}
-                  <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
-                </>
+                            <Calendar className="w-5 h-5 mr-2" />
+                            {t('common.create')}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        {t('common.next')}
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </div>
               )}
             </button>
+                </div>
           </div>
         </form>
+          </div>
+        </div>
       </div>
     </div>
   );

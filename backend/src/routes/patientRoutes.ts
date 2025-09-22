@@ -7,7 +7,8 @@ import {
   deletePatient,
   searchPatients,
   getPatientMedicalHistory,
-  updatePatientMedicalHistory
+  updatePatientMedicalHistory,
+  getPatientsByUserId
 } from '../controllers/patientController';
 import { getPatientMedications } from '../controllers/medicationController';
 import {
@@ -75,6 +76,12 @@ router.get('/search', staffOrAdmin, [
     .withMessage('Search query must be at least 2 characters'),
   ...validatePagination.slice(0, -1)
 ], handleValidationErrors, searchPatients);
+
+// Get patients by user ID (for patient users to find their own records)
+router.get('/user/:userId', userOwnerOrStaff('userId'), [
+  ...createMongoIdValidation('userId'),
+  ...validatePagination.slice(0, -1)
+], handleValidationErrors, getPatientsByUserId);
 
 // Note: Statistics, recent patients, and clinic-specific routes commented out
 // until corresponding controller methods are implemented

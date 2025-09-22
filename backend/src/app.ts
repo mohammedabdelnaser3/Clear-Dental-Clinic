@@ -154,13 +154,13 @@ app.use((req, res, next) => {
 });
 
 // Debug route for testing
-app.get("/debug", (req, res) => {
-	console.log("✅ Debug route hit!");
-	res.json({
-		message: "Debug route working",
-		timestamp: new Date().toISOString(),
-	});
-});
+// app.get("/debug", (req, res) => {
+// 	console.log("✅ Debug route hit!");
+// 	res.json({
+// 		message: "Debug route working",
+// 		timestamp: new Date().toISOString(),
+// 	});
+// });
 
 // API routes
 app.use("/", routes);

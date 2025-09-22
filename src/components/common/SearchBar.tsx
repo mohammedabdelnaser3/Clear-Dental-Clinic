@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '../ui';
 
 interface SearchBarProps {
@@ -13,7 +14,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  placeholder = "Search...",
+  placeholder,
   onSearch,
   onClear,
   initialValue = '',
@@ -22,6 +23,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   loading = false,
   className = ''
 }) => {
+  const { t } = useTranslation();
+  const defaultPlaceholder = placeholder || t('common.search') + '...';
   const [query, setQuery] = useState(initialValue);
   const [debouncedQuery, setDebouncedQuery] = useState(initialValue);
 
@@ -57,7 +60,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <div className={`relative ${className}`}>
       <Input
         type="text"
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyPress={handleKeyPress}

@@ -80,9 +80,10 @@ export const validateAppointmentForm = (
  */
 export const validateTimeSlotAvailability = async (
   appointmentService: any,
-  data: { date: string; timeSlot: string },
+  data: { date: string; timeSlot: string; dentistId?: string },
   clinicId: string,
-  appointmentId?: string
+  appointmentId?: string,
+  fallbackDentistId?: string
 ): Promise<ValidationResult> => {
   try {
     // Validate required parameters before making the API call
@@ -93,11 +94,15 @@ export const validateTimeSlotAvailability = async (
       };
     }
     
+    // Use dentistId from data, or fallback dentistId if provided
+    const dentistId = data.dentistId || fallbackDentistId;
+    
     // The improved checkTimeSlotConflict now returns a boolean
     const hasConflict = await appointmentService.checkTimeSlotConflict({
       date: data.date,
       timeSlot: data.timeSlot,
       clinicId: clinicId,
+      dentistId: dentistId, // Include dentistId to prevent 400 error
       excludeAppointmentId: appointmentId
     });
 

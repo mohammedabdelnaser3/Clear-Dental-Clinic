@@ -193,9 +193,11 @@ export const getUsersByRole = catchAsync(async (req: Request, res: Response) => 
   });
 });
 
-// Get dentists
+// Get dentists with enhanced error handling
 export const getDentists = catchAsync(async (req: Request, res: Response) => {
   const { clinicId } = req.query;
+  
+  console.log('getDentists called with clinicId:', clinicId);
   
   const query: any = {
     role: 'dentist',
@@ -206,14 +208,41 @@ export const getDentists = catchAsync(async (req: Request, res: Response) => {
     query.assignedClinics = clinicId;
   }
 
+  console.log('Dentist query:', JSON.stringify(query, null, 2));
+
   const dentists = await User.find(query)
     .populate('assignedClinics', 'name')
     .select('firstName lastName email phone specialization licenseNumber profileImage')
     .sort({ firstName: 1 });
 
+  console.log(`Found ${dentists.length} dentists for query`);
+
+  // If specific clinic requested but no dentists found, return 404 instead of 401
+  if (clinicId && dentists.length === 0) {
+    // First verify the clinic exists
+    const Clinic = require('../models/Clinic').default;
+    const clinic = await Clinic.findById(clinicId);
+    
+    if (!clinic) {
+      return res.status(404).json({
+        success: false,
+        message: 'Clinic not found',
+        data: { dentists: [] }
+      });
+    }
+    
+    // Clinic exists but has no dentists assigned
+    return res.status(200).json({
+      success: true,
+      data: { dentists: [] },
+      message: `No dentists are currently assigned to clinic "${clinic.name}". Please contact administration to assign dentists.`
+    });
+  }
+
   res.json({
     success: true,
-    data: { dentists }
+    data: { dentists },
+    message: dentists.length > 0 ? undefined : 'No dentists found in the system'
   });
 });
 

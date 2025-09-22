@@ -19,17 +19,28 @@ const transformClinicData = (clinic: any): Clinic => {
   };
 };
 
+// Use the actual clinic ID from the database (Dr. Gamal Abdel Nasser Center)
+// const SINGLE_CLINIC_ID = '687468107e70478314c346b6';
+
 // Get all clinics
-export const getClinics = async (): Promise<ApiResponse<Clinic[]>> => {
+export const getAllClinics = async (): Promise<ApiResponse<Clinic[]>> => {
   try {
-    const response = await api.get('/clinics');
-    const clinics = response.data.data.map(transformClinicData);
+    const response = await api.get('/api/v1/clinics/public');
     
-    return {
-      success: true,
-      data: clinics,
-      message: 'Clinics retrieved successfully'
-    };
+    if (response.data?.data) {
+      const clinics = response.data.data.map(transformClinicData);
+      return {
+        success: true,
+        data: clinics,
+        message: 'Clinics retrieved successfully'
+      };
+    } else {
+      return {
+        success: false,
+        data: [],
+        message: 'No clinics found'
+      };
+    }
   } catch (error: any) {
     return {
       success: false,
@@ -39,81 +50,29 @@ export const getClinics = async (): Promise<ApiResponse<Clinic[]>> => {
   }
 };
 
-// Get clinic by ID
-export const getClinicById = async (id: string): Promise<ApiResponse<Clinic | null>> => {
+// Get single clinic data (backward compatibility)
+export const getClinic = async (): Promise<ApiResponse<Clinic | null>> => {
   try {
-    const response = await api.get(`/clinics/${id}`);
-    const clinic = transformClinicData(response.data.data);
+    const clinicsResponse = await getAllClinics();
     
-    return {
-      success: true,
-      data: clinic,
-      message: 'Clinic retrieved successfully'
-    };
+    if (clinicsResponse.success && clinicsResponse.data.length > 0) {
+      return {
+        success: true,
+        data: clinicsResponse.data[0],
+        message: 'Clinic retrieved successfully'
+      };
+    } else {
+      return {
+        success: false,
+        data: null,
+        message: 'No clinics found'
+      };
+    }
   } catch (error: any) {
     return {
       success: false,
       data: null,
-      message: error.response?.data?.message || error.message || 'Failed to retrieve clinic'
-    };
-  }
-};
-
-// Create clinic
-export const createClinic = async (clinicData: Omit<Clinic, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Clinic>> => {
-  try {
-    const response = await api.post('/clinics', clinicData);
-    const clinic = transformClinicData(response.data.data);
-    
-    return {
-      success: true,
-      data: clinic,
-      message: 'Clinic created successfully'
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      data: {} as Clinic,
-      message: error.response?.data?.message || error.message || 'Failed to create clinic'
-    };
-  }
-};
-
-// Update clinic
-export const updateClinic = async (id: string, clinicData: Partial<Clinic>): Promise<ApiResponse<Clinic>> => {
-  try {
-    const response = await api.put(`/clinics/${id}`, clinicData);
-    const clinic = transformClinicData(response.data.data);
-    
-    return {
-      success: true,
-      data: clinic,
-      message: 'Clinic updated successfully'
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      data: {} as Clinic,
-      message: error.response?.data?.message || error.message || 'Failed to update clinic'
-    };
-  }
-};
-
-// Delete clinic
-export const deleteClinic = async (id: string): Promise<ApiResponse<null>> => {
-  try {
-    await api.delete(`/clinics/${id}`);
-    
-    return {
-      success: true,
-      data: null,
-      message: 'Clinic deleted successfully'
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      data: null,
-      message: error.response?.data?.message || error.message || 'Failed to delete clinic'
+      message: error.message || 'Failed to retrieve clinic'
     };
   }
 };

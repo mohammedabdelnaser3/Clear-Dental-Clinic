@@ -211,7 +211,7 @@ const Patients: React.FC = () => {
           data={paginatedPatients}
           keyExtractor={(patient) => patient.id}
           isLoading={loading}
-          emptyMessage={isPatient ? "No profile information found" : "No patients found"}
+          emptyMessage={isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
           onRowClick={handleRowClick}
           isSelectable={isStaffOrAdmin}
           selectedIds={selectedPatients}

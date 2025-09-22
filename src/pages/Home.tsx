@@ -26,7 +26,6 @@ import type { User as UserType } from '../types';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedLocation, setSelectedLocation] = useState('attsa');
   const [dentists, setDentists] = useState<UserType[]>([]);
   const [_loading, setLoading] = useState(true);
   // Fetch real data on component mount
@@ -64,18 +63,8 @@ const Home: React.FC = () => {
         emergency: t('clinicLocations.attsa.hours.emergency')
       },
       mapUrl: 'https://maps.google.com/?q=Attsa+Preparatory+School+Attsa+Fayoum+Egypt'
-    },
-    fayoum: {
-      name: t('clinicLocations.fayoum.name'),
-      address: t('clinicLocations.fayoum.address'),
-      phone: '+201017848825',
-      hours: {
-        weekdays: t('clinicLocations.fayoum.hours.weekdays'),
-        friday: t('clinicLocations.fayoum.hours.friday'),
-        emergency: t('clinicLocations.fayoum.hours.emergency')
-      },
-      mapUrl: 'https://maps.google.com/?q=Al-Nabawi+Street+General+Hospital+Fayoum+Egypt'
     }
+    // Removed fayoum location as we are focusing on a single clinic
   };
 
   const services = [
@@ -160,42 +149,61 @@ const Home: React.FC = () => {
     }
   ];
 
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+
+  const handleNextTestimonial = () => {
+    setCurrentTestimonialIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  };
+
+  const handlePrevTestimonial = () => {
+    setCurrentTestimonialIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+  };
+
+  // Clinic Locations - Updated to focus on single location without selection
   return (
     <div className="min-h-screen">
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 to-indigo-100 py-16 md:py-24">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-gradient-to-br from-blue-50 to-indigo-100 py-16 md:py-24 overflow-hidden" role="banner">
+        <div className="absolute inset-0 z-0">
+          <img src="/images/dental-clinic.jpg" alt="Dental clinic interior" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 bg-blue-900 bg-opacity-50"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-8 lg:mb-0">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                 {t('hero.title')}
-                <span className="text-blue-600"> {t('hero.subtitle')}</span>
+                <span className="text-blue-300"> {t('hero.subtitle')}</span>
               </h1>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
                 {t('hero.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
-                  <Calendar className="w-5 h-5 mr-2" />
+                <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-white px-10 py-5 text-xl font-bold" aria-label="Book an appointment online">
+                  <Calendar className="w-6 h-6 mr-2" />
                   {t('hero.bookAppointment')}
                 </Button>
-                <Button variant="outline" size="lg" className="px-8 py-4 text-lg">
+                <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-blue-700" aria-label="Call us now">
                   <Phone className="w-5 h-5 mr-2" />
                   {t('hero.callNow')}
                 </Button>
+                <Button variant="outline" size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg" aria-label="Create a patient account">
+                  <Users className="w-5 h-5 mr-2" />
+                  Create Account
+                </Button>
               </div>
-              <div className="flex items-center gap-6 text-sm text-gray-600">
+              <div className="flex items-center gap-6 text-sm text-blue-100">
                 <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
                   {t('hero.hipaaCompliant')}
                 </div>
                 <div className="flex items-center">
-                  <Shield className="w-5 h-5 text-blue-500 mr-2" />
+                  <Shield className="w-5 h-5 text-blue-300 mr-2" />
                   {t('hero.adaCertified')}
                 </div>
                 <div className="flex items-center">
-                  <Award className="w-5 h-5 text-yellow-500 mr-2" />
+                  <Award className="w-5 h-5 text-yellow-400 mr-2" />
                   {t('home.hero.experience')}
                 </div>
               </div>
@@ -218,9 +226,9 @@ const Home: React.FC = () => {
                         <Star key={i} className="w-4 h-4 fill-current" />
                       ))}
                     </div>
-                    <span className="text-sm font-medium">4.9/5 Rating</span>
+                    <span className="text-sm font-medium">{t('home.rating.score')}</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">500+ Happy Patients</p>
+                  <p className="text-xs text-gray-600 mt-1">{t('home.rating.happyPatients')}</p>
                 </div>
               </div>
             </div>
@@ -228,57 +236,73 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* New Patient Information Section */}
+      <section className="py-12 bg-gray-50" role="region" aria-label="New patient information">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              New Patient Information
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Start your journey to a healthier smile today. Create an account to book appointments and manage your dental care easily.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-4xl mx-auto">
+            <Card className="p-6 text-center flex-1">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('home.quickStart.createAccount')}</h3>
+              <p className="text-gray-600 mb-4">
+                Sign up to access our patient portal and manage your appointments.
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white">
+                Sign Up Now
+              </Button>
+            </Card>
+            <Card className="p-6 text-center flex-1">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('home.quickStart.bookAppointment')}</h3>
+              <p className="text-gray-600 mb-4">
+                Schedule your first visit with our easy online booking system.
+              </p>
+              <Button className="bg-blue-700 hover:bg-blue-800 text-white">
+                Book Now
+              </Button>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Clinic Locations */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" role="region" aria-label="Clinic location">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {t('home.locations.title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {t('home.locations.description')}
+              Visit our clinic in Attsa for all your dental needs.
             </p>
           </div>
           
-          <div className="flex justify-center mb-8">
-            <div className="bg-gray-100 p-1 rounded-lg">
-              <button
-                onClick={() => setSelectedLocation('attsa')}
-                className={`px-6 py-3 rounded-md font-medium transition-all ${
-                  selectedLocation === 'attsa'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('home.locations.attsa')}
-              </button>
-              <button
-                onClick={() => setSelectedLocation('fayoum')}
-                className={`px-6 py-3 rounded-md font-medium transition-all ${
-                  selectedLocation === 'fayoum'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('home.locations.fayoum')}
-              </button>
-            </div>
-          </div>
-
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="p-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {clinicLocations[selectedLocation as keyof typeof clinicLocations].name}
+                {clinicLocations['attsa'].name}
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <p className="text-gray-700">
-                      {clinicLocations[selectedLocation as keyof typeof clinicLocations].address}
+                      {clinicLocations['attsa'].address}
                     </p>
                     <a 
-                      href={clinicLocations[selectedLocation as keyof typeof clinicLocations].mapUrl}
+                      href={clinicLocations['attsa'].mapUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium"
@@ -290,18 +314,18 @@ const Home: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-blue-600" />
                   <a 
-                    href={`tel:${clinicLocations[selectedLocation as keyof typeof clinicLocations].phone}`}
+                    href={`tel:${clinicLocations['attsa'].phone}`}
                     className="text-gray-700 hover:text-blue-600 font-medium"
                   >
-                    {clinicLocations[selectedLocation as keyof typeof clinicLocations].phone}
+                    {clinicLocations['attsa'].phone}
                   </a>
                 </div>
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-blue-600 mt-1" />
                   <div className="text-gray-700">
-                    <p>{clinicLocations[selectedLocation as keyof typeof clinicLocations].hours.weekdays}</p>
-                    <p>{clinicLocations[selectedLocation as keyof typeof clinicLocations].hours.friday}</p>
-                    <p className="text-red-600 font-medium">{clinicLocations[selectedLocation as keyof typeof clinicLocations].hours.emergency}</p>
+                    <p>{clinicLocations['attsa'].hours.weekdays}</p>
+                    <p>{clinicLocations['attsa'].hours.friday}</p>
+                    <p className="text-red-600 font-medium">{clinicLocations['attsa'].hours.emergency}</p>
                   </div>
                 </div>
               </div>
@@ -326,7 +350,7 @@ const Home: React.FC = () => {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Clinic Location Map"
+                title={t('home.map.title')}
               ></iframe>
             </div>
           </div>
@@ -334,7 +358,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Dental Services Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50" role="region" aria-label="Dental services">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -348,6 +372,9 @@ const Home: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {services.map((service, index) => (
               <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+                <div className="mb-4">
+                  <img src={`/images/service-${index + 1}.jpg`} alt={service.title} className="w-full h-48 object-cover rounded-md" />
+                </div>
                 <div className="text-blue-600 mb-4">
                   {service.icon}
                 </div>
@@ -378,7 +405,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Patient Testimonials Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" role="region" aria-label="Patient testimonials">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -389,41 +416,67 @@ const Home: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400 mr-2">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-800 text-xs">
-                    {testimonial.treatment}
-                  </Badge>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="flex overflow-hidden">
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="w-full flex-shrink-0 transition-transform duration-500" style={{ transform: `translateX(-${currentTestimonialIndex * 100}%)` }}>
+                  <Card className="p-6 mx-auto max-w-md">
+                    <div className="flex items-center mb-4">
+                      <div className="flex text-yellow-400 mr-2">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs">
+                        {testimonial.treatment}
+                      </Badge>
+                    </div>
+                    <p className="text-gray-600 mb-4 italic">
+                      "{testimonial.text}"
+                    </p>
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <Smile className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                        <p className="text-sm text-gray-500">{t('home.testimonials.verifiedPatient')}</p>
+                      </div>
+                    </div>
+                  </Card>
                 </div>
-                <p className="text-gray-600 mb-4 italic">
-                  "{testimonial.text}"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <Smile className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{t('home.testimonials.verifiedPatient')}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
+              ))}
+            </div>
+            <div className="flex justify-center mt-6 gap-2">
+              {testimonials.map((_, index) => (
+                <button 
+                  key={index} 
+                  onClick={() => setCurrentTestimonialIndex(index)}
+                  className={`w-3 h-3 rounded-full ${currentTestimonialIndex === index ? 'bg-blue-600' : 'bg-gray-300'} transition-colors`}
+                  aria-label={`View testimonial ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button 
+              onClick={handlePrevTestimonial}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+              aria-label="Previous testimonial"
+            >
+              ←
+            </button>
+            <button 
+              onClick={handleNextTestimonial}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+              aria-label="Next testimonial"
+            >
+              →
+            </button>
           </div>
         </div>
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-24 bg-white" role="region" aria-label="Why choose us">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -436,6 +489,9 @@ const Home: React.FC = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="p-6 text-center">
+              <div className="mb-4">
+                <img src="/images/team-experience.jpg" alt="Experienced Team" className="w-full h-48 object-cover rounded-md mx-auto" />
+              </div>
               <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
                 <Users className="w-8 h-8 text-blue-600" />
               </div>
@@ -445,6 +501,9 @@ const Home: React.FC = () => {
               </p>
             </Card>
             <Card className="p-6 text-center">
+              <div className="mb-4">
+                <img src="/images/patient-care.jpg" alt="Patient-Centered Care" className="w-full h-48 object-cover rounded-md mx-auto" />
+              </div>
               <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
                 <Smile className="w-8 h-8 text-green-600" />
               </div>
@@ -454,6 +513,9 @@ const Home: React.FC = () => {
               </p>
             </Card>
             <Card className="p-6 text-center">
+              <div className="mb-4">
+                <img src="/images/modern-tech.jpg" alt="Modern Technology" className="w-full h-48 object-cover rounded-md mx-auto" />
+              </div>
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
                 <Award className="w-8 h-8 text-purple-600" />
               </div>
@@ -462,41 +524,6 @@ const Home: React.FC = () => {
                 {t('home.whyChooseUs.cards.modernTechnology.description')}
               </p>
             </Card>
-          </div>
-              <Card className="p-6 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Users className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {t('home.team.experiencedDentists.title')}
-                </h3>
-                <p className="text-gray-600">
-                  {t('home.team.experiencedDentists.description')}
-                </p>
-              </Card>
-              <Card className="p-6 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {t('home.team.gentleCare.title')}
-                </h3>
-                <p className="text-gray-600">
-                  {t('home.team.gentleCare.description')}
-                </p>
-              </Card>
-              <Card className="p-6 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Award className="w-8 h-8 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {t('home.team.advancedTechnology.title')}
-                </h3>
-                <p className="text-gray-600">
-                  {t('home.team.advancedTechnology.description')}
-                </p>
-              </Card>
-            </div>
           </div>
           
           <div className="text-center">
@@ -509,7 +536,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Newsletter & Contact Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-blue-600 text-white" role="region" aria-label="Newsletter signup">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -547,7 +574,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12" role="contentinfo">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             {/* Company Info */}
@@ -613,7 +640,7 @@ const Home: React.FC = () => {
                   <MapPin className="w-4 h-4 mt-1" />
                   <div>
                     <p>{t('home.footer.contactInfo.addressAttsa')}</p>
-                    <p>{t('home.footer.contactInfo.addressFayoum')}</p>
+                    // Removed reference to second location
                   </div>
                 </div>
               </div>

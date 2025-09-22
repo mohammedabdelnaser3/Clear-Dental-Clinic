@@ -28,6 +28,7 @@ import Profile from './pages/profile/Profile';
 import Clinics from './pages/clinics/Clinics';
 import MultiClinicDashboard from './pages/MultiClinicDashboard';
 import StaffScheduling from './components/StaffScheduling';
+import Search from './pages/search/Search';
 
 // Public Pages
 import Home from './pages/Home';
@@ -49,20 +50,20 @@ const AppContent = () => {
   const from = location.state?.from?.pathname || '/dashboard';
   const isAuthenticated = !!user;
 
-  // Debug logs for App routing
-  console.log('🚀 App.tsx - AppContent render:', {
-    currentPath: location.pathname,
-    isInitialized,
-    loading,
-    isAuthenticated,
-    user: user ? { id: user.id, email: user.email, role: user.role } : null,
-    from,
-    locationState: location.state
-  });
+  // Only log in development mode and reduce frequency
+  if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {
+    console.log('🚀 App.tsx - AppContent render:', {
+      currentPath: location.pathname,
+      isInitialized,
+      loading,
+      isAuthenticated,
+      userRole: user?.role,
+      from
+    });
+  }
 
   // Show loading during initial auth check
   if (!isInitialized || loading) {
-    console.log('⏳ App.tsx: Showing loading spinner - not initialized or loading');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -81,22 +82,10 @@ const AppContent = () => {
       <Route path="/terms" element={<Layout><Terms /></Layout>} />
       
       {/* Auth Routes */}
-      <Route path="/login" element={!isAuthenticated ? <Login /> : (() => {
-        console.log('🔄 App.tsx: Redirecting authenticated user from /login to:', from);
-        return <Navigate to={from} replace />;
-      })()} />
-      <Route path="/register" element={!isAuthenticated ? <Register /> : (() => {
-        console.log('🔄 App.tsx: Redirecting authenticated user from /register to:', from);
-        return <Navigate to={from} replace />;
-      })()} />
-      <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : (() => {
-        console.log('🔄 App.tsx: Redirecting authenticated user from /forgot-password to:', from);
-        return <Navigate to={from} replace />;
-      })()} />
-      <Route path="/reset-password" element={!isAuthenticated ? <ResetPassword /> : (() => {
-        console.log('🔄 App.tsx: Redirecting authenticated user from /reset-password to:', from);
-        return <Navigate to={from} replace />;
-      })()} />
+      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={from} replace />} />
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to={from} replace />} />
+      <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to={from} replace />} />
+      <Route path="/reset-password" element={!isAuthenticated ? <ResetPassword /> : <Navigate to={from} replace />} />
       
       {/* Protected Routes */}
       <Route 
@@ -239,6 +228,16 @@ const AppContent = () => {
             } 
           />
           
+          {/* Search Route */}
+          <Route 
+            path="/search" 
+            element={
+              <ProtectedRoute>
+                <Layout><Search /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+
           {/* Settings Routes */}
           <Route 
             path="/settings" 
@@ -268,7 +267,13 @@ function App() {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <Router>
+        {/* React Router v7 Migration - Future flags enabled for forward compatibility */}
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <AppContent />
           <Toaster
             position="top-right"

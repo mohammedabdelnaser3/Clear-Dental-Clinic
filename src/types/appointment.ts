@@ -1,7 +1,7 @@
 export interface Appointment {
   id: string;
   patientId: string;
-  dentistId: string;
+  dentistId?: string; // Made optional
   clinicId: string;
   clinicName?: string;
   dentistName?: string;

@@ -174,7 +174,7 @@ const Register: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 error={formErrors.email}
-                placeholder="you@example.com"
+                placeholder={t('common.placeholders.email')}
                 required
                 autoComplete="email"
               />
@@ -187,7 +187,7 @@ const Register: React.FC = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 error={formErrors.phoneNumber}
-                placeholder="(123) 456-7890"
+                placeholder={t('common.placeholders.phone')}
                 required
                 autoComplete="tel"
               />
@@ -230,7 +230,7 @@ const Register: React.FC = () => {
                 value={formData.age > 0 ? formData.age.toString() : ''}
                 onChange={handleChange}
                 error={formErrors.age}
-                placeholder="18"
+                placeholder={t('common.placeholders.age')}
                 required
                 min="1"
                 max="120"
@@ -245,7 +245,7 @@ const Register: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 error={formErrors.password}
-                placeholder="••••••••"
+                placeholder={t('common.placeholders.password')}
                 required
                 autoComplete="new-password"
               />
@@ -259,7 +259,7 @@ const Register: React.FC = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 error={formErrors.confirmPassword}
-                placeholder="••••••••"
+                placeholder={t('common.placeholders.password')}
                 required
                 autoComplete="new-password"
               />

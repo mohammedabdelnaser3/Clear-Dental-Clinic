@@ -3,8 +3,10 @@ import type { Patient, PatientReport, ApiResponse, PaginatedResponse } from '../
 
 // Helper function to transform backend patient data
 const transformPatientData = (patient: any): Patient => {
+
+  
   return {
-    id: patient._id,
+    id: patient.id || patient._id, // Use patient.id if available, fallback to _id
     firstName: patient.firstName,
     lastName: patient.lastName,
     email: patient.email,
@@ -20,6 +22,7 @@ const transformPatientData = (patient: any): Patient => {
     },
     treatmentRecords: patient.treatmentRecords || [],
     preferredClinicId: patient.preferredClinic,
+    userId: patient.userId, // Link to user account
     createdAt: new Date(patient.createdAt),
     updatedAt: new Date(patient.updatedAt)
   };
@@ -34,7 +37,10 @@ export const getPatients = async (params?: {
   patientId?: string; // For patient role - only their own data
 }): Promise<PaginatedResponse<Patient>> => {
   try {
-    const response = await api.get<PaginatedResponse<any>>('/patients', { params });
+    const response = await api.get<PaginatedResponse<any>>('/api/v1/patients', { params });
+    
+
+    
     return {
       ...response.data,
       data: response.data.data.map(transformPatientData),
@@ -49,7 +55,7 @@ export const getPatients = async (params?: {
 // Get patient by ID
 export const getPatientById = async (id: string): Promise<Patient> => {
   try {
-    const response = await api.get<ApiResponse<any>>(`/patients/${id}`);
+    const response = await api.get<ApiResponse<any>>(`/api/v1/patients/${id}`);
     return transformPatientData(response.data.data);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch patient';
@@ -60,7 +66,7 @@ export const getPatientById = async (id: string): Promise<Patient> => {
 // Create a new patient
 export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>): Promise<Patient> => {
   try {
-    const response = await api.post<ApiResponse<any>>('/patients', patientData);
+    const response = await api.post<ApiResponse<any>>('/api/v1/patients', patientData);
     return transformPatientData(response.data.data);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to create patient';
@@ -71,7 +77,7 @@ export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt
 // Update an existing patient
 export const updatePatient = async (id: string, patientData: Partial<Patient>): Promise<Patient> => {
   try {
-    const response = await api.put<ApiResponse<any>>(`/patients/${id}`, patientData);
+    const response = await api.put<ApiResponse<any>>(`/api/v1/patients/${id}`, patientData);
     return transformPatientData(response.data.data);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to update patient';
@@ -82,7 +88,7 @@ export const updatePatient = async (id: string, patientData: Partial<Patient>): 
 // Delete a patient
 export const deletePatient = async (id: string): Promise<void> => {
   try {
-    await api.delete(`/patients/${id}`);
+    await api.delete(`/api/v1/patients/${id}`);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to delete patient';
     throw new Error(errorMessage);
@@ -93,7 +99,7 @@ export const deletePatient = async (id: string): Promise<void> => {
 export const getPatientReports = async (patientId?: string): Promise<PatientReport[]> => {
   try {
     // If no patientId provided, backend will return reports based on user role
-    const endpoint = patientId ? `/patients/${patientId}/reports` : '/reports/my-reports';
+    const endpoint = patientId ? `/api/v1/patients/${patientId}/reports` : '/api/v1/reports/my-reports';
     const response = await api.get<ApiResponse<PatientReport[]>>(endpoint);
     return response.data.data || [];
   } catch (error: any) {
@@ -105,7 +111,7 @@ export const getPatientReports = async (patientId?: string): Promise<PatientRepo
 // Create patient report
 export const createPatientReport = async (reportData: Omit<PatientReport, 'id' | 'createdAt' | 'updatedAt'>): Promise<PatientReport> => {
   try {
-    const response = await api.post<ApiResponse<PatientReport>>(`/patients/${reportData.patientId}/reports`, reportData);
+    const response = await api.post<ApiResponse<PatientReport>>(`/api/v1/patients/${reportData.patientId}/reports`, reportData);
     if (!response.data.data) {
       throw new Error('No data returned from server');
     }
@@ -119,7 +125,7 @@ export const createPatientReport = async (reportData: Omit<PatientReport, 'id' |
 // Update patient report
 export const updatePatientReport = async (reportId: string, reportData: Partial<PatientReport>): Promise<PatientReport> => {
   try {
-    const response = await api.put<ApiResponse<PatientReport>>(`/reports/${reportId}`, reportData);
+    const response = await api.put<ApiResponse<PatientReport>>(`/api/v1/reports/${reportId}`, reportData);
     if (!response.data.data) {
       throw new Error('No data returned from server');
     }
@@ -133,7 +139,7 @@ export const updatePatientReport = async (reportId: string, reportData: Partial<
 // Delete patient report
 export const deletePatientReport = async (reportId: string): Promise<void> => {
   try {
-    await api.delete(`/reports/${reportId}`);
+    await api.delete(`/api/v1/reports/${reportId}`);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to delete patient report';
     throw new Error(errorMessage);
@@ -149,7 +155,7 @@ export const getPatientsByUserId = async (userId: string, params?: {
     // Using a more reliable endpoint or adding fallback logic
     let response;
     try {
-      response = await api.get<PaginatedResponse<any>>(`/patients/user/${userId}`, { params });
+      response = await api.get<PaginatedResponse<any>>(`/api/v1/patients/user/${userId}`, { params });
     } catch (innerError) {
       // Fallback to alternative endpoint if the first one fails
       console.warn(`Error getting patient ID: ${innerError}`);

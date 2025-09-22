@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthUser } from '../types';
 import type { LoginCredentials } from '../types';
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     initAuth();
   }, [validateAndSetUser, isInitialized]);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setLoading(true);
       setError(null);
@@ -123,9 +123,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (data: RegisterData) => {
+  const register = useCallback(async (data: RegisterData) => {
     try {
       setLoading(true);
       setError(null);
@@ -155,9 +155,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setLoading(true);
       await logoutUser();
@@ -170,9 +170,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(null);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -184,9 +184,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const clearError = () => setError(null);
+  const clearError = useCallback(() => setError(null), []);
 
   const refreshUser = useCallback(async () => {
     // Prevent multiple refresh attempts
@@ -218,7 +218,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [user, validateAndSetUser]);
 
-  const value = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     user,
     loading,
     error,
@@ -229,7 +230,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     changePassword,
     clearError,
     refreshUser,
-  };
+  }), [user, loading, error, isInitialized, login, register, logout, changePassword, clearError, refreshUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Input from './Input';
 import type { ChangeEvent } from 'react';
 
@@ -19,6 +20,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   placeholder,
   disabled = false
 }) => {
+  const { t } = useTranslation();
   const formatDate = (date: Date | null): string => {
     if (!date) return '';
     return date.toISOString().split('T')[0];
@@ -42,7 +44,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             const newStart = parseDate(e.target.value);
             onChange?.({ start: newStart, end: rangeValue.end });
           }}
-          placeholder="Start date"
+          placeholder={t('common.startDate')}
           disabled={disabled}
           className="flex-1"
         />
@@ -53,7 +55,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             const newEnd = parseDate(e.target.value);
             onChange?.({ start: rangeValue.start, end: newEnd });
           }}
-          placeholder="End date"
+          placeholder={t('common.endDate')}
           disabled={disabled}
           className="flex-1"
         />

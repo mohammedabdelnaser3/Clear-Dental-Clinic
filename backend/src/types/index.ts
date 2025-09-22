@@ -132,7 +132,7 @@ export interface IClinicModel extends Model<IClinic> {
 export interface IAppointment extends Document {
   _id: Types.ObjectId;
   patientId: Types.ObjectId;
-  dentistId: Types.ObjectId;
+  dentistId?: Types.ObjectId; // Made optional
   clinicId: Types.ObjectId;
   date: Date;
   timeSlot: string;
@@ -170,6 +170,7 @@ export interface IAppointmentModel extends Model<IAppointment> {
   findByDentistAndDate(dentistId: string, date: Date): Promise<IAppointment[]>;
   findConflicts(dentistId: string, date: Date, timeSlot: string, duration: number, excludeId?: string): Promise<IAppointment[]>;
   getAvailableTimeSlots(dentistId: string, date: Date, duration?: number): Promise<any[]>;
+  getNextSlotAfterLastBooking(clinicId: string, date: Date, duration?: number): Promise<IAppointment | null>;
 }
 
 // Treatment Record related types
@@ -549,8 +550,11 @@ export interface ValidationError {
 
 // Time slot types
 export interface TimeSlot {
+  id: string;
   time: string;
-  available: boolean;
+  isAvailable: boolean;
+  isPeak: boolean;
+  available: boolean; // Keep for backward compatibility
   reason?: string;
 }
 

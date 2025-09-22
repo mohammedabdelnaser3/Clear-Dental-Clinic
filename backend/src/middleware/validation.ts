@@ -229,6 +229,7 @@ export const validateAppointmentCreation = [
     .withMessage('Invalid patient ID'),
   
   body('dentistId')
+    .optional()
     .isMongoId()
     .withMessage('Invalid dentist ID'),
   
@@ -247,22 +248,23 @@ export const validateAppointmentCreation = [
     .custom((value) => {
       const appointmentDate = new Date(value);
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (appointmentDate < today) {
+      
+      // Simple timezone-safe date comparison using date strings
+      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
+      const todayDateStr = today.toISOString().split('T')[0];
+      
+      if (appointmentDateStr < todayDateStr) {
         throw new Error('Appointment date cannot be in the past');
       }
       return true;
     }),
   
-  body('timeSlot.startTime')
+  body('timeSlot')
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-    .withMessage('Invalid start time format (HH:MM)'),
-  
-  body('timeSlot.endTime')
-    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-    .withMessage('Invalid end time format (HH:MM)'),
+    .withMessage('Invalid time slot format (HH:MM)'),
   
   body('duration')
+    .optional()
     .isInt({ min: 15, max: 480 })
     .withMessage('Duration must be between 15 and 480 minutes'),
   
@@ -284,8 +286,12 @@ export const validateAppointmentUpdate = [
       if (value) {
         const appointmentDate = new Date(value);
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (appointmentDate < today) {
+        
+        // Simple timezone-safe date comparison using date strings
+        const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
+        const todayDateStr = today.toISOString().split('T')[0];
+        
+        if (appointmentDateStr < todayDateStr) {
           throw new Error('Appointment date cannot be in the past');
         }
       }

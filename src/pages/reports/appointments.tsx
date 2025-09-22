@@ -226,7 +226,7 @@ const AppointmentReports: React.FC = () => {
                   xKey="date" 
                   yKey="appointments" 
                   xLabel="Date" 
-                  yLabel="Number of Appointments" 
+                  yLabel={t('reports.reportTypesConfig.appointments.numberOfAppointments')} 
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
@@ -244,7 +244,7 @@ const AppointmentReports: React.FC = () => {
                   xKey="name" 
                   yKey="appointments" 
                   xLabel="Doctor" 
-                  yLabel="Number of Appointments" 
+                  yLabel={t('reports.reportTypesConfig.appointments.numberOfAppointments')} 
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">

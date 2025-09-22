@@ -7,6 +7,9 @@ import { connectDB } from '../config/database';
 import { createAdminUser } from './adminSeeder';
 import { seedMedications } from './medicationSeeder';
 import { seedClinics } from './clinicSeeder';
+import { createDentistUsers } from './dentistSeeder';
+import { createPatientRecords } from './patientSeeder';
+import { createDentistSchedules } from './dentistScheduleSeeder';
 
 /**
  * Main seeder function that runs all seeders
@@ -18,14 +21,23 @@ export const runAllSeeders = async (): Promise<void> => {
     // Connect to database
     await connectDB();
     
-    // Run admin seeder
+    // Run admin seeder first
     await createAdminUser();
     
-    // Run clinic seeder
+    // Run clinic seeder (required for dentists)
     await seedClinics();
+    
+    // Run dentist seeder (creates dentist users)
+    await createDentistUsers();
+    
+    // Run patient seeder
+    await createPatientRecords();
     
     // Run medication seeder
     await seedMedications();
+    
+    // Run dentist schedule seeder (set up working days)
+    await createDentistSchedules();
     
     console.log('🎉 All seeders completed successfully!');
     
@@ -46,7 +58,7 @@ export const resetDatabase = async (): Promise<void> => {
     await connectDB();
     
     // Import models
-    const { User, Patient, Clinic, Appointment, TreatmentRecord, Notification, Medication, Prescription, Billing } = await import('../models');
+    const { User, Patient, Clinic, Appointment, TreatmentRecord, Notification, Medication, Prescription, Billing, StaffSchedule } = await import('../models');
     
     // Delete all data
     await Promise.all([
@@ -58,7 +70,8 @@ export const resetDatabase = async (): Promise<void> => {
       Notification.deleteMany({}),
       Medication.deleteMany({}),
       Prescription.deleteMany({}),
-      Billing.deleteMany({})
+      Billing.deleteMany({}),
+      StaffSchedule.deleteMany({})
     ]);
     
     console.log('✅ Database reset completed');

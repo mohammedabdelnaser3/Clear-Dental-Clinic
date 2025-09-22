@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Button, Input, Alert, Modal } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
-import { getClinics, createClinic, updateClinic, deleteClinic } from '../../services/clinicService';
+import { getClinic } from '../../services/clinicService';
 import type { Clinic } from '../../types';
 
 interface ClinicFormData {
@@ -21,11 +21,10 @@ interface ClinicFormData {
 
 const Clinics: React.FC = () => {
   const { user } = useAuth();
-  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [clinic, setClinic] = useState<Clinic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingClinic, setEditingClinic] = useState<Clinic | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState<ClinicFormData>({
     name: '',
     address: {
@@ -39,7 +38,6 @@ const Clinics: React.FC = () => {
     email: '',
     description: ''
   });
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Check if user has admin privileges
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
@@ -50,17 +48,21 @@ const Clinics: React.FC = () => {
       setLoading(false);
       return;
     }
-    fetchClinics();
+    fetchClinic();
   }, [isAdmin]);
 
-  const fetchClinics = async () => {
+  const fetchClinic = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getClinics();
-      setClinics(Array.isArray(response) ? response : (response.data || []));
+      const response = await getClinic();
+      if (response.success && response.data) {
+        setClinic(response.data);
+      } else {
+        setError(response.message || 'Failed to fetch clinic');
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch clinics');
+      setError(err.message || 'Failed to fetch clinic');
     } finally {
       setLoading(false);
     }
@@ -82,30 +84,7 @@ const Clinics: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setError(null);
-      if (editingClinic) {
-        await updateClinic(editingClinic.id, formData);
-      } else {
-        await createClinic({
-          ...formData,
-          staff: [],
-          operatingHours: [],
-          services: [],
-          isActive: true
-        });
-      }
-      await fetchClinics();
-      resetForm();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save clinic');
-    }
-  };
-
   const handleEdit = (clinic: Clinic) => {
-    setEditingClinic(clinic);
     setFormData({
       name: clinic.name,
       address: {
@@ -119,20 +98,7 @@ const Clinics: React.FC = () => {
       email: clinic.email,
       description: clinic.description || ''
     });
-    setShowCreateModal(true);
-  };
-
-  const handleDelete = async (clinicId: string) => {
-    if (!window.confirm('Are you sure you want to delete this clinic?')) {
-      return;
-    }
-    try {
-      setError(null);
-      await deleteClinic(clinicId);
-      await fetchClinics();
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete clinic');
-    }
+    setShowEditModal(true);
   };
 
   const resetForm = () => {
@@ -149,22 +115,14 @@ const Clinics: React.FC = () => {
       email: '',
       description: ''
     });
-    setEditingClinic(null);
-    setShowCreateModal(false);
+    setShowEditModal(false);
   };
-
-  const filteredClinics = clinics.filter(clinic =>
-    clinic.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    clinic.address.street.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    clinic.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    clinic.address.state.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (!isAdmin) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert variant="error">
-          Access denied. You need admin privileges to manage clinics.
+          Access denied. You need admin privileges to manage clinic settings.
         </Alert>
       </div>
     );
@@ -178,15 +136,25 @@ const Clinics: React.FC = () => {
     );
   }
 
+  if (!clinic) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="error">
+          No clinic found. Please contact system administrator.
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Clinic Management</h1>
+        <h1 className="text-2xl font-bold">Clinic Information</h1>
         <Button
           variant="primary"
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => handleEdit(clinic)}
         >
-          Add New Clinic
+          Edit Clinic
         </Button>
       </div>
 
@@ -196,160 +164,192 @@ const Clinics: React.FC = () => {
         </Alert>
       )}
 
-      {/* Search */}
-      <div className="mb-6">
-        <Input
-          type="text"
-          placeholder="Search clinics by name or address..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
-        />
-      </div>
-
-      {/* Clinics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredClinics.map((clinic) => (
-          <Card key={clinic.id} className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold">{clinic.name}</h3>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(clinic)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(clinic.id)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-            
-            <div className="space-y-2 text-sm text-gray-600">
-              <p><strong>Address:</strong> {clinic.address.street}, {clinic.address.city}, {clinic.address.state} {clinic.address.zipCode}</p>
-              <p><strong>Phone:</strong> {clinic.phone}</p>
-              <p><strong>Email:</strong> {clinic.email}</p>
-              {clinic.description && (
-                <p><strong>Description:</strong> {clinic.description}</p>
-              )}
-            </div>
-            
-            <div className="mt-4 pt-4 border-t">
-              <Link
-                to={`/settings/clinic/${clinic.id}`}
-                className="text-blue-600 hover:text-blue-700 text-sm"
+      {/* Single Clinic Display */}
+      <div className="max-w-4xl mx-auto">
+        <Card className="p-6">
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-2xl font-semibold">{clinic.name}</h3>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEdit(clinic)}
               >
-                View Settings →
-              </Link>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {filteredClinics.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">
-            {searchTerm ? 'No clinics found matching your search.' : 'No clinics found. Create your first clinic to get started.'}
-          </p>
-        </div>
-      )}
-
-      {/* Create/Edit Modal */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={resetForm}
-        title={editingClinic ? 'Edit Clinic' : 'Create New Clinic'}
-        size="lg"
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Clinic Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
-          
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-700">Address</h4>
-            <Input
-              label="Street Address"
-              name="address.street"
-              value={formData.address.street}
-              onChange={handleInputChange}
-              required
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="City"
-                name="address.city"
-                value={formData.address.city}
-                onChange={handleInputChange}
-                required
-              />
-              <Input
-                label="State"
-                name="address.state"
-                value={formData.address.state}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="ZIP Code"
-                name="address.zipCode"
-                value={formData.address.zipCode}
-                onChange={handleInputChange}
-                required
-              />
-              <Input
-                label="Country"
-                name="address.country"
-                value={formData.address.country}
-                onChange={handleInputChange}
-                required
-              />
+                Edit
+              </Button>
             </div>
           </div>
           
-          <Input
-            label="Phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleInputChange}
-            required
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Address</h4>
+                <p className="text-gray-900">
+                  {clinic.address.street}, {clinic.address.city}, {clinic.address.state} {clinic.address.zipCode}
+                </p>
+                <p className="text-gray-600">{clinic.address.country}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Contact Information</h4>
+                <p className="text-gray-900">
+                  <strong>Phone:</strong> {clinic.phone}
+                </p>
+                <p className="text-gray-900">
+                  <strong>Email:</strong> {clinic.email}
+                </p>
+                {clinic.website && (
+                  <p className="text-gray-900">
+                    <strong>Website:</strong> {clinic.website}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              {clinic.description && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Description</h4>
+                  <p className="text-gray-900">{clinic.description}</p>
+                </div>
+              )}
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Status</h4>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  clinic.isActive 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {clinic.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Operating Hours</h4>
+                {clinic.operatingHours && clinic.operatingHours.length > 0 ? (
+                  <div className="space-y-1">
+                    {clinic.operatingHours.map((hours, index) => (
+                      <p key={index} className="text-sm text-gray-900">
+                        {hours}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No operating hours set</p>
+                )}
+              </div>
+            </div>
+          </div>
           
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
+          <div className="mt-6 pt-6 border-t">
+            <Link
+              to={`/settings/clinic/${clinic.id}`}
+              className="text-blue-600 hover:text-blue-700 text-sm"
+            >
+              View Detailed Settings →
+            </Link>
+          </div>
+        </Card>
+      </div>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={resetForm}
+        title={t('clinics.editClinicInfo')}
+        size="lg"
+      >
+        <div className="p-4">
+          <Alert variant="info" className="mb-4">
+            Note: Clinic updates are currently disabled in single clinic mode. 
+            Please contact system administrator for any changes.
+          </Alert>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description (Optional)
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
+          <div className="space-y-4">
+            <Input
+              label={t('clinics.name')}
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Brief description of the clinic..."
+              disabled
             />
+            
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-gray-700">Address</h4>
+              <Input
+                label={t('clinics.address')}
+                name="address.street"
+                value={formData.address.street}
+                onChange={handleInputChange}
+                disabled
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="City"
+                  name="address.city"
+                  value={formData.address.city}
+                  onChange={handleInputChange}
+                  disabled
+                />
+                <Input
+                  label="State"
+                  name="address.state"
+                  value={formData.address.state}
+                  onChange={handleInputChange}
+                  disabled
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="ZIP Code"
+                  name="address.zipCode"
+                  value={formData.address.zipCode}
+                  onChange={handleInputChange}
+                  disabled
+                />
+                <Input
+                  label="Country"
+                  name="address.country"
+                  value={formData.address.country}
+                  onChange={handleInputChange}
+                  disabled
+                />
+              </div>
+            </div>
+            
+            <Input
+              label="Phone"
+              name="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={handleInputChange}
+              disabled
+            />
+            
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              disabled
+            />
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description (Optional)
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                placeholder={t('common.placeholders.description')}
+                disabled
+              />
+            </div>
           </div>
           
           <div className="flex justify-end space-x-3 pt-4">
@@ -358,16 +358,10 @@ const Clinics: React.FC = () => {
               variant="outline"
               onClick={resetForm}
             >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-            >
-              {editingClinic ? 'Update Clinic' : 'Create Clinic'}
+              Close
             </Button>
           </div>
-        </form>
+        </div>
       </Modal>
     </div>
   );

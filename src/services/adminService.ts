@@ -194,7 +194,7 @@ export const checkStaffAvailability = async (params: {
  * Create a new staff schedule
  */
 export const createStaffSchedule = async (scheduleData: any) => {
-  const response = await api.post('/staff-schedules', scheduleData);
+  const response = await api.post('/api/v1/staff-schedules', scheduleData);
   return response.data;
 };
 
@@ -226,7 +226,7 @@ export const getStaffScheduleById = async (scheduleId: string) => {
  * Get all clinics (admin)
  */
 export const getAdminClinics = async () => {
-  const response = await api.get('/admin/clinics');
+  const response = await api.get('/api/v1/admin/clinics');
   return response.data;
 };
 

@@ -65,14 +65,14 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 
   // Send welcome email
   try {
-    await sendWelcomeEmail(user.email, user.firstName);
+    await sendWelcomeEmail(user.email as any, user.firstName as any);
   } catch (emailError) {
     console.error('Failed to send welcome email:', emailError);
     // Don't fail registration if email fails
   }
 
   // Create token response
-  const tokenResponse = createTokenResponse(user);
+  const tokenResponse = createTokenResponse(user as any);
 
   res.status(201).json({
     success: true,
@@ -82,45 +82,55 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 });
 
 // Login user
-export const login = catchAsync(async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) {
     throw createValidationError('credentials', 'Email and password are required');
   }
 
   // Find user and include password for comparison
-  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-  if (!user) {
-    throw createUnauthorizedError('Invalid email or password. Please check your credentials and try again.');
+  try{
+    // console.log(email, password);
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    // console.log(user);
+    
+    if (!user) {
+      throw createUnauthorizedError('#1-Invalid email or password. Please check your credentials and try again.');
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      throw createUnauthorizedError('#2-Your account has been deactivated. Please contact support for assistance.');
+    }
+
+    // Compare password
+    if (!user.password || typeof user.password !== 'string') {
+      throw createUnauthorizedError('#3-Invalid email or password. Please check your credentials and try again.');
+    }
+    console.log(user.password);
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      throw createUnauthorizedError('#4-Invalid email or password. Please check your credentials and try again.');
+    }
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Create token response
+    const tokenResponse = createTokenResponse(user as any);
+
+    res.json({
+      success: true,
+      message: 'Login successful. Welcome back!',
+      data: tokenResponse
+    });
+} catch (err: any) {
+  for(let e in err.errors){
+    console.log(err.errors[e].message);
   }
-
-  // Check if user is active
-  if (!user.isActive) {
-    throw createUnauthorizedError('Your account has been deactivated. Please contact support for assistance.');
-  }
-
-  // Compare password
-  if (!user.password) {
-    throw createUnauthorizedError('Invalid email or password. Please check your credentials and try again.');
-  }
-  const isPasswordValid = await comparePassword(password, user.password);
-  if (!isPasswordValid) {
-    throw createUnauthorizedError('Invalid email or password. Please check your credentials and try again.');
-  }
-
-  // Update last login
-  user.lastLogin = new Date();
-  await user.save();
-
-  // Create token response
-  const tokenResponse = createTokenResponse(user);
-
-  res.json({
-    success: true,
-    message: 'Login successful. Welcome back!',
-    data: tokenResponse
-  });
-});
+}
+};
 
 // Refresh token
 export const refreshToken = catchAsync(async (req: Request, res: Response) => {
@@ -134,7 +144,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
     const decoded = verifyRefreshToken(refreshToken);
     const user = await User.findById(decoded.id)
       .populate('assignedClinics', 'name address')
-      .populate('preferredClinicId', 'name address');
+      .populate('preferredClinicId', 'name address') as any;
 
     if (!user || !user.isActive) {
       throw createUnauthorizedError('Invalid or expired refresh token. Please log in again.');
@@ -164,7 +174,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
-          fullName: user.fullName,
+          fullName: (user as any).fullName,
           email: user.email,
           phone: user.phone,
           role: user.role,
@@ -199,7 +209,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
 export const getCurrentUser = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const user = await User.findById(req.user._id)
     .populate('assignedClinics', 'name address')
-    .populate('preferredClinicId', 'name address');
+    .populate('preferredClinicId', 'name address') as any;
 
   if (!user) {
     throw createNotFoundError('User');
@@ -212,7 +222,7 @@ export const getCurrentUser = catchAsync(async (req: AuthenticatedRequest, res: 
         id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        fullName: user.fullName,
+        fullName: (user as any).fullName,
         email: user.email,
         phone: user.phone,
         role: user.role,
@@ -281,7 +291,7 @@ export const changePassword = catchAsync(async (req: AuthenticatedRequest, res: 
   }
 
   // Verify current password
-  if (!user.password) {
+  if (!user.password || typeof user.password !== 'string') {
     throw createUnauthorizedError('Current password is incorrect');
   }
   const isCurrentPasswordValid = await comparePassword(currentPassword, user.password);
@@ -330,7 +340,7 @@ export const requestPasswordReset = catchAsync(async (req: Request, res: Respons
 
   try {
     // Send reset email
-    await sendPasswordResetEmail(user.email, resetToken);
+    await sendPasswordResetEmail(user.email as any, resetToken);
     
     res.json({
       success: true,

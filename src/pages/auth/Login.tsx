@@ -91,7 +91,7 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={formErrors.email}
-                placeholder="you@example.com"
+                placeholder={t('common.placeholders.email')}
                 required
                 autoComplete="email"
               />
@@ -104,7 +104,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={formErrors.password}
-                placeholder="••••••••"
+                placeholder={t('common.placeholders.password')}
                 required
                 autoComplete="current-password"
               />

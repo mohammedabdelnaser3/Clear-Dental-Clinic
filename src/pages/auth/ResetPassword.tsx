@@ -119,7 +119,7 @@ const ResetPassword: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t('common.placeholders.password')}
                   required
                   autoComplete="new-password"
                 />
@@ -131,7 +131,7 @@ const ResetPassword: React.FC = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t('common.placeholders.password')}
                   required
                   autoComplete="new-password"
                 />

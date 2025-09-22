@@ -40,7 +40,7 @@ export const verifyRefreshToken = (token: string): any => {
 
 // Hash password
 export const hashPassword = async (password: string): Promise<string> => {
-  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
+  const saltRounds = await bcrypt.genSaltSync(10);
   return await bcrypt.hash(password, saltRounds);
 };
 
@@ -173,4 +173,4 @@ export const generateApiKey = (): string => {
 // Hash API key for storage
 export const hashApiKey = (apiKey: string): string => {
   return crypto.createHash('sha256').update(apiKey).digest('hex');
-};
+};                                          

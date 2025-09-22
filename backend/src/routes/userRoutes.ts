@@ -93,8 +93,14 @@ router.get('/role/:role', staffOrAdmin, [
   handleValidationErrors
 ], getUsersByRole);
 
-// Get dentists (public for staff)
-router.get('/dentists', getDentists);
+// Get dentists (authenticated users) - allow all authenticated users to fetch dentist list
+router.get('/dentists', [
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  handleValidationErrors
+], getDentists);
 
 // Upload profile image
 router.post('/upload-image', uploadSingle('profileImage'), uploadUserProfileImage);

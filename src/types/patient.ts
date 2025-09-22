@@ -10,6 +10,7 @@ export interface Patient {
   medicalHistory: MedicalHistory;
   treatmentRecords: TreatmentRecord[];
   preferredClinicId: string;
+  userId?: string; // Link to user account
   isActive?: boolean;
   emergencyContact?: EmergencyContact;
   createdAt: Date;

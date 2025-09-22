@@ -2,6 +2,7 @@ export * from './authService';
 export * from './clinicService';
 export * from './appointmentService';
 export * from './patientService';
+export * from './userService';
 export * from './reportsService';
 export * from './medicationService';
 export * from './prescriptionService';

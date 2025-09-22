@@ -240,6 +240,7 @@ const SecuritySettings: React.FC = () => {
                 </div>
                 
                 <Input
+                  id="verification-code"
                   label={t('settings.security.twoFactorAuth.verificationCode')}
                   placeholder={t('settings.security.twoFactorAuth.verificationCodePlaceholder')}
                   maxLength={6}
@@ -259,7 +260,7 @@ const SecuritySettings: React.FC = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      const input = document.querySelector('input[placeholder="Enter 6-digit code"]') as HTMLInputElement;
+                      const input = document.getElementById('verification-code') as HTMLInputElement;
                       if (input?.value.length === 6) {
                         handleEnable2FA();
                       }

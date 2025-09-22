@@ -108,6 +108,62 @@ const AppointmentBooking: React.FC = () => {
     return true;
   };
 
+  const handleAutoBooking = async () => {
+    if (!user?.id || !formData.service || !selectedDate) {
+      toast.error('Please fill in all required fields before auto-booking');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const autoBookData = {
+        patientId: user.id,
+        clinicId: '687468107e70478314c346be', // Default clinic ID
+        serviceType: formData.service,
+        date: selectedDate,
+        duration: 60, // Default duration
+        notes: formData.notes || '',
+        emergency: formData.emergency || false
+      };
+
+      const result = await appointmentService.autoBookFirstAvailable(autoBookData);
+
+      if (result.success && result.appointment) {
+        toast.success(result.message || 'Appointment successfully auto-booked!', {
+          duration: 5000
+        });
+
+        // Show additional info about the booked slot
+        if (result.bookedSlot) {
+          toast.success(
+            `Booked at ${result.bookedSlot.time} with Dr. ${result.bookedSlot.dentistName}`,
+            { duration: 7000 }
+          );
+        }
+
+        setIsModalOpen(false);
+        setFormData({
+          patientName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : '',
+          patientEmail: user?.email || '',
+          patientPhone: user?.phone || '',
+          service: '',
+          preferredDate: '',
+          preferredTime: '',
+          notes: '',
+          emergency: false
+        });
+      } else {
+        toast.error(result.message || 'Failed to auto-book appointment. Please try selecting a time slot manually.');
+      }
+    } catch (error) {
+      console.error('Auto-booking error:', error);
+      toast.error('An error occurred while auto-booking. Please try again or select a time slot manually.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -118,8 +174,8 @@ const AppointmentBooking: React.FC = () => {
     try {
       const appointmentData = {
         patientId: user?.id || '',
-        dentistId: '', // This should be selected or assigned
-        service: formData.service,
+        dentistId: '', // Will be assigned by backend based on availability
+        service: formData.service, // Use service to match CreateAppointmentDto interface
         date: formData.preferredDate,
         timeSlot: formData.preferredTime,
         notes: formData.notes,
@@ -267,6 +323,43 @@ const AppointmentBooking: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* Auto-booking option */}
+          {selectedDate && (
+            <div className="mb-6">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-900 mb-1">
+                      {t('appointment.autoBook.title') || 'Quick Book'}
+                    </h3>
+                    <p className="text-xs text-blue-700">
+                      {t('appointment.autoBook.description') || 'Automatically book the first available time slot for this date'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAutoBooking}
+                    disabled={isLoading || !selectedDate || !formData.service}
+                    className="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md transition-colors"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        {t('appointment.autoBook.booking') || 'Booking...'}
+                      </>
+                    ) : (
+                      t('appointment.autoBook.button') || 'Auto Book'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-center text-sm text-gray-500 mb-4">
+                {t('appointment.orSelectManually') || 'Or select a time slot manually:'}
+              </div>
+            </div>
+          )}
 
           {/* Enhanced Time Slots */}
           {selectedDate && (

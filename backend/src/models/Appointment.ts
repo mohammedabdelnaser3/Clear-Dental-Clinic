@@ -1,5 +1,6 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import { IAppointment, IAppointmentModel } from '../types';
+import Clinic from './Clinic'; // Import Clinic model to access operating hours
 
 const appointmentSchema = new Schema<IAppointment>({
   patientId: {
@@ -10,7 +11,7 @@ const appointmentSchema = new Schema<IAppointment>({
   dentistId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Dentist ID is required']
+    required: false // Made optional - appointments can exist without dentists
   },
   clinicId: {
     type: Schema.Types.ObjectId,
@@ -238,12 +239,40 @@ appointmentSchema.statics.findConflicts = function(dentistId: string, date: Date
 };
 
 // Static method to get available time slots
-appointmentSchema.statics.getAvailableTimeSlots = function(dentistId: string, date: Date, duration: number = 30) {
-  const startHour = 9; // 9 AM
-  const endHour = 17; // 5 PM
-  const slotDuration = 30; // 30 minutes
-  
-  return (this as IAppointmentModel).findByDentistAndDate(dentistId, date).then((appointments: any[]) => {
+appointmentSchema.statics.getAvailableTimeSlots = async function(dentistId: string, date: Date, duration: number = 30) {
+  try {
+    const appointmentModel = this as IAppointmentModel;
+    
+    // Find the dentist to get their assigned clinic
+    const dentist = await mongoose.model('User').findById(dentistId).populate('assignedClinics');
+    if (!dentist || !dentist.assignedClinics || dentist.assignedClinics.length === 0) {
+      console.warn(`Dentist not found or not assigned to any clinic: ${dentistId}`);
+      return []; // No slots if dentist or clinic is invalid
+    }
+
+    // For simplicity, we'll use the first assigned clinic's operating hours.
+    // A more complex system might check schedules for a specific clinic if a dentist works at multiple.
+    const clinic = await Clinic.findById(dentist.assignedClinics[0]);
+    if (!clinic || !clinic.operatingHours) {
+      console.warn(`Clinic or operating hours not found for dentist: ${dentistId}`);
+      return []; // No slots if clinic hours aren't defined
+    }
+    
+    // Determine operating hours for the specific day of the week
+    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    const hoursForDay = clinic.operatingHours.find(h => h.day.toLowerCase() === dayOfWeek);
+
+    if (!hoursForDay || hoursForDay.closed) {
+      return []; // Clinic is closed on this day
+    }
+
+    const startHour = parseInt(hoursForDay.open.split(':')[0]);
+    const startMinute = parseInt(hoursForDay.open.split(':')[1]);
+    const endHour = parseInt(hoursForDay.close.split(':')[0]);
+    const endMinute = parseInt(hoursForDay.close.split(':')[1]);
+
+    const appointments = await appointmentModel.findByDentistAndDate(dentistId, date);
+    
     const bookedSlots = appointments
       .filter((apt: any) => ['scheduled', 'confirmed'].includes(apt.status))
       .map((apt: any) => {
@@ -254,38 +283,141 @@ appointmentSchema.statics.getAvailableTimeSlots = function(dentistId: string, da
           end: startTime + apt.duration
         };
       });
-    
+      
     const availableSlots = [];
+    const slotDuration = 30; // Assuming 30-minute slot increments for generation
+
+    let currentTime = startHour * 60 + startMinute;
+    const endTime = endHour * 60 + endMinute;
     
-    for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += slotDuration) {
-        const slotStart = hour * 60 + minute;
-        const slotEnd = slotStart + duration;
+    while(currentTime + duration <= endTime) {
+      const slotStart = currentTime;
+      const slotEnd = slotStart + duration;
+
+      const hasConflict = bookedSlots.some(booked => 
+        slotStart < booked.end && slotEnd > booked.start
+      );
+
+      if (!hasConflict) {
+        const hour = Math.floor(slotStart / 60);
+        const minute = slotStart % 60;
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         
-        // Check if this slot conflicts with any booked appointment
-        const hasConflict = bookedSlots.some((booked: any) => 
-          slotStart < booked.end && slotEnd > booked.start
-        );
+        const isPeak = hour >= 10 && hour < 14;
         
-        if (!hasConflict && slotEnd <= endHour * 60) {
-          const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-          availableSlots.push({
-            time: timeString,
-            available: true
-          });
-        }
+        availableSlots.push({
+          id: `${dentistId}-${date.toISOString().split('T')[0]}-${timeString}`,
+          time: timeString,
+          isAvailable: true,
+          isPeak: isPeak,
+          available: true
+        });
       }
+      
+      currentTime += slotDuration;
     }
     
     return availableSlots;
-  });
+  } catch (error) {
+    console.error("Error in getAvailableTimeSlots:", error);
+    throw error; // Rethrow to be caught by the controller's error handler
+  }
+};
+
+// Static method to get next available slot after the last booked appointment
+appointmentSchema.statics.getNextSlotAfterLastBooking = async function(clinicId: string, date: Date, duration: number = 30) {
+  try {
+    // Get clinic operating hours
+    const clinic = await Clinic.findById(clinicId);
+    if (!clinic || !clinic.operatingHours) {
+      console.warn(`Clinic or operating hours not found: ${clinicId}`);
+      return null;
+    }
+    
+    // Determine operating hours for the specific day of the week
+    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    const hoursForDay = clinic.operatingHours.find(h => h.day.toLowerCase() === dayOfWeek);
+
+    if (!hoursForDay || hoursForDay.closed) {
+      return null; // Clinic is closed on this day
+    }
+
+    const startHour = parseInt(hoursForDay.open.split(':')[0]);
+    const startMinute = parseInt(hoursForDay.open.split(':')[1]);
+    const endHour = parseInt(hoursForDay.close.split(':')[0]);
+    const endMinute = parseInt(hoursForDay.close.split(':')[1]);
+    
+    const clinicStartTime = startHour * 60 + startMinute;
+    const clinicEndTime = endHour * 60 + endMinute;
+
+    // Find all appointments for this clinic on this date (across all dentists)
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    const appointments = await this.find({
+      clinicId,
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      },
+      status: { $in: ['scheduled', 'confirmed'] }
+    }).sort({ timeSlot: 1 });
+
+    let nextAvailableTime = clinicStartTime;
+
+    if (appointments.length > 0) {
+      // Find the latest end time among all appointments
+      let latestEndTime = 0;
+      
+      appointments.forEach((apt: any) => {
+        const [hours, minutes] = apt.timeSlot.split(':').map(Number);
+        const startTime = hours * 60 + minutes;
+        const endTime = startTime + apt.duration;
+        
+        if (endTime > latestEndTime) {
+          latestEndTime = endTime;
+        }
+      });
+      
+      // Set next available time to after the last appointment
+      nextAvailableTime = latestEndTime;
+    }
+
+    // Check if the next slot fits within clinic hours
+    if (nextAvailableTime + duration > clinicEndTime) {
+      return null; // No time available after last booking within clinic hours
+    }
+
+    // Convert back to time string
+    const hour = Math.floor(nextAvailableTime / 60);
+    const minute = nextAvailableTime % 60;
+    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    
+    
+    const isPeak = hour >= 10 && hour < 14;
+
+    return {
+      time: timeString,
+      isAvailable: true,
+      isPeak: isPeak,
+      available: true,
+      id: `${clinicId}-${date.toISOString().split('T')[0]}-${timeString}`
+    };
+    
+  } catch (error) {
+    console.error("Error in getNextSlotAfterLastBooking:", error);
+    throw error;
+  }
 };
 
 // Pre-save middleware for validation
 appointmentSchema.pre('save', async function(this: any, next) {
   try {
     // Check for conflicts only if this is a new appointment or date/time changed
-    if (this.isNew || this.isModified('date') || this.isModified('timeSlot') || this.isModified('duration')) {
+    // AND if a dentist is assigned (conflicts can only occur with specific dentists)
+    if ((this.isNew || this.isModified('date') || this.isModified('timeSlot') || this.isModified('duration')) && this.dentistId) {
       const conflicts = await (this.constructor as any).findConflicts(
         this.dentistId,
         this.date,

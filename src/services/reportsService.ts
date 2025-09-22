@@ -81,7 +81,7 @@ const transformReportData = (report: any): ReportData => {
 // API Functions
 export const getAppointmentReport = async (filters: ReportFilters): Promise<ApiResponse<AppointmentReportData>> => {
   try {
-    const response = await api.get('/reports/appointments', {
+    const response = await api.get('/api/v1/reports/appointments', {
       params: filters
     });
     
@@ -101,7 +101,7 @@ export const getAppointmentReport = async (filters: ReportFilters): Promise<ApiR
 
 export const getPatientReport = async (filters: ReportFilters): Promise<ApiResponse<PatientReportData>> => {
   try {
-    const response = await api.get('/reports/patients', {
+    const response = await api.get('/api/v1/reports/patients', {
       params: filters
     });
     
@@ -121,7 +121,7 @@ export const getPatientReport = async (filters: ReportFilters): Promise<ApiRespo
 
 export const getRevenueReport = async (filters: ReportFilters): Promise<ApiResponse<RevenueReportData>> => {
   try {
-    const response = await api.get('/reports/revenue', {
+    const response = await api.get('/api/v1/reports/revenue', {
       params: filters
     });
     
@@ -146,7 +146,7 @@ export const generateCustomReport = async (config: {
   metrics: string[];
 }): Promise<ApiResponse<ReportData>> => {
   try {
-    const response = await api.post('/reports/custom', config);
+    const response = await api.post('/api/v1/reports/custom', config);
     const report = transformReportData(response.data.data);
     
     return {
@@ -165,7 +165,7 @@ export const generateCustomReport = async (config: {
 
 export const getSavedReports = async (): Promise<ApiResponse<ReportData[]>> => {
   try {
-    const response = await api.get('/reports/saved');
+    const response = await api.get('/api/v1/reports/saved');
     const reports = response.data.data.map(transformReportData);
     
     return {

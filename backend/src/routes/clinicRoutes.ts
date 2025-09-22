@@ -93,6 +93,35 @@ router.get('/public/:id/status', [
   ...createMongoIdValidation('id')
 ], handleValidationErrors, checkClinicStatus);
 
+// TEMPORARY: Move appointment endpoints here until routing issue is fixed
+router.get('/appointments/available-slots', [
+  query('date')
+    .isISO8601()
+    .withMessage('Date is required and must be a valid date'),
+  query('dentistId')
+    .optional()
+    .custom((value) => {
+      if (value === '' || value === undefined || value === null) {
+        return true; // Allow empty values
+      }
+      // If value is provided, validate it's a valid MongoDB ID
+      const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
+      return mongoIdRegex.test(value);
+    })
+    .withMessage('Dentist ID must be valid if provided'),
+  query('clinicId')
+    .isMongoId()
+    .withMessage('Valid clinic ID is required'),
+  query('duration')
+    .optional()
+    .isInt({ min: 15, max: 240 })
+    .withMessage('Duration must be between 15 and 240 minutes')
+], handleValidationErrors, async (req: any, res: any, next: any) => {
+  // Import and use the controller
+  const { getAvailableTimeSlots } = await import('../controllers/appointmentController');
+  return getAvailableTimeSlots(req, res, next);
+});
+
 // Protected routes (authentication required)
 router.use(authenticate);
 

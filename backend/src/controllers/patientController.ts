@@ -246,3 +246,41 @@ export const updatePatientMedicalHistory = asyncHandler(async (req: Request, res
     message: 'Medical history updated successfully'
   });
 });
+
+// Get patients by user ID
+export const getPatientsByUserId = asyncHandler(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { 
+    page = 1, 
+    limit = 10 
+  } = req.query;
+
+  const pageNum = parseInt(page as string);
+  const limitNum = parseInt(limit as string);
+  const skip = (pageNum - 1) * limitNum;
+
+  try {
+    console.log(`Fetching patients for userId: ${userId}, page: ${pageNum}, limit: ${limitNum}`);
+    const [patients, total] = await Promise.all([
+      Patient.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .populate('preferredClinicId', 'name'),
+      Patient.countDocuments({ userId })
+    ]);
+    console.log(`Found ${patients.length} patients for userId: ${userId}`);
+
+    res.status(200).json({
+      success: true,
+      data: patients,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum),
+      message: `Found ${patients.length} patient(s) for user`
+    });
+  } catch (error) {
+    console.error(`Error in getPatientsByUserId for userId: ${userId}`, error);
+    throw new AppError('Internal server error while fetching patient data', 500);
+  }
+});

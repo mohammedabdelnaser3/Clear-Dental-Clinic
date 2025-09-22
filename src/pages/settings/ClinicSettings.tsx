@@ -198,7 +198,7 @@ const ClinicSettings: React.FC = () => {
               type="url"
               value={formData.website}
               onChange={(e) => handleInputChange('website', e.target.value)}
-              placeholder="https://"
+              placeholder={t('common.placeholders.website')}
             />
           </div>
 

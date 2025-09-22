@@ -149,8 +149,8 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
 
 // Async error wrapper
 export const catchAsync = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    fn(req, res, next).catch(next);
+  return async(req: Request, res: Response, next: NextFunction) => {
+    await fn(req, res, next).catch(next);
   };
 };
 

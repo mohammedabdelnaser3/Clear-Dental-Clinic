@@ -1,8 +1,8 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUser, UserRole } from '../types';
 
-const userSchema = new Schema<IUser>({
+const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: [true, 'First name is required'],
@@ -44,11 +44,11 @@ const userSchema = new Schema<IUser>({
     default: null
   },
   assignedClinics: [{
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: 'Clinic'
   }],
   preferredClinicId: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Clinic'
   },
   specialization: {
@@ -184,6 +184,6 @@ userSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
 });
 
-const User = mongoose.model<IUser>('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
 export default User;
