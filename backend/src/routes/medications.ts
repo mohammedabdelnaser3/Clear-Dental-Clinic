@@ -6,7 +6,8 @@ import {
   updateMedication,
   deleteMedication,
   searchMedications,
-  getMedicationsByCategory
+  getMedicationsByCategory,
+  getMedicationStats
 } from '../controllers/medicationController';
 import { protect, authorize } from '../middleware/auth';
 import { handleValidationErrors } from '../middleware/validation';
@@ -16,6 +17,12 @@ const router = express.Router();
 
 // Protect all routes
 router.use(protect);
+
+// Get medication statistics
+router.get('/stats',
+  authorize('dentist', 'staff', 'admin'),
+  getMedicationStats
+);
 
 // Search medications
 router.get('/search', 

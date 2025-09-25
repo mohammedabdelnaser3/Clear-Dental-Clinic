@@ -140,51 +140,58 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
     ]);
     
     // Extract successful responses or provide empty defaults
-    const appointmentStats = results[0].status === 'fulfilled' ? results[0].value : { data: { data: {} } };
-    const patientStats = results[1].status === 'fulfilled' ? results[1].value : { data: { data: {} } };
-    const revenueStats = results[2].status === 'fulfilled' ? results[2].value : { data: { data: {} } };
-    const todayAppointments = results[3].status === 'fulfilled' ? results[3].value : { data: { data: [] } };
-    const upcomingAppointments = results[4].status === 'fulfilled' ? results[4].value : { data: { data: [] } };
-    const recentPatients = results[5].status === 'fulfilled' ? results[5].value : { data: { data: [] } };
+    const appointmentStats = results[0].status === 'fulfilled' ? results[0].value : { data: {} };
+    const patientStats = results[1].status === 'fulfilled' ? results[1].value : { data: {} };
+    const revenueStats = results[2].status === 'fulfilled' ? results[2].value : { data: {} };
+    const todayAppointments = results[3].status === 'fulfilled' ? results[3].value : { data: [] };
+    const upcomingAppointments = results[4].status === 'fulfilled' ? results[4].value : { data: [] };
+    const recentPatients = results[5].status === 'fulfilled' ? results[5].value : { data: [] };
 
     // Combine all the data
+    const appointmentData = appointmentStats.data?.data || appointmentStats.data || {};
+    const patientData = patientStats.data?.data || patientStats.data || {};
+    const revenueData = revenueStats.data?.data || revenueStats.data || {};
+    const todayAppointmentData = todayAppointments.data?.data || todayAppointments.data || [];
+    const upcomingAppointmentData = upcomingAppointments.data?.data || upcomingAppointments.data || [];
+    const recentPatientData = recentPatients.data?.data || recentPatients.data || [];
+
     const dashboardData: DashboardStats = {
       appointments: {
-        total: appointmentStats.data.data?.total || 0,
-        today: todayAppointments.data.data?.length || 0,
-        upcoming: upcomingAppointments.data.data?.length || 0,
-        completed: appointmentStats.data.data?.completed || 0,
-        cancelled: appointmentStats.data.data?.cancelled || 0,
-        noShow: appointmentStats.data.data?.noShow || 0
+        total: appointmentData.total || 0,
+        today: Array.isArray(todayAppointmentData) ? todayAppointmentData.length : 0,
+        upcoming: Array.isArray(upcomingAppointmentData) ? upcomingAppointmentData.length : 0,
+        completed: appointmentData.completed || 0,
+        cancelled: appointmentData.cancelled || 0,
+        noShow: appointmentData.noShow || 0
       },
       patients: {
-        total: patientStats.data.data?.total || 0,
-        new: patientStats.data.data?.newThisMonth || 0,
-        active: patientStats.data.data?.active || 0,
+        total: patientData.total || 0,
+        new: patientData.newThisMonth || 0,
+        active: patientData.active || 0,
         byGender: {
-          male: patientStats.data.data?.byGender?.male || 0,
-          female: patientStats.data.data?.byGender?.female || 0,
-          other: patientStats.data.data?.byGender?.other || 0
+          male: patientData.byGender?.male || 0,
+          female: patientData.byGender?.female || 0,
+          other: patientData.byGender?.other || 0
         },
         byAgeGroup: {
-          '0-18': patientStats.data.data?.byAgeGroup?.['0-18'] || 0,
-          '19-35': patientStats.data.data?.byAgeGroup?.['19-35'] || 0,
-          '36-50': patientStats.data.data?.byAgeGroup?.['36-50'] || 0,
-          '51-65': patientStats.data.data?.byAgeGroup?.['51-65'] || 0,
-          '65+': patientStats.data.data?.byAgeGroup?.['65+'] || 0
+          '0-18': patientData.byAgeGroup?.['0-18'] || 0,
+          '19-35': patientData.byAgeGroup?.['19-35'] || 0,
+          '36-50': patientData.byAgeGroup?.['36-50'] || 0,
+          '51-65': patientData.byAgeGroup?.['51-65'] || 0,
+          '65+': patientData.byAgeGroup?.['65+'] || 0
         }
       },
       revenue: {
-        total: revenueStats.data.data?.total || 0,
-        thisMonth: revenueStats.data.data?.thisMonth || 0,
-        lastMonth: revenueStats.data.data?.lastMonth || 0,
-        pending: revenueStats.data.data?.pending || 0,
-        overdue: revenueStats.data.data?.overdue || 0
+        total: revenueData.total || 0,
+        thisMonth: revenueData.thisMonth || 0,
+        lastMonth: revenueData.lastMonth || 0,
+        pending: revenueData.pending || 0,
+        overdue: revenueData.overdue || 0
       },
       activities: {
-        recentAppointments: todayAppointments.data.data || [],
-        recentPatients: recentPatients.data.data || [],
-        upcomingAppointments: upcomingAppointments.data.data?.slice(0, 5) || []
+        recentAppointments: Array.isArray(todayAppointmentData) ? todayAppointmentData : [],
+        recentPatients: Array.isArray(recentPatientData) ? recentPatientData : [],
+        upcomingAppointments: Array.isArray(upcomingAppointmentData) ? upcomingAppointmentData.slice(0, 5) : []
       }
     };
 
@@ -227,14 +234,15 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
           ]);
           
           // Extract successful responses
-          const recentAppointments = results[0].status === 'fulfilled' ? results[0].value : { data: { data: [] } };
-          const recentPatients = results[1].status === 'fulfilled' ? results[1].value : { data: { data: [] } };
+          const recentAppointments = results[0].status === 'fulfilled' ? results[0].value : { data: [] };
+          const recentPatients = results[1].status === 'fulfilled' ? results[1].value : { data: [] };
           
           const activities: RecentActivity[] = [];
 
           // Add recent appointments
-          if (recentAppointments.data.data) {
-            recentAppointments.data.data.forEach((appointment: any) => {
+          const appointmentData = recentAppointments.data?.data || recentAppointments.data || [];
+          if (Array.isArray(appointmentData)) {
+            appointmentData.forEach((appointment: any) => {
               activities.push({
                 id: appointment._id,
                 type: 'appointment',
@@ -247,8 +255,9 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
           }
 
         // Add recent patients
-        if (recentPatients.data.data) {
-          recentPatients.data.data.forEach((patient: any) => {
+        const patientData = recentPatients.data?.data || recentPatients.data || [];
+        if (Array.isArray(patientData)) {
+          patientData.forEach((patient: any) => {
             activities.push({
               id: patient._id,
               type: 'patient',
@@ -298,8 +307,9 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     const activities: RecentActivity[] = [];
 
     // Add recent appointments
-    if (recentAppointments.data.data) {
-      recentAppointments.data.data.forEach((appointment: any) => {
+    const appointmentData = recentAppointments.data?.data || recentAppointments.data || [];
+    if (Array.isArray(appointmentData)) {
+      appointmentData.forEach((appointment: any) => {
         activities.push({
           id: appointment._id,
           type: 'appointment',
@@ -312,8 +322,9 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     }
 
     // Add recent patients
-    if (recentPatients.data.data) {
-      recentPatients.data.data.forEach((patient: any) => {
+    const patientData = recentPatients.data?.data || recentPatients.data || [];
+    if (Array.isArray(patientData)) {
+      patientData.forEach((patient: any) => {
         activities.push({
           id: patient._id,
           type: 'patient',

@@ -284,3 +284,148 @@ export const getPatientsByUserId = asyncHandler(async (req: Request, res: Respon
     throw new AppError('Internal server error while fetching patient data', 500);
   }
 });
+
+// Get patient statistics
+export const getPatientStatistics = asyncHandler(async (req: Request, res: Response) => {
+  const { clinicId } = req.query;
+  
+  try {
+    // Build base query
+    const baseQuery = clinicId ? { clinicId } : {};
+    
+    // Get current date for time-based queries
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    
+    // Parallel aggregation queries
+    const [
+      totalPatients,
+      activePatients,
+      newThisMonth,
+      newLastMonth,
+      genderStats,
+      ageStats
+    ] = await Promise.all([
+      Patient.countDocuments(baseQuery),
+      Patient.countDocuments({ ...baseQuery, status: 'active' }),
+      Patient.countDocuments({ 
+        ...baseQuery, 
+        createdAt: { $gte: startOfMonth }
+      }),
+      Patient.countDocuments({ 
+        ...baseQuery, 
+        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+      }),
+      Patient.aggregate([
+        { $match: baseQuery },
+        { $group: { _id: '$gender', count: { $sum: 1 } } }
+      ]),
+      Patient.aggregate([
+        { $match: baseQuery },
+        {
+          $addFields: {
+            age: {
+              $floor: {
+                $divide: [
+                  { $subtract: [new Date(), '$dateOfBirth'] },
+                  365.25 * 24 * 60 * 60 * 1000
+                ]
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              $switch: {
+                branches: [
+                  { case: { $lt: ['$age', 18] }, then: '0-18' },
+                  { case: { $lt: ['$age', 35] }, then: '19-35' },
+                  { case: { $lt: ['$age', 50] }, then: '36-50' },
+                  { case: { $lt: ['$age', 65] }, then: '51-65' }
+                ],
+                default: '65+'
+              }
+            },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+    ]);
+    
+    // Format gender statistics
+    const byGender = {
+      male: 0,
+      female: 0,
+      other: 0
+    };
+    genderStats.forEach(stat => {
+      if (stat._id && byGender.hasOwnProperty(stat._id)) {
+        byGender[stat._id as keyof typeof byGender] = stat.count;
+      }
+    });
+    
+    // Format age statistics
+    const byAgeGroup = {
+      '0-18': 0,
+      '19-35': 0,
+      '36-50': 0,
+      '51-65': 0,
+      '65+': 0
+    };
+    ageStats.forEach(stat => {
+      if (stat._id && byAgeGroup.hasOwnProperty(stat._id)) {
+        byAgeGroup[stat._id as keyof typeof byAgeGroup] = stat.count;
+      }
+    });
+    
+    const statistics = {
+      total: totalPatients,
+      active: activePatients,
+      newThisMonth,
+      newLastMonth,
+      byGender,
+      byAgeGroup
+    };
+    
+    res.status(200).json({
+      success: true,
+      data: statistics
+    });
+  } catch (error) {
+    console.error('Error fetching patient statistics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching patient statistics'
+    });
+  }
+});
+
+// Get recent patients
+export const getRecentPatients = asyncHandler(async (req: Request, res: Response) => {
+  const { limit = 10, clinicId } = req.query;
+  
+  try {
+    // Build query
+    const query = clinicId ? { clinicId } : {};
+    
+    const recentPatients = await Patient.find(query)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit as string))
+      .select('firstName lastName email phone createdAt status')
+      .lean();
+    
+    res.status(200).json({
+      success: true,
+      data: recentPatients
+    });
+  } catch (error) {
+    console.error('Error fetching recent patients:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching recent patients'
+    });
+  }
+});

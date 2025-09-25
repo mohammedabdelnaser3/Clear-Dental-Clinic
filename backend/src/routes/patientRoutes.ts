@@ -8,7 +8,9 @@ import {
   searchPatients,
   getPatientMedicalHistory,
   updatePatientMedicalHistory,
-  getPatientsByUserId
+  getPatientsByUserId,
+  getPatientStatistics,
+  getRecentPatients
 } from '../controllers/patientController';
 import { getPatientMedications } from '../controllers/medicationController';
 import {
@@ -83,8 +85,25 @@ router.get('/user/:userId', userOwnerOrStaff('userId'), [
   ...validatePagination.slice(0, -1)
 ], handleValidationErrors, getPatientsByUserId);
 
-// Note: Statistics, recent patients, and clinic-specific routes commented out
-// until corresponding controller methods are implemented
+// Get patient statistics
+router.get('/statistics', staffOrAdmin, [
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID')
+], handleValidationErrors, getPatientStatistics);
+
+// Get recent patients
+router.get('/recent', staffOrAdmin, [
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be between 1 and 50'),
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID')
+], handleValidationErrors, getRecentPatients);
 
 // Get patient by ID (staff/admin or patient themselves)
 router.get('/:id', patientOwnerOrStaff('id'), [

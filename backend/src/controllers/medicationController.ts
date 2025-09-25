@@ -227,3 +227,59 @@ export const getPatientMedications = asyncHandler(async (req: Request, res: Resp
     }
   });
 });
+
+// @desc    Get medication statistics
+// @route   GET /api/medications/stats
+// @access  Private (Dentist, Staff, Admin)
+export const getMedicationStats = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    // Get total medications count
+    const totalMedications = await Medication.countDocuments({ isActive: true });
+    
+    // Get medications by category
+    const categoryStats = await Medication.aggregate([
+      { $match: { isActive: true } },
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+    
+    // Get most prescribed medications (from prescriptions)
+    const Prescription = require('../models/Prescription').default;
+    const popularMedications = await Prescription.aggregate([
+      { $unwind: '$medications' },
+      { $group: { _id: '$medications.medicationId', count: { $sum: 1 } } },
+      { $lookup: { from: 'medications', localField: '_id', foreignField: '_id', as: 'medication' } },
+      { $unwind: '$medication' },
+      { $match: { 'medication.isActive': true } },
+      { $sort: { count: -1 } },
+      { $limit: 5 },
+      { $project: { name: '$medication.name', count: 1 } }
+    ]);
+    
+    // Get recent medications added
+    const recentMedications = await Medication.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('name category createdAt');
+    
+    const stats = {
+      totalMedications,
+      categoryStats: categoryStats.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}),
+      popularMedications,
+      recentMedications
+    };
+    
+    return res.status(200).json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Error fetching medication stats:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching medication statistics'
+    });
+  }
+});
