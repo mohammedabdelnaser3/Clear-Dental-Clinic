@@ -6,7 +6,7 @@ export interface Medication {
   dosage: string;
   frequency: string;
   duration?: string;
-  category: 'antibiotic' | 'painkiller' | 'anti_inflammatory' | 'anesthetic' | 'antiseptic' | 'other';
+  category: 'antibiotic' | 'painkiller' | 'anti-inflammatory' | 'anesthetic' | 'antiseptic' | 'other';
   instructions?: string;
   sideEffects?: string[];
   contraindications?: string[];
@@ -20,7 +20,7 @@ export interface CreateMedicationData {
   dosage: string;
   frequency: string;
   duration?: string;
-  category: 'antibiotic' | 'painkiller' | 'anti_inflammatory' | 'anesthetic' | 'antiseptic' | 'other';
+  category: 'antibiotic' | 'painkiller' | 'anti-inflammatory' | 'anesthetic' | 'antiseptic' | 'other';
   instructions?: string;
   sideEffects?: string[];
   contraindications?: string[];
@@ -45,7 +45,7 @@ export interface MedicationResponse {
 }
 
 class MedicationService {
-  private baseURL = '/medications';
+  private baseURL = '/api/v1/medications';
 
   // Get all medications with filters
   async getMedications(filters: MedicationFilters = {}) {
@@ -215,7 +215,7 @@ class MedicationService {
       }
     });
 
-    const response = await api.get(`${this.baseURL}/patient/${patientId}?${params.toString()}`);
+    const response = await api.get(`/api/v1/patients/${patientId}/medications?${params.toString()}`);
     return response;
   }
 }

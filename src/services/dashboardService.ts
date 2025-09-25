@@ -132,20 +132,19 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
     // Fetch data from multiple endpoints in parallel with error handling
     const results = await Promise.allSettled([
       api.get('/api/v1/appointments/statistics', { params }),
-      api.get('/api/v1/patients/statistics', { params }),
+      // Fallback: patients list used for totals/recent since /patients/statistics and /patients/recent are not implemented
+      api.get('/api/v1/patients', { params: { page: 1, limit: 5 } }),
       api.get('/api/v1/billing/stats/revenue', { params }),
       api.get('/api/v1/appointments/today', { params }),
-      api.get('/api/v1/appointments/upcoming', { params: { ...params, days: 7 } }),
-      api.get('/api/v1/patients/recent', { params: { ...params, limit: 5 } })
+      api.get('/api/v1/appointments/upcoming', { params: { ...params, days: 7 } })
     ]);
     
     // Extract successful responses or provide empty defaults
     const appointmentStats = results[0].status === 'fulfilled' ? results[0].value : { data: { data: {} } };
-    const patientStats = results[1].status === 'fulfilled' ? results[1].value : { data: { data: {} } };
+    const patientsList = results[1].status === 'fulfilled' ? results[1].value : { data: { data: [], pagination: { total: 0 } } };
     const revenueStats = results[2].status === 'fulfilled' ? results[2].value : { data: { data: {} } };
-    const todayAppointments = results[3].status === 'fulfilled' ? results[3].value : { data: { data: [] } };
-    const upcomingAppointments = results[4].status === 'fulfilled' ? results[4].value : { data: { data: [] } };
-    const recentPatients = results[5].status === 'fulfilled' ? results[5].value : { data: { data: [] } };
+    const todayAppointments = results[3].status === 'fulfilled' ? results[3].value : { data: { data: { data: [] } } };
+    const upcomingAppointments = results[4].status === 'fulfilled' ? results[4].value : { data: { data: { data: [] } } };
 
     // Combine all the data
     const dashboardData: DashboardStats = {
@@ -158,21 +157,11 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
         noShow: appointmentStats.data.data?.noShow || 0
       },
       patients: {
-        total: patientStats.data.data?.total || 0,
-        new: patientStats.data.data?.newThisMonth || 0,
-        active: patientStats.data.data?.active || 0,
-        byGender: {
-          male: patientStats.data.data?.byGender?.male || 0,
-          female: patientStats.data.data?.byGender?.female || 0,
-          other: patientStats.data.data?.byGender?.other || 0
-        },
-        byAgeGroup: {
-          '0-18': patientStats.data.data?.byAgeGroup?.['0-18'] || 0,
-          '19-35': patientStats.data.data?.byAgeGroup?.['19-35'] || 0,
-          '36-50': patientStats.data.data?.byAgeGroup?.['36-50'] || 0,
-          '51-65': patientStats.data.data?.byAgeGroup?.['51-65'] || 0,
-          '65+': patientStats.data.data?.byAgeGroup?.['65+'] || 0
-        }
+        total: patientsList?.data?.pagination?.total || 0,
+        new: 0,
+        active: patientsList?.data?.pagination?.total || 0,
+        byGender: { male: 0, female: 0, other: 0 },
+        byAgeGroup: { '0-18': 0, '19-35': 0, '36-50': 0, '51-65': 0, '65+': 0 }
       },
       revenue: {
         total: revenueStats.data.data?.total || 0,
@@ -182,9 +171,9 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
         overdue: revenueStats.data.data?.overdue || 0
       },
       activities: {
-        recentAppointments: todayAppointments.data.data || [],
-        recentPatients: recentPatients.data.data || [],
-        upcomingAppointments: upcomingAppointments.data.data?.slice(0, 5) || []
+        recentAppointments: Array.isArray(todayAppointments?.data?.data?.data) ? todayAppointments.data.data.data : [],
+        recentPatients: Array.isArray(patientsList?.data?.data) ? patientsList.data.data.slice(0, 5) : [],
+        upcomingAppointments: Array.isArray(upcomingAppointments?.data?.data?.data) ? upcomingAppointments.data.data.data.slice(0, 5) : []
       }
     };
 
@@ -290,16 +279,22 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     const params = { clinicId, limit };
     
     // Fetch recent data from multiple endpoints
-    const [recentAppointments, recentPatients] = await Promise.all([
+    const [recentAppointments, patientsList] = await Promise.all([
       api.get('/api/v1/appointments/recent', { params }),
-      api.get('/api/v1/patients/recent', { params })
+      api.get('/api/v1/patients', { params: { page: 1, limit } })
     ]);
 
     const activities: RecentActivity[] = [];
 
     // Add recent appointments
-    if (recentAppointments.data.data) {
-      recentAppointments.data.data.forEach((appointment: any) => {
+    const recentAppointmentsArray = Array.isArray(recentAppointments?.data?.data?.data)
+      ? recentAppointments.data.data.data
+      : Array.isArray(recentAppointments?.data?.data)
+        ? recentAppointments.data.data
+        : [];
+
+    if (recentAppointmentsArray.length > 0) {
+      recentAppointmentsArray.forEach((appointment: any) => {
         activities.push({
           id: appointment._id,
           type: 'appointment',
@@ -312,8 +307,9 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     }
 
     // Add recent patients
-    if (recentPatients.data.data) {
-      recentPatients.data.data.forEach((patient: any) => {
+    const recentPatientsArray = Array.isArray(patientsList?.data?.data) ? patientsList.data.data : [];
+    if (recentPatientsArray.length > 0) {
+      recentPatientsArray.forEach((patient: any) => {
         activities.push({
           id: patient._id,
           type: 'patient',
