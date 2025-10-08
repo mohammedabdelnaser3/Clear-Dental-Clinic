@@ -33,7 +33,7 @@ export const createStaffSchedule = catchAsync(async (req: AuthenticatedRequest, 
   }
 
   // Verify clinic exists
-  const clinic = await Clinic.findById(clinicId);
+  const clinic = await (Clinic as any).findById(clinicId);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -53,7 +53,7 @@ export const createStaffSchedule = catchAsync(async (req: AuthenticatedRequest, 
   if (conflicts.length > 0) {
     // Create conflict notification
     const conflictDetails = `Overlapping schedule from ${conflicts[0].startTime} to ${conflicts[0].endTime}`;
-    await Notification.create({
+    await (Notification as any).create({
       userId: staffId,
       type: 'schedule_conflict',
       title: 'Schedule Conflict Detected',
@@ -87,7 +87,7 @@ export const createStaffSchedule = catchAsync(async (req: AuthenticatedRequest, 
   await schedule.populate('clinicId', 'name address');
 
   // Create schedule assignment notification
-  await Notification.createScheduleNotification(
+  await (Notification as any).createScheduleNotification(
     staffId,
     'schedule_assignment',
     'New Schedule Assignment',
@@ -193,7 +193,7 @@ export const updateStaffSchedule = catchAsync(async (req: AuthenticatedRequest, 
     
     if (conflicts.length > 0) {
       const conflictDetails = `Overlapping schedule from ${conflicts[0].startTime} to ${conflicts[0].endTime}`;
-      await Notification.createScheduleConflict(
+      await (Notification as any).createScheduleConflict(
         (schedule.staffId as any).toString(),
         (conflicts[0]._id as any).toString(),
         (schedule.clinicId as any).name || 'Unknown Clinic',
@@ -219,7 +219,7 @@ export const updateStaffSchedule = catchAsync(async (req: AuthenticatedRequest, 
 
   // Send schedule change notification if time/date changed
   if (updates.date || updates.startTime || updates.endTime) {
-    await Notification.createScheduleChange(
+    await (Notification as any).createScheduleChange(
       (schedule.staffId as any)._id.toString(),
       (schedule._id as any).toString(),
       (schedule.clinicId as any).name,

@@ -5,7 +5,6 @@ import { Card, Button, Badge } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
 import { appointmentService } from '../../services/appointmentService';
 import { patientService } from '../../services/patientService';
-import { toast } from 'react-hot-toast';
 
 // Patient Dashboard Interfaces
 interface PatientDashboardStats {
@@ -52,7 +51,6 @@ const PatientDashboard: React.FC = () => {
   });
   const [upcomingAppointments, setUpcomingAppointments] = useState<UpcomingAppointment[]>([]);
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
-  const [patientProfile, setPatientProfile] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPatientDashboardData = useCallback(async () => {
@@ -68,7 +66,7 @@ const PatientDashboard: React.FC = () => {
         const patientsResponse = await patientService.getPatientsByUserId(user.id, { page: 1, limit: 1 });
         if (patientsResponse.data && patientsResponse.data.length > 0) {
           patientId = patientsResponse.data[0].id;
-          setPatientProfile(patientsResponse.data[0]);
+          // Patient profile data stored in patientId for other uses
         }
       } catch (patientError) {
         console.warn('No patient record found for user');

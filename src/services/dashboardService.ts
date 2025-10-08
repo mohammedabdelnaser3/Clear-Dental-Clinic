@@ -1,5 +1,6 @@
 import api from './api';
 import type { ApiResponse } from '../types';
+import { createSafeApiParams } from '../utils/clinicUtils';
 
 // Dashboard data types
 export interface DashboardStats {
@@ -127,7 +128,12 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
       }
     }
     
-    const params = { clinicId };
+    const params = createSafeApiParams(clinicId);
+    
+    // Log the parameters being sent for debugging (development only)
+    if (import.meta.env.DEV) {
+      console.log('🔍 getDashboardStats params:', params, 'original clinicId:', clinicId);
+    }
     
     // Fetch data from multiple endpoints in parallel with error handling
     const results = await Promise.allSettled([
@@ -139,13 +145,21 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
       api.get('/api/v1/patients/recent', { params: { ...params, limit: 5 } })
     ]);
     
-    // Extract successful responses or provide empty defaults
+    // Extract successful responses or provide empty defaults with better error handling
     const appointmentStats = results[0].status === 'fulfilled' ? results[0].value : { data: { data: {} } };
     const patientStats = results[1].status === 'fulfilled' ? results[1].value : { data: { data: {} } };
     const revenueStats = results[2].status === 'fulfilled' ? results[2].value : { data: { data: {} } };
     const todayAppointments = results[3].status === 'fulfilled' ? results[3].value : { data: { data: [] } };
     const upcomingAppointments = results[4].status === 'fulfilled' ? results[4].value : { data: { data: [] } };
     const recentPatients = results[5].status === 'fulfilled' ? results[5].value : { data: { data: [] } };
+
+    // Log failed requests for debugging
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const endpoints = ['appointments/statistics', 'patients/statistics', 'billing/stats/revenue', 'appointments/today', 'appointments/upcoming', 'patients/recent'];
+        console.warn(`Failed to fetch ${endpoints[index]}:`, result.reason?.response?.status, result.reason?.response?.data);
+      }
+    });
 
     // Combine all the data
     const dashboardData: DashboardStats = {
@@ -182,9 +196,9 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
         overdue: revenueStats.data.data?.overdue || 0
       },
       activities: {
-        recentAppointments: todayAppointments.data.data || [],
-        recentPatients: recentPatients.data.data || [],
-        upcomingAppointments: upcomingAppointments.data.data?.slice(0, 5) || []
+        recentAppointments: Array.isArray(todayAppointments.data.data) ? todayAppointments.data.data : [],
+        recentPatients: Array.isArray(recentPatients.data.data) ? recentPatients.data.data : [],
+        upcomingAppointments: Array.isArray(upcomingAppointments.data.data) ? upcomingAppointments.data.data.slice(0, 5) : []
       }
     };
 
@@ -287,18 +301,35 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
       }
     }
     
-    const params = { clinicId, limit };
+    const params = createSafeApiParams(clinicId, { limit });
     
-    // Fetch recent data from multiple endpoints
-    const [recentAppointments, recentPatients] = await Promise.all([
+    // Log the parameters being sent for debugging (development only)
+    if (import.meta.env.DEV) {
+      console.log('🔍 getRecentActivities params:', params);
+    }
+    
+    // Fetch recent data from multiple endpoints with error handling
+    const results = await Promise.allSettled([
       api.get('/api/v1/appointments/recent', { params }),
       api.get('/api/v1/patients/recent', { params })
     ]);
+    
+    // Log failed requests for debugging
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const endpoints = ['appointments/recent', 'patients/recent'];
+        console.warn(`Failed to fetch recent ${endpoints[index]}:`, result.reason?.response?.status, result.reason?.response?.data);
+      }
+    });
+    
+    // Extract successful responses
+    const recentAppointments = results[0].status === 'fulfilled' ? results[0].value : { data: { data: [] } };
+    const recentPatients = results[1].status === 'fulfilled' ? results[1].value : { data: { data: [] } };
 
     const activities: RecentActivity[] = [];
 
     // Add recent appointments
-    if (recentAppointments.data.data) {
+    if (recentAppointments.data && recentAppointments.data.data && Array.isArray(recentAppointments.data.data)) {
       recentAppointments.data.data.forEach((appointment: any) => {
         activities.push({
           id: appointment._id,
@@ -312,7 +343,7 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
     }
 
     // Add recent patients
-    if (recentPatients.data.data) {
+    if (recentPatients.data && recentPatients.data.data && Array.isArray(recentPatients.data.data)) {
       recentPatients.data.data.forEach((patient: any) => {
         activities.push({
           id: patient._id,
@@ -345,7 +376,7 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
 // Get billing summary
 export const getBillingSummary = async (clinicId?: string): Promise<ApiResponse<any>> => {
   try {
-    const params = clinicId ? { clinicId } : {};
+    const params = createSafeApiParams(clinicId);
     const response = await api.get('/api/v1/billing/summary', { params });
     return response.data;
   } catch (error: any) {
@@ -361,7 +392,7 @@ export const getBillingSummary = async (clinicId?: string): Promise<ApiResponse<
 // Get overdue bills
 export const getOverdueBills = async (clinicId?: string): Promise<ApiResponse<any[]>> => {
   try {
-    const params = clinicId ? { clinicId } : {};
+    const params = createSafeApiParams(clinicId);
     const response = await api.get('/api/v1/billing/overdue', { params });
     return response.data;
   } catch (error: any) {

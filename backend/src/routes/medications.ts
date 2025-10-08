@@ -68,7 +68,7 @@ router.post('/',
     body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
   ],
   handleValidationErrors,
-  authorize('admin'),
+  authorize('admin','dentist'),
   createMedication
 );
 
@@ -99,7 +99,7 @@ router.put('/:id',
     body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
   ],
   handleValidationErrors,
-  authorize('admin'),
+  authorize('admin', 'dentist'),
   updateMedication
 );
 
@@ -109,7 +109,7 @@ router.delete('/:id',
     param('id').isMongoId().withMessage('Invalid medication ID')
   ],
   handleValidationErrors,
-  authorize('admin'),
+  authorize('admin','dentist'),
   deleteMedication
 );
 

@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AppProvider } from './context';
 import { useAuth } from './hooks'; // Import useAuth from AuthContext
 import { Layout } from './components/layout';
-import ErrorBoundary from './components/common/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
+import { setupConsoleErrorHandling } from './utils/consoleUtils';
+import { useEffect } from 'react';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -13,6 +15,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 
 // Main Pages
 import Dashboard from './pages/dashboard/Dashboard';
+import UnifiedAppointmentDashboard from './pages/dashboard/UnifiedAppointmentDashboard';
 import Appointments from './pages/appointment/Appointments';
 import AppointmentDetails from './pages/appointment/AppointmentDetail';
 import CreateAppointment from './pages/appointment/AppointmentForm';
@@ -22,9 +25,7 @@ import CreatePatient from './pages/patient/PatientForm';
 import Medications from './pages/medications/Medications';
 import Prescriptions from './pages/prescriptions/Prescriptions';
 import Billing from './pages/billing/Billing';
-import Settings from './pages/settings/Settings';
 import Reports from './pages/reports/Reports';
-import Profile from './pages/profile/Profile';
 import Clinics from './pages/clinics/Clinics';
 import MultiClinicDashboard from './pages/MultiClinicDashboard';
 import StaffScheduling from './components/StaffScheduling';
@@ -39,8 +40,12 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import NotFound from './pages/NotFound';
 
+// Prototype Pages
+import { MultiBranchBookingPrototype } from './pages/prototype';
+
 // Protected Route Component
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { PatientProfile, PatientSettings } from './pages/patient';
 
 
 
@@ -51,7 +56,7 @@ const AppContent = () => {
   const isAuthenticated = !!user;
 
   // Only log in development mode and reduce frequency
-  if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {
+  if (import.meta.env.DEV && Math.random() < 0.1) {
     console.log('🚀 App.tsx - AppContent render:', {
       currentPath: location.pathname,
       isInitialized,
@@ -81,6 +86,9 @@ const AppContent = () => {
       <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
       <Route path="/terms" element={<Layout><Terms /></Layout>} />
       
+      {/* Prototype Routes */}
+      <Route path="/prototype/multi-branch" element={<MultiBranchBookingPrototype />} />
+      
       {/* Auth Routes */}
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={from} replace />} />
       <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to={from} replace />} />
@@ -105,19 +113,29 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
+          {/* Unified Appointment Dashboard */}
           <Route 
-            path="/appointments/:id" 
+            path="/appointments/unified" 
             element={
               <ProtectedRoute>
-                <Layout><AppointmentDetails /></Layout>
+                <Layout><UnifiedAppointmentDashboard /></Layout>
               </ProtectedRoute>
             } 
           />
+          {/* Specific routes must come before parameterized routes */}
           <Route 
             path="/appointments/create" 
             element={
               <ProtectedRoute>
                 <Layout><CreateAppointment /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/appointments/:id" 
+            element={
+              <ProtectedRoute>
+                <Layout><AppointmentDetails /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -131,11 +149,12 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
+          {/* Specific routes must come before parameterized routes */}
           <Route 
-            path="/patients/:id" 
+            path="/patients/new" 
             element={
               <ProtectedRoute>
-                <Layout><PatientDetails /></Layout>
+                <Layout><CreatePatient /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -144,6 +163,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Layout><CreatePatient /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/patients/:id" 
+            element={
+              <ProtectedRoute>
+                <Layout><PatientDetails /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -193,7 +220,7 @@ const AppContent = () => {
             path="/profile" 
             element={
               <ProtectedRoute>
-                <Layout><Profile /></Layout>
+                <Layout><PatientProfile/></Layout>
               </ProtectedRoute>
             } 
           />
@@ -243,7 +270,7 @@ const AppContent = () => {
             path="/settings" 
             element={
               <ProtectedRoute>
-                <Layout><Settings /></Layout>
+                <Layout><PatientSettings /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -251,7 +278,7 @@ const AppContent = () => {
             path="/settings/*" 
             element={
               <ProtectedRoute>
-                <Layout><Settings /></Layout>
+                <Layout><PatientSettings /></Layout>
               </ProtectedRoute>
             } 
           />
@@ -264,6 +291,11 @@ const AppContent = () => {
 };
 
 function App() {
+  // Initialize console error handling on app startup
+  useEffect(() => {
+    setupConsoleErrorHandling();
+  }, []);
+
   return (
     <ErrorBoundary>
       <AppProvider>

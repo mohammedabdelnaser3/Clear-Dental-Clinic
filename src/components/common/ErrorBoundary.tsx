@@ -70,7 +70,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <p className="font-medium">Error Details:</p>
                 <p className="text-sm">{this.state.error?.message || 'Unknown error occurred'}</p>
                 
-                {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
+                {import.meta.env.DEV && this.state.errorInfo && (
                   <details className="mt-2">
                     <summary className="cursor-pointer text-sm font-medium">Stack Trace (Development)</summary>
                     <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-h-40">

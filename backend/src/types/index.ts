@@ -79,17 +79,46 @@ export interface IPatient extends Document {
   updatedAt: Date;
 }
 
-export interface IPatientModel extends Model<IPatient> {
+export interface IPatientModel extends Model<IPatient, {}, {}, {}, any, any, any> {
   findByEmail(email: string): Promise<IPatient | null>;
   findByPhone(phone: string): Promise<IPatient | null>;
   findByClinic(clinicId: string): any;
   searchPatients(searchTerm: string, clinicId?: string): any;
 }
 
+// Patient Report related types
+export interface IPatientReport extends Document {
+  _id: Types.ObjectId;
+  patientId: Types.ObjectId;
+  dentistId: Types.ObjectId;
+  clinicId: Types.ObjectId;
+  title: string;
+  description: string;
+  date: Date;
+  attachments: {
+    id: string;
+    fileName: string;
+    fileType: string;
+    fileUrl: string;
+    uploadedAt: Date;
+  }[];
+  isShared: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IPatientReportModel extends Model<IPatientReport, {}, {}, {}, any, any, any> {
+  findByPatient(patientId: string): any;
+  findByDentist(dentistId: string): any;
+  findByClinic(clinicId: string): any;
+  searchReports(searchTerm: string, options?: any): any;
+}
+
 // Clinic related types
 export interface IClinic extends Document {
   _id: Types.ObjectId;
   name: string;
+  branchName?: string; // New: Branch identifier (e.g., "Fayoum", "Atesa", "Minya")
   email: string;
   phone: string;
   address: {
@@ -120,7 +149,7 @@ export interface IClinic extends Document {
   updatedAt: Date;
 }
 
-export interface IClinicModel extends Model<IClinic> {
+export interface IClinicModel extends Model<IClinic, {}, {}, {}, any, any, any> {
   findByCity(city: string, options?: { skip?: number; limit?: number }): Promise<IClinic[]>;
   findByName(name: string): Promise<IClinic[]>;
   findByService(service: string, options?: { skip?: number; limit?: number }): Promise<IClinic[]>;
@@ -165,7 +194,7 @@ export interface IAppointment extends Document {
   canBeRescheduled(): boolean;
 }
 
-export interface IAppointmentModel extends Model<IAppointment> {
+export interface IAppointmentModel extends Model<IAppointment, {}, {}, {}, any, any, any> {
   findByDateRange(startDate: Date, endDate: Date): Promise<IAppointment[]>;
   findByDentistAndDate(dentistId: string, date: Date): Promise<IAppointment[]>;
   findConflicts(dentistId: string, date: Date, timeSlot: string, duration: number, excludeId?: string): Promise<IAppointment[]>;
@@ -199,7 +228,7 @@ export interface ITreatmentRecord extends Document {
   removeAttachment(attachmentId: string): Promise<ITreatmentRecord>;
 }
 
-export interface ITreatmentRecordModel extends Model<ITreatmentRecord> {
+export interface ITreatmentRecordModel extends Model<ITreatmentRecord, {}, {}, {}, any, any, any> {
   findByPatient(patientId: string): any;
   findByDentist(dentistId: string): any;
   findByClinic(clinicId: string): any;
@@ -227,7 +256,7 @@ export interface IMedication extends Document {
   updatedAt: Date;
 }
 
-export interface IMedicationModel extends Model<IMedication> {
+export interface IMedicationModel extends Model<IMedication, {}, {}, {}, any, any, any> {
   searchMedications(searchTerm: string): any;
   findByCategory(category: string): any;
 }
@@ -264,7 +293,7 @@ export interface IPrescription extends Document {
   addRefill(): Promise<IPrescription>;
 }
 
-export interface IPrescriptionModel extends Model<IPrescription> {
+export interface IPrescriptionModel extends Model<IPrescription, {}, {}, {}, any, any, any> {
   findByPatient(patientId: string, options?: any): any;
   findActive(patientId?: string): any;
   findExpiring(days?: number): any;
@@ -312,7 +341,7 @@ export interface IBilling extends Document {
   addPayment(amount: number, method?: string): Promise<IBilling>;
 }
 
-export interface IBillingModel extends Model<IBilling> {
+export interface IBillingModel extends Model<IBilling, {}, {}, {}, any, any, any> {
   findByPatient(patientId: string, options?: any): any;
   findOverdue(clinicId?: string): any;
   getRevenueStats(clinicId: string, startDate: Date, endDate: Date): any;
@@ -334,7 +363,7 @@ export interface INotification extends Document {
   markAsUnread(): Promise<INotification>;
 }
 
-export interface INotificationModel extends Model<INotification> {
+export interface INotificationModel extends Model<INotification, {}, {}, {}, any, any, any> {
   createScheduleNotification(staffId: any, arg1: string, arg2: string, arg3: string, arg4: { scheduleId: unknown; clinicId: any; date: Date; startTime: any; endTime: any; }, arg5: { email: boolean; sms: boolean; inApp: boolean; }): unknown;
   createAppointmentConfirmation(appointmentId: string, userId: string): Promise<INotification>;
   createAppointmentReminder(appointmentId: string, userId: string): Promise<INotification>;
@@ -384,7 +413,7 @@ export interface IStaffSchedule extends Document {
   updatedAt: Date;
 }
 
-export interface IStaffScheduleModel extends Model<IStaffSchedule> {
+export interface IStaffScheduleModel extends Model<IStaffSchedule, {}, {}, {}, any, any, any> {
   findByClinicAndDateRange(clinicId: string, startDate: Date, endDate: Date): any;
   findStaffAvailability(staffId: string, date: Date): any;
   detectConflicts(staffId: string, date: Date, startTime: string, endTime: string, excludeId?: string): any;

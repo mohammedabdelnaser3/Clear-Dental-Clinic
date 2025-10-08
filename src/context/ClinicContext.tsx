@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import type { ReactNode } from 'react';
 import type { Clinic } from '../types';
 import { getClinic } from '../services/clinicService';
@@ -60,4 +60,13 @@ export const ClinicProvider = ({ children }: ClinicProviderProps) => {
   };
 
   return <ClinicContext.Provider value={value}>{children}</ClinicContext.Provider>;
+};
+
+// Custom hook to use clinic context
+export const useClinic = () => {
+  const context = useContext(ClinicContext);
+  if (context === undefined) {
+    throw new Error('useClinic must be used within a ClinicProvider');
+  }
+  return context;
 };

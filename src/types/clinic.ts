@@ -1,6 +1,7 @@
 export interface Clinic {
   id: string;
   name: string;
+  branchName?: string; // NEW: Branch identifier (e.g., "Fayoum", "Atesa", "Minya")
   description?: string;
   address: ClinicAddress;
   phone: string;

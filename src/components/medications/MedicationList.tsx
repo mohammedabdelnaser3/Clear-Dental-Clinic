@@ -1,6 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { 
+  Search, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Filter,
+  CheckCircle,
+  Pill,
+  Download,
+  MoreVertical
+} from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
@@ -13,7 +23,7 @@ import { medicationService } from '../../services/medicationService';
 import { toast } from 'react-hot-toast';
 
 interface Medication {
-  _id: string;
+  id: string;
   name: string;
   genericName?: string;
   dosage: string;
@@ -31,6 +41,8 @@ interface Medication {
 interface MedicationListProps {
   onSelectMedication?: (medication: Medication) => void;
   selectionMode?: boolean;
+  showFilters?: boolean;
+  viewMode?: 'grid' | 'list';
 }
 
 export const MedicationList: React.FC<MedicationListProps> = ({
@@ -41,12 +53,15 @@ export const MedicationList: React.FC<MedicationListProps> = ({
   const { user } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMedication, setEditingMedication] = useState<Medication | null>(null);
+  const [selectedMedications] = useState<string[]>([]);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const categories = [
     { value: 'all', label: t('medicationList.categories.all') },
@@ -58,12 +73,14 @@ export const MedicationList: React.FC<MedicationListProps> = ({
     { value: 'other', label: t('medicationList.categories.other') }
   ];
 
-  const fetchMedications = async () => {
+  const fetchMedications = useCallback(async (refresh = false) => {
     try {
-      setLoading(true);
+      if (refresh) setRefreshing(true);
+      else setLoading(true);
+      
       const params = {
         page: currentPage,
-        limit: 10,
+        limit: 100,
         search: searchTerm,
         category: categoryFilter !== 'all' ? categoryFilter : undefined
       };
@@ -90,12 +107,13 @@ export const MedicationList: React.FC<MedicationListProps> = ({
       setTotalPages(1);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, [currentPage, searchTerm, categoryFilter, user?.role, user?.id, t]);
 
   useEffect(() => {
     fetchMedications();
-  }, [currentPage, searchTerm, categoryFilter, user?.id, user?.role]);
+  }, [fetchMedications]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -150,6 +168,18 @@ export const MedicationList: React.FC<MedicationListProps> = ({
     return colors[category as keyof typeof colors] || colors.other;
   };
 
+  const getCategoryGradient = (category: string) => {
+    const gradients = {
+      antibiotic: 'from-blue-500 to-blue-600',
+      painkiller: 'from-red-500 to-red-600',
+      'anti-inflammatory': 'from-orange-500 to-orange-600',
+      anesthetic: 'from-purple-500 to-purple-600',
+      antiseptic: 'from-green-500 to-green-600',
+      other: 'from-gray-500 to-gray-600'
+    };
+    return gradients[category as keyof typeof gradients] || gradients.other;
+  };
+
   const canManageMedications = user?.role === 'dentist' || user?.role === 'admin' || user?.role === 'super_admin';
   const isPatient = user?.role === 'patient';
 
@@ -163,17 +193,56 @@ export const MedicationList: React.FC<MedicationListProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {selectionMode ? t('medicationList.selectTitle') : (isPatient ? t('medicationList.myTitle') : t('medicationList.title'))}
-        </h2>
-        {canManageMedications && !selectionMode && (
-          <Button onClick={handleAddMedication} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            {t('medicationList.addMedication')}
-          </Button>
-        )}
+      {/* Enhanced Header */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+        <div className="flex items-center space-x-4">
+          <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
+            <Pill className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">
+              {selectionMode ? t('medicationList.selectTitle') : (isPatient ? t('medicationList.myTitle') : t('medicationList.title'))}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {medications.length} medication{medications.length !== 1 ? 's' : ''} available
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          {canManageMedications && !selectionMode && (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => fetchMedications(true)}
+                disabled={refreshing}
+                className="flex items-center gap-2"
+              >
+                <Search className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Advanced Filters
+              </Button>
+              
+              <Button 
+                onClick={handleAddMedication} 
+                className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+              >
+                <Plus className="h-4 w-4" />
+                {t('medicationList.addMedication')}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -211,14 +280,36 @@ export const MedicationList: React.FC<MedicationListProps> = ({
         </div>
       )}
 
+      {/* Bulk Actions Bar */}
+      {canManageMedications && selectedMedications.length > 0 && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-sm font-medium text-green-900">
+                {selectedMedications.length} medication{selectedMedications.length !== 1 ? 's' : ''} selected
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" className="text-green-600 border-green-200 hover:bg-green-100">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Medications Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {medications.length === 0 && !loading ? (
           <div className="col-span-full text-center py-12">
             <div className="text-gray-400 mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.78 0-2.678-2.153-1.415-3.414l5-5A2 2 0 009 11.172V5L8 4z" />
-              </svg>
+              <Pill className="mx-auto h-12 w-12" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               {isPatient ? t('medicationList.noMedicationsPrescribed') : t('medicationList.noMedicationsFound')}
@@ -231,23 +322,39 @@ export const MedicationList: React.FC<MedicationListProps> = ({
           </div>
         ) : (
           medications.map((medication) => (
-          <Card key={medication._id} className="p-6 hover:shadow-lg transition-shadow">
-            <div className="space-y-4">
+          <Card key={medication.id} className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 group">
+            <div className="p-6 space-y-4">
               {/* Header */}
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {medication.name}
-                  </h3>
-                  {medication.genericName && (
-                    <p className="text-sm text-gray-600">
-                      {t('medicationList.genericName', { name: medication.genericName })}
-                    </p>
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg bg-gradient-to-r ${getCategoryGradient(medication.category)}`}>
+                    <Pill className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {medication.name}
+                    </h3>
+                    {medication.genericName && (
+                      <p className="text-sm text-gray-600">
+                        {t('medicationList.genericName', { name: medication.genericName })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge className={getCategoryColor(medication.category)}>
+                    {medication.category}
+                  </Badge>
+                  {canManageMedications && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
                   )}
                 </div>
-                <Badge className={getCategoryColor(medication.category)}>
-                  {medication.category}
-                </Badge>
               </div>
 
               {/* Dosage Info */}
@@ -324,7 +431,7 @@ export const MedicationList: React.FC<MedicationListProps> = ({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDeleteMedication(medication._id)}
+                          onClick={() => handleDeleteMedication(medication.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />

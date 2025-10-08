@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Users, Calendar, FileText, Clock, ArrowRight } from 'lucide-react';
 import SearchBar from '../../components/common/SearchBar';
 import { Card } from '../../components/ui';
+import { searchService } from '../../services/searchService';
 
 interface SearchResult {
   id: string;
@@ -25,7 +26,7 @@ const Search: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  // Mock search function - replace with actual API call
+  // Search function using the search service
   const performSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
@@ -34,48 +35,33 @@ const Search: React.FC = () => {
 
     setLoading(true);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Mock results - replace with actual search API
-    const mockResults: SearchResult[] = [
-      {
-        id: '1',
-        type: 'patient' as const,
-        title: 'John Doe',
-        subtitle: 'Patient ID: P001',
-        description: 'Last visit: 2 weeks ago',
-        date: '2024-01-15',
-        status: 'Active',
-        url: '/patients/1'
-      },
-      {
-        id: '2',
-        type: 'appointment' as const,
-        title: 'Dental Cleaning - Sarah Wilson',
-        subtitle: 'Today at 2:00 PM',
-        description: 'Room 3 with Dr. Smith',
-        date: '2024-01-30',
-        status: 'Scheduled',
-        url: '/appointments/2'
-      },
-      {
-        id: '3',
-        type: 'prescription' as const,
-        title: 'Amoxicillin 500mg',
-        subtitle: 'Prescribed to Mike Johnson',
-        description: 'Take 3 times daily for 7 days',
-        date: '2024-01-28',
-        status: 'Active',
-        url: '/prescriptions/3'
+    try {
+      const response = await searchService.globalSearch(searchQuery);
+      
+      if (response.success && response.data) {
+        // Transform the API response to match our SearchResult interface
+        const formattedResults = response.data.map((item: any) => ({
+          id: item.id,
+          type: item.type,
+          title: item.title,
+          subtitle: item.subtitle,
+          description: item.description,
+          date: item.date ? new Date(item.date).toLocaleDateString() : undefined,
+          status: item.status,
+          url: item.url
+        }));
+        
+        setResults(formattedResults);
+      } else {
+        console.error('Search failed:', response.message);
+        setResults([]);
       }
-    ].filter(result => 
-      result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    setResults(mockResults);
-    setLoading(false);
+    } catch (error) {
+      console.error('Error performing search:', error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

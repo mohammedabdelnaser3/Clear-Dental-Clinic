@@ -107,7 +107,6 @@ export const login = async (req: Request, res: Response) => {
     if (!user.password || typeof user.password !== 'string') {
       throw createUnauthorizedError('#3-Invalid email or password. Please check your credentials and try again.');
     }
-    console.log(user.password);
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       throw createUnauthorizedError('#4-Invalid email or password. Please check your credentials and try again.');
@@ -126,9 +125,12 @@ export const login = async (req: Request, res: Response) => {
       data: tokenResponse
     });
 } catch (err: any) {
-  for(let e in err.errors){
-    console.log(err.errors[e].message);
-  }
+  // Ensure we always respond on error to avoid hanging requests
+  const statusCode = typeof err?.statusCode === 'number' ? err.statusCode : 401;
+  const message = typeof err?.message === 'string' && err.message.length > 0
+    ? err.message
+    : 'Login failed. Please check your credentials and try again.';
+  return res.status(statusCode).json({ success: false, message });
 }
 };
 

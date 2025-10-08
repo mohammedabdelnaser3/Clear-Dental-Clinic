@@ -28,7 +28,7 @@ export const linkPatientsByEmail = async (): Promise<LinkingResult> => {
 
   try {
     // Get all patients that don't have a userId yet
-    const patients = await Patient.find({ 
+    const patients = await (Patient as any).find({ 
       userId: { $exists: false },
       email: { $exists: true, $ne: null, $and: [{ $ne: '' }] }
     });
@@ -91,7 +91,7 @@ export const linkPatientsByPhone = async (): Promise<LinkingResult> => {
 
   try {
     // Get all patients that don't have a userId yet
-    const patients = await Patient.find({ 
+    const patients = await (Patient as any).find({ 
       userId: { $exists: false },
       phone: { $exists: true, $ne: null, $and: [{ $ne: '' }] }
     });
@@ -146,12 +146,12 @@ export const linkPatientsByPhone = async (): Promise<LinkingResult> => {
  */
 export const getLinkingStatistics = async () => {
   try {
-    const totalPatients = await Patient.countDocuments();
-    const linkedPatients = await Patient.countDocuments({ userId: { $exists: true, $ne: null } });
+    const totalPatients = await (Patient as any).countDocuments();
+    const linkedPatients = await (Patient as any).countDocuments({ userId: { $exists: true, $ne: null } });
     const unlinkedPatients = totalPatients - linkedPatients;
     
     const totalUsers = await User.countDocuments({ role: 'patient' });
-    const usersWithPatients = await Patient.distinct('userId').then(userIds => userIds.filter(id => id).length);
+    const usersWithPatients = await (Patient as any).distinct('userId').then(userIds => userIds.filter(id => id).length);
     const usersWithoutPatients = totalUsers - usersWithPatients;
 
     return {
@@ -187,7 +187,7 @@ export const createUsersForUnlinkedPatients = async (defaultPassword: string = '
 
   try {
     // Get all patients that don't have a userId and have an email
-    const patients = await Patient.find({ 
+    const patients = await (Patient as any).find({ 
       userId: { $exists: false },
       email: { $exists: true, $ne: null, $and: [{ $ne: '' }] }
     });

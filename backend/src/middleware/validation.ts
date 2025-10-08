@@ -60,6 +60,9 @@ export const commonValidations = {
   ]
 };
 
+// Export pagination validation rules for backward compatibility
+export const paginationValidationRules = commonValidations.pagination;
+
 // User validation rules
 export const userValidation = {
   register: [

@@ -32,11 +32,15 @@
     "actions": "Actions",
     "status": "Status",
     "date": "Date",
-    "time": "Time",
+    "time": {
+      "am": "AM",
+      "pm": "PM"
+    },
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
+    "age": "Age",
     "notes": "Notes",
     "description": "Description",
     "active": "Active",
@@ -50,10 +54,7 @@
     "create": "Create",
     "processing": "Processing...",
     "refresh": "Refresh",
-    "time": {
-      "am": "AM",
-      "pm": "PM"
-    },
+    "retry": "Retry",
     "placeholders": {
       "email": "you@example.com",
       "password": "••••••••",
@@ -71,7 +72,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
-    "staffScheduling":"Staff ",
+    "staffScheduling": "Staff ",
     "appointments": "Appointments",
     "patients": "Patients",
     "clinics": "Clinics",
@@ -93,130 +94,137 @@
   },
   "services": {
     "hero": {
-      "title": "Comprehensive Clinic Management Solutions",
-      "description": "From appointment scheduling to billing and patient records, our platform is designed to streamline every aspect of your clinic's operations."
+      "title": "Our Services",
+      "description": "Comprehensive healthcare management solutions designed for modern medical practices."
     },
     "mainServices": {
-      "appointment": {
-        "title": "Appointment Scheduling",
-        "description": "Effortlessly manage your clinic’s schedule with our intuitive, powerful appointment booking system.",
+      "appointmentManagement": {
+        "title": "Appointment Management",
+        "description": "Our intuitive appointment scheduling system helps you manage your clinic's calendar efficiently. Features include:",
         "features": [
-          "Real-time availability and booking",
-          "Automated reminders for patients",
-          "Color-coded appointment types",
-          "Drag-and-drop rescheduling",
-          "Multi-provider and multi-location support"
+          "Easy scheduling and rescheduling",
+          "Automated appointment reminders",
+          "Online booking for patients",
+          "Recurring appointment setup",
+          "Multi-provider calendar views"
         ]
       },
-      "patient": {
-        "title": "Patient Record Management",
-        "description": "Maintain comprehensive and secure digital records for all your patients.",
+      "patientManagement": {
+        "title": "Patient Management",
+        "description": "Maintain comprehensive patient records and streamline patient interactions with our robust management system:",
         "features": [
-          "Centralized patient demographics",
-          "Complete medical history tracking",
-          "Secure document and image storage",
-          "Customizable patient forms",
-          "Easy data import and export"
+          "Complete electronic health records",
+          "Patient demographics and insurance information",
+          "Medical history tracking",
+          "Document and image storage",
+          "Secure patient portal access"
         ]
       },
-      "reporting": {
+      "reportingAnalytics": {
         "title": "Reporting & Analytics",
-        "description": "Gain valuable insights into your clinic's performance with our advanced reporting tools.",
+        "description": "Gain valuable insights into your practice with comprehensive reporting tools:",
         "features": [
-          "Customizable financial reports",
-          "Patient demographic analysis",
-          "Appointment statistics",
-          "Staff performance metrics",
-          "Export reports to PDF and CSV"
+          "Financial performance metrics",
+          "Patient visit analytics",
+          "Provider productivity reports",
+          "Custom report generation",
+          "Data visualization dashboards"
         ]
       },
-      "billing": {
+      "billingInvoicing": {
         "title": "Billing & Invoicing",
-        "description": "Simplify your financial workflow with our integrated billing and invoicing module.",
+        "description": "Simplify your financial operations with our integrated billing solutions:",
         "features": [
           "Automated invoice generation",
-          "Online payment processing",
+          "Payment tracking and processing",
           "Insurance claim management",
-          "Detailed financial statements",
-          "Customizable billing codes"
+          "Patient statement creation",
+          "Financial reporting tools"
         ]
-      }
-    },
-    "additionalServices": {
-      "title": "Expand Your Capabilities",
-      "telemedicine": {
-        "title": "Telemedicine Platform",
-        "description": "Offer remote consultations with our secure, integrated video conferencing solution."
-      },
-      "multiClinic": {
-        "title": "Multi-Clinic Management",
-        "description": "Oversee operations across multiple locations from a single, centralized dashboard."
-      },
-      "customIntegrations": {
-        "title": "Custom Integrations",
-        "description": "Connect with your favorite third-party apps and services for a seamless workflow."
-      }
-    },
-    "pricing": {
-      "title": "Flexible Pricing for Every Clinic",
-      "description": "Choose the plan that best fits your clinic's size and needs. All plans come with a 14-day free trial.",
-      "plans": {
-        "basic": {
-          "title": "Basic",
-          "description": "For small clinics and solo practitioners.",
-          "price": "$49",
-          "period": "/month",
-          "features": [
-            "Up to 3 staff members",
-            "Core features included"
-          ]
-        }
       }
     },
     "learnMore": "Learn More",
-    "learnMoreLink": "Learn more"
+    "additionalServices": {
+      "title": "Additional Services",
+      "telemedicine": {
+        "title": "Telemedicine Integration",
+        "description": "Conduct virtual appointments with integrated video conferencing, digital prescriptions, and secure messaging."
+      },
+      "multiClinic": {
+        "title": "Multi-Clinic Management",
+        "description": "Manage multiple locations from a single platform with location-specific settings, staff management, and reporting."
+      },
+      "customIntegrations": {
+        "title": "Custom Integrations",
+        "description": "Connect with your existing systems through our API, including EHR systems, accounting software, and more."
+      }
+    },
+    "learnMoreLink": "Learn more →",
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "description": "Choose the plan that fits your practice size and needs. All plans include our core features.",
+      "plans": {
+        "basic": {
+          "title": "Basic",
+          "description": "For small practices",
+          "price": "$99",
+          "period": "/month",
+          "features": [
+            "Up to 2 providers",
+            "Appointment management"
+          ]
+        }
+      }
+    }
   },
   "about": {
-    "title": "About Our Clinic Management System",
-    "subtitle": "Your all-in-one solution for seamless clinic operations.",
+    "hero": {
+      "title": "About Us",
+      "description": "We're on a mission to transform healthcare management with innovative technology solutions."
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "Founded in 2020, our company was born from a simple observation: healthcare professionals spend too much time on administrative tasks and not enough time with patients.",
+      "paragraph2": "Our team of healthcare professionals and software engineers came together to create a solution that streamlines clinic operations, simplifies appointment management, and improves the overall patient experience.",
+      "paragraph3": "Today, our platform is used by hundreds of healthcare providers across the country, helping them deliver better care to thousands of patients every day."
+    },
     "mission": {
       "title": "Our Mission",
-      "description": "We are dedicated to revolutionizing clinic management through innovative technology.",
+      "description": "To empower healthcare providers with technology that simplifies their work and enhances patient care.",
       "simplify": {
-        "title": "Simplify Workflow",
-        "description": "Streamline appointments, billing, and patient records with an intuitive interface."
+        "title": "Simplify",
+        "description": "We simplify complex healthcare workflows to save time and reduce administrative burden."
       },
       "empower": {
-        "title": "Empower Staff",
-        "description": "Provide your team with the tools they need to deliver exceptional care."
+        "title": "Empower",
+        "description": "We empower healthcare providers with data-driven insights to make better decisions."
       },
       "enhance": {
-        "title": "Enhance Patient Experience",
-        "description": "Improve patient satisfaction with self-service portals and automated reminders."
+        "title": "Enhance",
+        "description": "We enhance the patient experience through better communication and care coordination."
       }
     },
     "team": {
-      "title": "Meet Our Team",
-      "description": "The passionate individuals behind our success.",
+      "title": "Our Leadership Team",
       "member1": {
-        "name": "Dr. Emily Carter",
-        "role": "CEO & Co-founder",
-        "bio": "Visionary leader with 15+ years in healthcare management."
+        "name": "Dr. Michael Johnson",
+        "role": "CEO & Co-Founder",
+        "bio": "Former physician with 15+ years of clinical experience and a passion for healthcare innovation."
       },
       "member2": {
-        "name": "Dr. Ben Adams",
-        "role": "CTO & Co-founder",
-        "bio": "Expert in secure, scalable healthcare software solutions."
+        "name": "Sarah Chen",
+        "role": "CTO & Co-Founder",
+        "bio": "Software engineer with expertise in healthcare IT systems and a focus on user-centered design."
       },
       "member3": {
-        "name": "Sarah Chen",
+        "name": "David Rodriguez",
         "role": "COO",
-        "bio": "Specialist in operational efficiency and clinic workflow optimization."
+        "bio": "Healthcare administrator with a track record of optimizing clinic operations and improving patient satisfaction."
       }
     },
     "cta": {
-      "title": "Ready to Transform Your Clinic?",
-      "description": "Join hundreds of clinics who have streamlined their practice with our system.",
+      "title": "Join Our Mission",
+      "description": "We're always looking for talented individuals who are passionate about improving healthcare through technology.",
       "contact": "Contact Us",
       "getStarted": "Get Started"
     }
@@ -224,62 +232,62 @@
   "auth": {
     "login": "Login",
     "register": "Register",
-  "admin_dashboard": {
-    "title": "Admin Dashboard",
-    "access_denied": "Access Denied",
-    "access_denied_message": "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
-    "go_to_dashboard": "Go to Dashboard",
-    "go_to_home": "Go to Home",
-    "loading_clinics": "Loading Clinics...",
-    "failed_to_fetch_clinic_data": "We're having trouble fetching the clinic data right now.",
-    "error_loading_data": "Error Loading Data",
-    "try_again": "Try Again",
-    "retrying": "Retrying...",
-    "multi_clinic_dashboard": "Multi-Clinic Dashboard",
-    "manage_clinics": "Manage Clinics",
-    "refresh_data": "Refresh Data",
-    "refreshing": "Refreshing...",
-    "total_clinics": "Total Clinics",
-    "total_patients": "Total Patients",
-    "total_revenue": "Total Revenue",
-    "total_appointments": "Total Appointments",
-    "search_placeholder": "Search by clinic name, email, or location...",
-    "sort_by_name": "Sort by Name",
-    "sort_by_patients": "Sort by Patients",
-    "sort_by_revenue": "Sort by Revenue",
-    "sort_by_appointments": "Sort by Appointments",
-    "all_clinics": "All Clinics",
-    "active_only": "Active Only",
-    "inactive_only": "Inactive Only",
-    "clinic": "Clinic",
-    "location": "Location",
-    "patients": "Patients",
-    "appointments": "Appointments",
-    "revenue": "Revenue",
-    "status": "Status",
-    "actions": "Actions",
-    "no_clinics_found": "No clinics found.",
-    "no_clinics_available": "No clinics are available at this time.",
-    "view_details": "View Details",
-    "dashboard": "Dashboard",
-    "previous": "Previous",
-    "next": "Next",
-    "detailed_clinic_overview": "Detailed clinic overview",
-    "clinic_information": "Clinic Information",
-    "not_provided": "Not provided",
-    "performance_metrics": "Performance Metrics",
-    "avg_revenue_per_patient": "Avg Revenue per Patient",
-    "appointments_per_patient": "Appointments per Patient",
-    "revenue_per_appointment": "Revenue per Appointment",
-    "additional_details": "Additional Details",
-    "view_patients": "View Patients",
-    "view_appointments": "View Appointments",
-    "view_billing": "View Billing",
-    "edit_clinic": "Edit Clinic",
-    "close": "Close",
-    "active": "Active",
-    "inactive": "Inactive"
-  },
+    "admin_dashboard": {
+      "title": "Admin Dashboard",
+      "access_denied": "Access Denied",
+      "access_denied_message": "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
+      "go_to_dashboard": "Go to Dashboard",
+      "go_to_home": "Go to Home",
+      "loading_clinics": "Loading Clinics...",
+      "failed_to_fetch_clinic_data": "We're having trouble fetching the clinic data right now.",
+      "error_loading_data": "Error Loading Data",
+      "try_again": "Try Again",
+      "retrying": "Retrying...",
+      "multi_clinic_dashboard": "Multi-Clinic Dashboard",
+      "manage_clinics": "Manage Clinics",
+      "refresh_data": "Refresh Data",
+      "refreshing": "Refreshing...",
+      "total_clinics": "Total Clinics",
+      "total_patients": "Total Patients",
+      "total_revenue": "Total Revenue",
+      "total_appointments": "Total Appointments",
+      "search_placeholder": "Search by clinic name, email, or location...",
+      "sort_by_name": "Sort by Name",
+      "sort_by_patients": "Sort by Patients",
+      "sort_by_revenue": "Sort by Revenue",
+      "sort_by_appointments": "Sort by Appointments",
+      "all_clinics": "All Clinics",
+      "active_only": "Active Only",
+      "inactive_only": "Inactive Only",
+      "clinic": "Clinic",
+      "location": "Location",
+      "patients": "Patients",
+      "appointments": "Appointments",
+      "revenue": "Revenue",
+      "status": "Status",
+      "actions": "Actions",
+      "no_clinics_found": "No clinics found.",
+      "no_clinics_available": "No clinics are available at this time.",
+      "view_details": "View Details",
+      "dashboard": "Dashboard",
+      "previous": "Previous",
+      "next": "Next",
+      "detailed_clinic_overview": "Detailed clinic overview",
+      "clinic_information": "Clinic Information",
+      "not_provided": "Not provided",
+      "performance_metrics": "Performance Metrics",
+      "avg_revenue_per_patient": "Avg Revenue per Patient",
+      "appointments_per_patient": "Appointments per Patient",
+      "revenue_per_appointment": "Revenue per Appointment",
+      "additional_details": "Additional Details",
+      "view_patients": "View Patients",
+      "view_appointments": "View Appointments",
+      "view_billing": "View Billing",
+      "edit_clinic": "Edit Clinic",
+      "close": "Close",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
     "logout": "Logout",
     "forgotPassword": "Forgot Password",
     "resetPassword": "Reset Password",
@@ -302,7 +310,8 @@
     "emailRequired": "Email is required",
     "passwordRequired": "Password is required",
     "passwordMinLength": "Password must be at least 6 characters",
-    "passwordsNotMatch": "Passwords do not match"
+    "passwordsNotMatch": "Passwords do not match",
+    "signOut": "Sign Out"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -327,37 +336,80 @@
     "noUpcomingAppointments": "No upcoming appointments",
     "viewAllAppointments": "View all appointments",
     "today": "Today",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "fromLastMonth": "from last month",
+    "errors": {
+      "noAssignedClinic": "Unable to load dashboard data. Please ensure you are assigned to a clinic.",
+      "failedToFetchStats": "Failed to fetch dashboard statistics",
+      "failedToRefresh": "Failed to refresh dashboard data"
+    },
+    "quickActions": {
+      "scheduleAppointmentDesc": "Schedule a new patient appointment",
+      "myAppointments": "My Appointments",
+      "viewAppointmentsDesc": "View your scheduled appointments",
+      "createPrescriptionDesc": "Create new prescription",
+      "patientRecords": "Patient Records",
+      "accessRecordsDesc": "Access patient medical records",
+      "registerPatientDesc": "Register a new patient"
+    },
+    "Billing": "Billing",
+    "Appointments": "Appointments",
+    "Prescriptions": "Prescriptions",
+    "Reports": "Reports",
+    "viewDetails": "View Details",
+    "viewAllActivity": "View All Activity"
   },
   "appointmentDetail": {
     "title": "Appointment Details",
     "appointmentId": "Appointment ID",
+    "error": "Error",
+    "appointmentNotFound": "Appointment not found",
+    "appointmentNotFoundDesc": "The appointment you are looking for does not exist or has been removed.",
+    "backToAppointments": "Back to Appointments",
+    "backToList": "Back to List",
     "edit": "Edit",
     "markAsCompleted": "Mark as Completed",
     "cancelAppointment": "Cancel Appointment",
-    "markAsNoShow": "Mark as No-Show",
-    "backToList": "Back to List",
-    "cancelConfirmTitle": "Are you sure you want to cancel this appointment?",
-    "cancelConfirmMessage": "This action cannot be undone.",
-    "yesCancel": "Yes, Cancel Appointment",
-    "noKeep": "No, Keep Appointment",
+    "markAsNoShow": "Mark as No Show",
+    "createPrescription": "Create Prescription",
+    "createPrescriptionTitle": "Create Prescription for Appointment",
+    "prescriptionCreated": "Prescription created successfully",
     "appointmentInfo": "Appointment Information",
+    "patientInfo": "Patient Information",
+    "notes": "Notes",
+    "noNotes": "No notes available for this appointment.",
+    "appointmentHistory": "Appointment History",
     "date": "Date",
     "time": "Time",
     "type": "Type",
     "status": "Status",
     "doctor": "Doctor",
     "clinic": "Clinic",
-    "patientInfo": "Patient Information",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "viewPatientProfile": "View Patient Profile",
-    "notes": "Notes",
-    "noNotes": "No notes for this appointment",
-    "appointmentHistory": "Appointment History",
     "created": "Created",
-    "lastUpdated": "Last Updated"
+    "lastUpdated": "Last Updated",
+    "errorFetching": "Failed to fetch appointment details",
+    "accessDenied": "Access denied. You can only view your own appointments.",
+    "notFound": "Appointment not found.",
+    "unauthorized": "Please log in to view appointment details.",
+    "cancelSuccess": "Appointment cancelled successfully",
+    "cancelError": "Failed to cancel appointment",
+    "completeSuccess": "Appointment marked as completed",
+    "completeError": "Failed to complete appointment",
+    "noShowSuccess": "Appointment marked as no-show",
+    "noShowError": "Failed to mark appointment as no-show",
+    "cancelConfirmTitle": "Cancel Appointment",
+    "cancelConfirmMessage": "Are you sure you want to cancel this appointment? This action cannot be undone.",
+    "yesCancel": "Yes, Cancel",
+    "completeConfirmTitle": "Complete Appointment",
+    "completeConfirmMessage": "Are you sure you want to mark this appointment as completed?",
+    "yesComplete": "Yes, Complete",
+    "noShowConfirmTitle": "Mark as No-Show",
+    "noShowConfirmMessage": "Are you sure you want to mark this appointment as no-show?",
+    "yesNoShow": "Yes, Mark as No-Show"
   },
   "appointmentForm": {
     "title_new": "New Appointment",
@@ -387,6 +439,9 @@
     "selectDentist": "Select a dentist",
     "clinic": "Clinic",
     "selectClinic": "Select a clinic",
+    "selectBranch": "Select Clinic Branch",
+    "selectBranchPlaceholder": "Choose a branch...",
+    "noClinicsInBranch": "No clinics available in this branch",
     "loadingClinics": "Loading clinics...",
     "notes": "Notes",
     "notesPlaceholder": "Add any notes or special instructions for this appointment",
@@ -424,8 +479,8 @@
     "error_failedToLoadTimeSlots": "Error fetching time slots. Please try again later",
     "warning_usingFallbackSlots": "Using estimated time slots. Actual availability may vary.",
     "warning_dateRequired": "Please select a date first",
-    "warning_missingDateOrClinic": "Date and clinic selection required to fetch time slots",
-    "warning_timeSlotConflict": "This time slot may have a scheduling conflict",
+    "warning_missingDateOrClinic": "Missing date or clinic ID for validation. Proceeding with selection.",
+    "warning_timeSlotConflict": "This time slot has a potential conflict. Please review.",
     "error_timeout": "Request timed out. Please try again",
     "error_permissionDenied": "Access denied. Insufficient permissions",
     "appointmentNotFound": "Appointment not found. The appointment may have been deleted or you don't have permission to view it.",
@@ -446,26 +501,11 @@
     },
     "nextStep": "Next Step",
     "previousStep": "Previous Step",
-    "emergency": "Emergency",
-    "emergencyDescription": "Mark this appointment as an emergency for priority handling",
-    "emergencyWarning": "Emergency appointments will be prioritized and may affect the regular schedule",
-    "reviewAndConfirm": "Review and Confirm",
-    "appointmentDetails": "Appointment Details",
-    "selectedService": "Selected Service",
-    "selectedDate": "Selected Date",
-    "selectedTime": "Selected Time",
-    "estimatedDuration": "Estimated Duration",
-    "patientDetails": "Patient Details",
-    "additionalNotes": "Additional Notes",
-    "noNotesProvided": "No additional notes provided",
-    "confirmAppointment": "Confirm Appointment",
-    "editDetails": "Edit Details",
-    "morningSlots": "Morning",
-    "afternoonSlots": "Afternoon",
-    "eveningSlots": "Evening",
-    "selectPatient": "Select a patient to continue",
-    "selectService": "Select a service to continue",
-    "selectDateTime": "Select date and time to continue",
+    "emergency": {
+      "label": "This is an emergency appointment",
+      "description": "Check this option if the patient needs immediate attention",
+      "alert": "Emergency appointments will be prioritized and may result in rescheduling other appointments"
+    },
     "label_timeSlot": "Select Time Slot",
     "peak_hour": "Peak Hour",
     "peak_hour_legend": "Peak hours - higher demand",
@@ -510,8 +550,6 @@
     "error_dateRequired": "Please select a date",
     "error_timeSlotRequired": "Please select a time slot",
     "error_clinicRequired": "No clinic selected. Please select a clinic",
-    "warning_timeSlotConflict": "This time slot has a potential conflict. Please review.",
-    "warning_missingDateOrClinic": "Missing date or clinic ID for validation. Proceeding with selection.",
     "warning_permissionDenied": "Permission denied to check time slot conflicts. Proceeding with selection.",
     "emergency_alert_title": "Emergency Appointment",
     "emergency_alert_message": "This appointment is marked as urgent. We will prioritize your request and contact you within 30 minutes.",
@@ -520,17 +558,17 @@
     "placeholder_patientSearch": "Search for a patient...",
     "placeholder_notes": "Add any special requests or notes for your appointment...",
     "step_patient": "Patient",
-    "step_service": "Service", 
+    "step_service": "Service",
     "step_datetime": "Date & Time",
     "step_details": "Details",
     "step_review": "Review",
     "stepDescription_patient": "Select or verify patient information",
     "stepDescription_service": "Choose the service you need",
-    "stepDescription_datetime": "Pick your preferred date and time", 
+    "stepDescription_datetime": "Pick your preferred date and time",
     "stepDescription_details": "Add additional information",
     "stepDescription_review": "Review and confirm your appointment",
     "stepStatus_pending": "Pending",
-    "stepStatus_inProgress": "In Progress", 
+    "stepStatus_inProgress": "In Progress",
     "stepStatus_completed": "Completed",
     "subtitle": "Book your dental appointment quickly and securely with our easy online system.",
     "label_date": "Appointment Date",
@@ -545,7 +583,33 @@
     "secureBooking": "Secure Booking",
     "active": "Active",
     "changeClinic": "Change Clinic (Optional)",
-    "creatingAppointment": "Creating your appointment..."
+    "creatingAppointment": "Creating your appointment...",
+    "review": {
+      "title": "Review Appointment Details",
+      "description": "Please review the information below before confirming the appointment",
+      "patientDetails": "Patient Details",
+      "serviceDetails": "Service Details",
+      "dateTimeDetails": "Date & Time",
+      "additionalDetails": "Additional Details",
+      "emergencyStatus": "Emergency Status",
+      "yes": "Yes",
+      "no": "No",
+      "confirm": "Confirm Appointment"
+    },
+    "timeSlotCategories": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "peak": "Peak Time",
+      "available": "Available",
+      "unavailable": "Unavailable"
+    },
+    "validation": {
+      "selectPatient": "Please select a patient to proceed",
+      "selectService": "Please select a service to proceed",
+      "selectDateTime": "Please select a date and time to proceed",
+      "reviewDetails": "Please review all details before confirming"
+    }
   },
   "patient_form": {
     "first_name_required": "First name is required",
@@ -590,7 +654,766 @@
     "additional_medical_notes": "Additional medical notes...",
     "cancel": "Cancel",
     "update_patient": "Update Patient",
-    "create_patient": "Create Patient"
+    "create_patient": "Create Patient",
+    "preferred_clinic": "Preferred Clinic",
+    "clinic_required": "Preferred clinic is required",
+    "street_address_required": "Street address is required",
+    "city_required": "City is required",
+    "state_required": "State is required",
+    "zip_code_required": "ZIP code is required",
+    "country": "Country",
+    "country_required": "Country is required"
+  },
+  "billing": {
+    "title": "Billing",
+    "addBill": "Add Bill",
+    "editBill": "Edit Bill",
+    "billDetails": "Bill Details",
+    "patient": "Patient",
+    "appointment": "Appointment",
+    "services": "Services",
+    "amount": "Amount",
+    "tax": "Tax",
+    "discount": "Discount",
+    "total": "Total",
+    "paymentMethod": "Payment Method",
+    "paymentStatus": "Payment Status",
+    "dueDate": "Due Date",
+    "paidDate": "Paid Date",
+    "pending": "Pending",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "cash": "Cash",
+    "card": "Card",
+    "insurance": "Insurance",
+    "billCreated": "Bill created successfully",
+    "billUpdated": "Bill updated successfully",
+    "billDeleted": "Bill deleted successfully"
+  },
+  "billingList": {
+    "title": "Billing Records",
+    "patientBilling": "Patient Billing",
+    "newInvoice": "New Invoice",
+    "editInvoice": "Edit Invoice",
+    "invoice": "Invoice",
+    "allStatus": "All Status",
+    "pending": "Pending",
+    "partial": "Partial",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "searchPlaceholder": "Search by patient name or invoice number...",
+    "dueDateLabel": "Due",
+    "totalAmount": "Total",
+    "paidAmount": "Paid",
+    "balance": "Balance",
+    "items": "Items",
+    "moreItems": "more items",
+    "paidOn": "Paid on",
+    "noRecordsFound": "No billing records found",
+    "noPatientRecords": "No billing records found for this patient",
+    "noFilteredRecords": "No records match your search criteria",
+    "createFirstInvoice": "Create First Invoice",
+    "deleteConfirmation": "Are you sure you want to delete this invoice?",
+    "deleteSuccess": "Invoice deleted successfully",
+    "deleteError": "Failed to delete invoice",
+    "fetchError": "Failed to fetch billing records",
+    "invoiceDetails": "Invoice Details",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
+  "billingForm": {
+    "patient": "Patient",
+    "selectPatient": "Select Patient",
+    "dueDate": "Due Date",
+    "appointment": "Appointment",
+    "treatmentRecord": "Treatment Record",
+    "invoiceItems": "Invoice Items",
+    "addItem": "Add Item",
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit Price",
+    "total": "Total",
+    "summary": "Summary",
+    "subtotal": "Subtotal",
+    "taxRate": "Tax Rate (%)",
+    "discountAmount": "Discount Amount",
+    "totalAmount": "Total Amount",
+    "paymentInformation": "Payment Information",
+    "paymentMethod": "Payment Method",
+    "selectPaymentMethod": "Select Payment Method",
+    "cash": "Cash",
+    "creditCard": "Credit Card",
+    "debitCard": "Debit Card",
+    "check": "Check",
+    "bankTransfer": "Bank Transfer",
+    "insurance": "Insurance",
+    "insuranceProvider": "Insurance Provider",
+    "insurancePolicyNumber": "Policy Number",
+    "insuranceCoverageAmount": "Coverage Amount",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "createInvoice": "Create Invoice",
+    "updateInvoice": "Update Invoice",
+    "saving": "Saving...",
+    "updating": "Updating...",
+    "validation": {
+      "patientRequired": "Patient is required",
+      "itemDescriptionRequired": "Item description is required",
+      "itemQuantityMin": "Quantity must be at least 1",
+      "itemUnitPriceMin": "Unit price must be positive",
+      "itemTotalMin": "Total must be positive",
+      "atLeastOneItem": "At least one item is required",
+      "subtotalMin": "Subtotal must be positive",
+      "taxRateMin": "Tax rate must be between 0 and 100",
+      "taxAmountMin": "Tax amount must be positive",
+      "discountAmountMin": "Discount amount must be positive",
+      "totalAmountMin": "Total amount must be positive",
+      "dueDateRequired": "Due date is required"
+    }
+  },
+  "paymentForm": {
+    "invoiceSummary": "Invoice Summary",
+    "invoiceNumber": "Invoice #",
+    "patient": "Patient",
+    "totalAmount": "Total Amount",
+    "paidAmount": "Previously Paid",
+    "currentBalance": "Current Balance",
+    "newBalance": "New Balance",
+    "paymentAmount": "Payment Amount",
+    "paymentAmountPlaceholder": "Enter payment amount",
+    "fullPayment": "Full Payment",
+    "partialPayment50": "50% Payment",
+    "partialPayment25": "25% Payment",
+    "paymentMethod": "Payment Method",
+    "selectPaymentMethod": "Select Payment Method",
+    "cash": "Cash",
+    "creditCard": "Credit Card",
+    "debitCard": "Debit Card",
+    "check": "Check",
+    "bankTransfer": "Bank Transfer",
+    "insurancePayment": "Insurance Payment",
+    "other": "Other",
+    "paymentDate": "Payment Date",
+    "referenceNumber": "Reference Number",
+    "referencePlaceholder": "Transaction ID, check number, etc.",
+    "paymentNotes": "Payment Notes",
+    "notesPlaceholder": "Additional payment details...",
+    "paymentPreview": "Payment Preview",
+    "previewAmount": "Payment Amount",
+    "previewRemaining": "Remaining Balance",
+    "previewStatus": "New Status",
+    "cancel": "Cancel",
+    "addPayment": "Add Payment",
+    "processing": "Processing...",
+    "successMessage": "Payment added successfully",
+    "errorMessage": "Failed to add payment",
+    "errorAmountExceedsBalance": "Payment amount cannot exceed balance of ${balance}",
+    "infoFullSettlement": "This payment will fully settle the invoice",
+    "infoPartialPayment": "Remaining balance after payment: ${balance}",
+    "validation": {
+      "amountRequired": "Payment amount is required",
+      "amountMax": "Payment amount is too large",
+      "methodRequired": "Payment method is required",
+      "dateRequired": "Payment date is required",
+      "notesMax": "Notes cannot exceed 500 characters"
+    }
+  },
+  "billingDetails": {
+    "invoiceTitle": "Invoice #{invoiceNumber}",
+    "paymentStatus": {
+      "pending": "Pending",
+      "partial": "Partially Paid",
+      "paid": "Paid",
+      "overdue": "Overdue"
+    },
+    "overdue": "Overdue",
+    "print": "Print",
+    "downloadPDF": "Download PDF",
+    "addPayment": "Add Payment",
+    "fromClinic": "From: {clinicName}",
+    "billTo": "Bill To: {patientName}",
+    "invoiceDetailsTitle": "Invoice Details",
+    "invoiceDate": "Invoice Date",
+    "dueDate": "Due Date",
+    "paidDate": "Paid Date",
+    "provider": "Provider",
+    "dentistName": "Dr. {firstName} {lastName}",
+    "appointment": "Appointment",
+    "treatment": "Treatment",
+    "insuranceInfoTitle": "Insurance Information",
+    "insuranceProvider": "Provider",
+    "policyNumber": "Policy Number",
+    "coverageAmount": "Coverage Amount",
+    "invoiceItemsTitle": "Invoice Items",
+    "itemDescription": "Description",
+    "itemQuantity": "Qty",
+    "itemUnitPrice": "Unit Price",
+    "itemTotal": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax",
+    "totalAmount": "Total Amount",
+    "paidAmount": "Paid Amount",
+    "balanceDue": "Balance Due",
+    "paymentHistoryTitle": "Payment History",
+    "paymentReference": "Ref: {reference}",
+    "notesTitle": "Notes",
+    "pdfDownloadInfo": "PDF download functionality will be implemented soon"
+  },
+  "reports": {
+    "title": "Reports & Analytics",
+    "exportData": "Export Data",
+    "saveReport": "Save Report",
+    "reportTypes": "Report Types",
+    "configureReport": "Configure {{reportName}}",
+    "selectReportType": "Select a Report Type",
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "status": "Status",
+    "doctor": "Doctor",
+    "ageGroup": "Age Group",
+    "patientType": "Patient Type",
+    "serviceType": "Service Type",
+    "paymentMethod": "Payment Method",
+    "generateReport": "Generate Report",
+    "cancel": "Cancel",
+    "reportPreview": "Report Preview",
+    "previewGenerated": "Preview will be generated after you click \"Generate Report\"",
+    "viewSampleReport": "View sample report",
+    "myMedicalReports": "My Medical Reports",
+    "noMedicalReports": "No medical reports found.",
+    "viewReport": "View Report",
+    "reportDate": "Date",
+    "fetchingReportsError": "Failed to fetch reports",
+    "selectReportTypePrompt": "Please select a report type from the left panel to configure and generate a report.",
+    "profile": {
+      "title": "My Profile",
+      "description": "Manage your personal information and account settings."
+    },
+    "patientProfile": {
+      "title": "My Health Profile",
+      "subtitle": "Manage your dental health information and appointments",
+      "loading": "Loading your profile...",
+      "profileNotFound": "Patient profile not found",
+      "activePatient": "Active Patient",
+      "patientSince": "Patient since {{year}}",
+      "totalVisits": "Total Visits",
+      "upcoming": "Upcoming",
+      "allergies": "Allergies",
+      "conditions": "Conditions",
+      "quickActions": "Quick Actions",
+      "bookAppointment": "Book Appointment",
+      "viewRecords": "View Records",
+      "downloadReports": "Download Reports",
+      "accountSettings": "Account Settings",
+      "healthSummary": "Health Summary",
+      "lastCheckup": "Last Checkup",
+      "nextDue": "Next Due",
+      "scheduleNow": "Schedule now",
+      "noRecords": "No records",
+      "emergencyContact": "Emergency Contact",
+      "upcomingAppointments": "Upcoming Appointments",
+      "bookNew": "Book New",
+      "noUpcomingAppointments": "No upcoming appointments",
+      "scheduleNextVisit": "Schedule Your Next Visit",
+      "recentVisits": "Recent Visits",
+      "noRecentVisits": "No recent visits",
+      "allAppointments": "All Appointments",
+      "bookNewAppointment": "Book New Appointment",
+      "medicalInformation": "Medical Information",
+      "noKnownAllergies": "No known allergies",
+      "noMedicalConditions": "No medical conditions recorded",
+      "medicalNotes": "Medical Notes",
+      "noMedicalNotes": "No medical notes available",
+      "medicalDocuments": "Medical Documents",
+      "noDocuments": "No documents available yet",
+      "documentsDescription": "Your medical reports, X-rays, and treatment plans will appear here",
+      "notifications": "Notifications",
+      "editProfile": "Edit Profile",
+      "overview": "Overview",
+      "appointments": "Appointments",
+      "medical": "Medical Info",
+      "documents": "Documents",
+      "generalCheckup": "General Checkup",
+      "dentalVisit": "Dental Visit",
+      "view": "View",
+      "none": "None",
+      "recorded": "recorded"
+    },
+    "patientSettings": {
+      "title": "Account Settings",
+      "subtitle": "Manage your personal information and preferences",
+      "loading": "Loading your settings...",
+      "profileComplete": "Profile {{percent}}% Complete",
+      "personalInformation": "Personal Information",
+      "personalInfoDesc": "Update your basic personal details",
+      "contactDetails": "Contact Details",
+      "contactDetailsDesc": "Manage your contact information",
+      "addressInformation": "Address Information",
+      "addressInfoDesc": "Update your address details",
+      "emergencyContact": "Emergency Contact",
+      "emergencyContactDesc": "Person to contact in case of emergency",
+      "medicalInformation": "Medical Information",
+      "medicalInfoDesc": "Update your medical history and conditions",
+      "security": "Security",
+      "securityDesc": "Manage your account security",
+      "preferences": "Preferences",
+      "preferencesDesc": "Customize your experience",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "streetAddress": "Street Address",
+      "city": "City",
+      "state": "State/Province",
+      "zipCode": "ZIP/Postal Code",
+      "country": "Country",
+      "contactName": "Contact Name",
+      "relationship": "Relationship",
+      "spouse": "Spouse",
+      "parent": "Parent",
+      "child": "Child",
+      "sibling": "Sibling",
+      "friend": "Friend",
+      "addAllergy": "Add new allergy",
+      "addCondition": "Add medical condition",
+      "additionalMedicalNotes": "Additional medical notes...",
+      "changePassword": "Change Password",
+      "changePasswordDesc": "Update your account password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "cancel": "Cancel",
+      "passwordsNotMatch": "New passwords do not match",
+      "passwordUpdated": "Password updated successfully",
+      "failedToUpdatePassword": "Failed to update password",
+      "profileUpdated": "Profile updated successfully!",
+      "failedToUpdateProfile": "Failed to update profile",
+      "emailNotifications": "Email Notifications",
+      "smsNotifications": "SMS Notifications",
+      "appointmentReminders": "Appointment Reminders",
+      "healthTips": "Health Tips",
+      "language": "Language",
+      "timezone": "Timezone",
+      "saveChanges": "Save Changes",
+      "add": "Add",
+      "remove": "Remove",
+      "selectState": "Select State/Province",
+      "selectRelationship": "Select Relationship"
+    },
+    "home": {
+      "hero": {
+        "badge": "Serving Fayoum & Attsa communities since 2015",
+        "title": "Advanced Dental Care",
+        "subtitle": "With Laser Technology",
+        "description": "Experience exceptional dental care at Clear Dental Centers with state-of-the-art laser technology, expert specialists, and personalized treatment plans.",
+        "bookAppointment": "Book Appointment",
+        "watchStory": "Watch Our Story",
+        "hipaaCompliant": "HIPAA Compliant",
+        "adaCertified": "ADA Certified",
+        "yearsExperience": "15+ Years Experience",
+        "emergencyCare": "24/7 Emergency Care",
+        "patientRating": "4.9/5",
+        "reviews": "2,500+ Reviews"
+      },
+      "stats": {
+        "happyPatients": "Happy Patients",
+        "yearsExperience": "Years Experience",
+        "emergencyCare": "Emergency Care",
+        "patientRating": "Patient Rating"
+      },
+      "newPatient": {
+        "badge": "New Patient Special - 20% Off First Visit",
+        "title": "Start Your Journey to Perfect Oral Health",
+        "description": "Join our growing family of satisfied patients across Fayoum and Attsa. Experience the difference of modern laser dentistry.",
+        "createAccount": "Create Account",
+        "signUpFree": "Sign Up Free",
+        "bookAppointment": "Book Appointment",
+        "scheduleNow": "Schedule Now",
+        "getTreatment": "Get Treatment",
+        "learnMore": "Learn More",
+        "specialOffer": "🎉 New Patient Special: Get 20% off your first consultation and treatment at either location",
+        "offerTerms": "*Valid for new patients only. Cannot be combined with other offers. Expires December 31, 2024.",
+        "callNow": "Call Now: +201017848825",
+        "whatsappBooking": "WhatsApp Booking"
+      },
+      "locations": {
+        "badge": "Two Convenient Locations",
+        "title": "Visit Our Modern Clinics",
+        "description": "Choose from our two state-of-the-art locations in Fayoum Governorate, both equipped with the latest laser dental technology.",
+        "attsaBranch": "Attsa Branch",
+        "mainLocation": "Main Location",
+        "fayoumBranch": "Fayoum Branch",
+        "cityCenter": "City Center",
+        "viewOnMaps": "View on Google Maps",
+        "bookAppointment": "Book Appointment",
+        "callNow": "Call Now",
+        "availableServices": "Available Services:",
+        "more": "more",
+        "facilitiesNote": "Both locations offer: Free parking • Wheelchair accessible • Modern equipment • Sterilized environment",
+        "bookAtEither": "Book at Either Location"
+      },
+      "services": {
+        "badge": "Our Services",
+        "title": "Comprehensive Dental Care",
+        "description": "From routine cleanings to advanced procedures, we offer complete dental solutions using the latest technology and techniques."
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "noNotifications": "No notifications yet",
+      "markAsRead": "Mark as read",
+      "markAllRead": "Mark all as read",
+      "delete": "Delete",
+      "viewAll": "View all notifications",
+      "unreadCount": "{{count}} unread",
+      "types": {
+        "general": "General",
+        "appointment_reminder": "Appointment Reminder",
+        "appointment_confirmation": "Appointment Confirmation", 
+        "appointment_cancellation": "Appointment Cancellation",
+        "system": "System"
+      }
+    },
+    "reportTypesConfig": {
+      "my-reports": {
+        "name": "My Medical Reports",
+        "description": "View your personal medical reports and test results"
+      },
+      "my-appointments": {
+        "name": "My Appointments",
+        "description": "View your appointment history and upcoming appointments"
+      },
+      "appointments": {
+        "name": "Appointment Reports",
+        "description": "View appointment statistics, no-shows, cancellations, and booking trends",
+        "numberOfAppointments": "Number of Appointments"
+      },
+      "patients": {
+        "name": "Patient Reports",
+        "description": "Analyze patient demographics, new patients, and retention rates"
+      },
+      "revenue": {
+        "name": "Revenue Reports",
+        "description": "Track revenue by service, doctor, or time period"
+      },
+      "performance": {
+        "name": "Performance Reports",
+        "description": "Measure clinic and doctor performance metrics"
+      },
+      "custom": {
+        "name": "Custom Reports",
+        "description": "Create and save custom reports with your preferred metrics"
+      }
+    },
+    "dateRanges": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This Week",
+      "lastWeek": "Last Week",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "last30days": "Last 30 Days",
+      "last90days": "Last 90 Days",
+      "thisYear": "This Year",
+      "lastYear": "Last Year",
+      "custom": "Custom Range"
+    },
+    "appointmentStatuses": {
+      "all": "All Statuses",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no-show": "No Show",
+      "scheduled": "Scheduled"
+    },
+    "doctors": {
+      "all": "All Doctors",
+      "dr-smith": "Dr. Smith",
+      "dr-johnson": "Dr. Johnson",
+      "dr-williams": "Dr. Williams"
+    },
+    "ageGroups": {
+      "all": "All Ages",
+      "0-18": "0-18",
+      "19-35": "19-35",
+      "36-50": "36-50",
+      "51-65": "51-65",
+      "65+": "65+"
+    },
+    "patientTypes": {
+      "all": "All Patients",
+      "new": "New Patients",
+      "returning": "Returning Patients"
+    },
+    "serviceTypes": {
+      "all": "All Services",
+      "consultation": "Consultation",
+      "procedure": "Procedure",
+      "test": "Test/Lab Work",
+      "followup": "Follow-up"
+    },
+    "paymentMethods": {
+      "all": "All Methods",
+      "insurance": "Insurance",
+      "cash": "Cash",
+      "credit": "Credit Card",
+      "online": "Online Payment"
+    }
+  },
+  "reminders": {
+    "title": "Reminder Management",
+    "subtitle": "Monitor and manage automated appointment reminder system",
+    "triggerBatch": "Trigger Daily Batch",
+    "triggeringBatch": "Triggering...",
+    "batchTriggerSuccess": "Daily reminder batch triggered successfully",
+    "batchTriggerError": "Failed to trigger daily reminder batch",
+    "queueHealth": "Queue Health",
+    "queueHealthDescription": "Status of the reminder processing queue",
+    "scheduledTasks": "Scheduled Tasks",
+    "scheduledTasksDescription": "Background jobs and cron tasks",
+    "upcomingAppointments": "Upcoming Appointments",
+    "upcomingAppointmentsDescription": "Next 7 days with reminders enabled",
+    "queueStatistics": "Queue Statistics",
+    "scheduledJobs": "Scheduled Jobs",
+    "lastUpdated": "Last updated",
+    "healthStatus": {
+      "healthy": "Healthy",
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "queue": {
+      "waiting": "Waiting",
+      "active": "Active",
+      "delayed": "Delayed",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "jobs": {
+      "dailyReminderBatch": "Daily Reminder Batch",
+      "queueCleanup": "Queue Cleanup",
+      "queueMonitoring": "Queue Monitoring",
+      "databaseMaintenance": "Database Maintenance"
+    },
+    "errors": {
+      "failedToLoadStatus": "Failed to load reminder system status"
+    }
+  },
+  "inventory": {
+    "title": "Inventory Management",
+    "subtitle": "Track and manage medical supplies and equipment",
+    "loading": "Loading inventory...",
+    "addItem": "Add Item",
+    "totalItems": "Total Items",
+    "totalValue": "Total Value",
+    "lowStockItems": "Low Stock Items",
+    "expiringItems": "Expiring Items",
+    "stockByCategory": "Stock by Category",
+    "items": "items",
+    "lowStock": "Low Stock",
+    "outOfStock": "Out of Stock",
+    "lowStockAlert": "Low Stock Alert",
+    "expiringItemsAlert": "Items Expiring Soon",
+    "recentMovements": "Recent Stock Movements",
+    "minStock": "Min",
+    "noLowStockItems": "No items are currently low in stock",
+    "noRecentMovements": "No recent stock movements",
+    "viewAllLowStock": "View All",
+    "more": "more",
+    "expiringSoon": "expiring soon",
+    "expired": "Expired",
+    "daysLeft": "days left",
+    "expiryDate": "Expiry",
+    "currentStock": "Stock",
+    "noDashboardData": "No inventory data available",
+    "categories": {
+      "supplies": "Supplies",
+      "materials": "Materials",
+      "equipment": "Equipment",
+      "medications": "Medications",
+      "instruments": "Instruments",
+      "other": "Other"
+    },
+    "stockStatus": {
+      "out_of_stock": "Out of Stock",
+      "low_stock": "Low Stock",
+      "in_stock": "In Stock",
+      "overstock": "Overstock"
+    },
+    "movementTypes": {
+      "in": "Stock In",
+      "out": "Stock Out",
+      "adjustment": "Adjustment"
+    },
+    "errors": {
+      "fetchFailed": "Failed to load inventory data"
+    }
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "subtitle": "Manage supplier information and relationships",
+    "addSupplier": "Add Supplier",
+    "totalSuppliers": "Total Suppliers",
+    "activeSuppliers": "Active Suppliers",
+    "topSuppliers": "Top Suppliers",
+    "supplierPerformance": "Supplier Performance",
+    "contactPerson": "Contact Person",
+    "noRating": "No rating",
+    "rating": "Rating",
+    "totalOrders": "Total Orders",
+    "totalSpent": "Total Spent",
+    "averageOrderValue": "Avg Order Value",
+    "suppliedItems": "Supplied Items",
+    "noSuppliersFound": "No suppliers found",
+    "errors": {
+      "fetchFailed": "Failed to load supplier data"
+    }
+  },
+  "treatments": {
+    "title": "Treatment Records",
+    "subtitle": "Manage patient treatment records and history",
+    "patientTreatments": "Patient Treatments",
+    "loading": "Loading treatment records...",
+    "addRecord": "Add Treatment Record",
+    "editRecord": "Edit Treatment Record",
+    "recordDetails": "Treatment Record Details",
+    "createFirstRecord": "Create First Treatment Record",
+    "noRecordsFound": "No treatment records found",
+    "noPatientRecords": "No treatment records found for this patient",
+    "noFilteredRecords": "No records match your search criteria",
+    "confirmDelete": "Are you sure you want to delete this treatment record?",
+    "deleteSuccess": "Treatment record deleted successfully",
+    "deleteError": "Failed to delete treatment record",
+    "exportSuccess": "Treatment records exported successfully",
+    "exportError": "Failed to export treatment records",
+    "filters": "Filters",
+    "searchPlaceholder": "Search by treatment type, diagnosis, or patient name...",
+    "diagnosis": "Diagnosis",
+    "dentist": "Dentist",
+    "cost": "Cost",
+    "materials": "Materials",
+    "moreMaterials": "more materials",
+    "followUp": "Follow-up",
+    "followUpPending": "Follow-up pending",
+    "notes": "Notes",
+    "status": {
+      "all": "All Status",
+      "planned": "Planned",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "all": "All Types",
+      "cleaning": "Cleaning",
+      "filling": "Filling",
+      "extraction": "Extraction",
+      "rootCanal": "Root Canal",
+      "crown": "Crown",
+      "bridge": "Bridge",
+      "implant": "Implant",
+      "orthodontics": "Orthodontics",
+      "whitening": "Whitening",
+      "periodontal": "Periodontal",
+      "other": "Other"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "pdf": "Export PDF"
+    },
+    "errors": {
+      "fetchFailed": "Failed to load treatment records"
+    },
+    "form": {
+      "patient": "Patient",
+      "selectPatient": "Select Patient",
+      "appointment": "Related Appointment",
+      "noAppointment": "No appointment",
+      "treatmentDetails": "Treatment Details",
+      "treatmentType": "Treatment Type",
+      "selectType": "Select Treatment Type",
+      "treatmentCode": "Treatment Code",
+      "codePlaceholder": "e.g., D1110, D2160",
+      "diagnosis": "Diagnosis",
+      "diagnosisPlaceholder": "Describe the diagnosis or condition",
+      "procedure": "Procedure Details",
+      "procedurePlaceholder": "Describe the treatment procedure performed",
+      "notes": "Additional Notes",
+      "notesPlaceholder": "Any additional notes or observations",
+      "statusAndDates": "Status & Timeline",
+      "status": "Status",
+      "cost": "Cost",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "followUpRequired": "Follow-up required",
+      "followUpDate": "Follow-up Date",
+      "materials": "Materials Used",
+      "addMaterial": "Add Material",
+      "materialName": "Material Name",
+      "quantity": "Quantity",
+      "attachments": "Attachments",
+      "uploadFile": "Upload File",
+      "uploading": "Uploading...",
+      "fileUploadSuccess": "File uploaded successfully",
+      "fileUploadError": "Failed to upload file",
+      "cancel": "Cancel",
+      "createRecord": "Create Record",
+      "updateRecord": "Update Record",
+      "saving": "Saving...",
+      "updating": "Updating...",
+      "createSuccess": "Treatment record created successfully",
+      "updateSuccess": "Treatment record updated successfully",
+      "saveError": "Failed to save treatment record",
+      "validation": {
+        "patientRequired": "Patient is required",
+        "typeRequired": "Treatment type is required",
+        "diagnosisRequired": "Diagnosis is required",
+        "procedureRequired": "Procedure details are required",
+        "costMin": "Cost must be a positive number",
+        "startDateRequired": "Start date is required",
+        "materialNameRequired": "Material name is required",
+        "quantityMin": "Quantity must be at least 1",
+        "materialCostMin": "Material cost must be positive"
+      }
+    },
+    "detail": {
+      "recordId": "Record ID: {id}",
+      "print": "Print",
+      "edit": "Edit Record",
+      "patientInfo": "Patient Information",
+      "providerInfo": "Provider Information",
+      "treatmentDetails": "Treatment Details",
+      "diagnosis": "Diagnosis",
+      "cost": "Cost",
+      "procedure": "Procedure Details",
+      "notes": "Notes",
+      "timeline": "Timeline",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "relatedAppointment": "Related Appointment",
+      "followUp": "Follow-up Required",
+      "followUpPending": "Follow-up pending",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "materials": "Materials Used",
+      "materialName": "Material",
+      "quantity": "Quantity",
+      "unitCost": "Unit Cost",
+      "totalCost": "Total Cost",
+      "totalMaterialsCost": "Total Materials Cost",
+      "attachments": "Attachments",
+      "download": "Download",
+      "costSummary": "Cost Summary",
+      "treatmentCost": "Treatment Cost",
+      "materialsCost": "Materials Cost",
+      "grandTotal": "Grand Total"
+    }
   },
   "forgotPassword": {
     "title": "Forgot your password?",
@@ -704,7 +1527,11 @@
     "medications_placeholder": "Medications content placeholder",
     "notes": "Notes",
     "notes_placeholder": "Notes content placeholder",
-    "confirm_delete": "Are you sure you want to delete this patient? This action cannot be undone."
+    "confirm_delete": "Are you sure you want to delete this patient? This action cannot be undone.",
+    "years_zero": "{{count}} years",
+    "years_two": "{{count}} years",
+    "years_few": "{{count}} years",
+    "years_many": "{{count}} years"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -808,7 +1635,8 @@
       "title": "Contact Us",
       "intro": "If you have questions or comments about this Privacy Policy, please contact us at:",
       "address": "Healthcare Management Platform<br />123 Healthcare Avenue<br />San Francisco, CA 94107<br />Email: privacy@healthcareapp.com<br />Phone: (555) 123-4567",
-      "link": "Contact Us with Questions"
+      "link": "Contact Us with Questions",
+      "p1": "If you have any questions about this Privacy Policy, please contact us at:"
     }
   },
   "terms": {
@@ -869,91 +1697,6 @@
       "p1": "If you have any questions about these Terms, please contact us at:",
       "address": "Healthcare Management Platform<br />123 Healthcare Avenue<br />San Francisco, CA 94107<br />Email: legal@healthcareapp.com<br />Phone: (555) 123-4567",
       "link": "Contact Us with Questions"
-    }
-  },
-  "services": {
-    "hero": {
-      "title": "Our Services",
-      "description": "Comprehensive healthcare management solutions designed for modern medical practices."
-    },
-    "mainServices": {
-      "appointmentManagement": {
-        "title": "Appointment Management",
-        "description": "Our intuitive appointment scheduling system helps you manage your clinic's calendar efficiently. Features include:",
-        "features": [
-          "Easy scheduling and rescheduling",
-          "Automated appointment reminders",
-          "Online booking for patients",
-          "Recurring appointment setup",
-          "Multi-provider calendar views"
-        ]
-      },
-      "patientManagement": {
-        "title": "Patient Management",
-        "description": "Maintain comprehensive patient records and streamline patient interactions with our robust management system:",
-        "features": [
-          "Complete electronic health records",
-          "Patient demographics and insurance information",
-          "Medical history tracking",
-          "Document and image storage",
-          "Secure patient portal access"
-        ]
-      },
-      "reportingAnalytics": {
-        "title": "Reporting & Analytics",
-        "description": "Gain valuable insights into your practice with comprehensive reporting tools:",
-        "features": [
-          "Financial performance metrics",
-          "Patient visit analytics",
-          "Provider productivity reports",
-          "Custom report generation",
-          "Data visualization dashboards"
-        ]
-      },
-      "billingInvoicing": {
-        "title": "Billing & Invoicing",
-        "description": "Simplify your financial operations with our integrated billing solutions:",
-        "features": [
-          "Automated invoice generation",
-          "Payment tracking and processing",
-          "Insurance claim management",
-          "Patient statement creation",
-          "Financial reporting tools"
-        ]
-      }
-    },
-    "learnMore": "Learn More",
-    "additionalServices": {
-      "title": "Additional Services",
-      "telemedicine": {
-        "title": "Telemedicine Integration",
-        "description": "Conduct virtual appointments with integrated video conferencing, digital prescriptions, and secure messaging."
-      },
-      "multiClinic": {
-        "title": "Multi-Clinic Management",
-        "description": "Manage multiple locations from a single platform with location-specific settings, staff management, and reporting."
-      },
-      "customIntegrations": {
-        "title": "Custom Integrations",
-        "description": "Connect with your existing systems through our API, including EHR systems, accounting software, and more."
-      }
-    },
-    "learnMoreLink": "Learn more →",
-    "pricing": {
-      "title": "Simple, Transparent Pricing",
-      "description": "Choose the plan that fits your practice size and needs. All plans include our core features.",
-      "plans": {
-        "basic": {
-          "title": "Basic",
-          "description": "For small practices",
-          "price": "$99",
-          "period": "/month",
-          "features": [
-            "Up to 2 providers",
-            "Appointment management"
-          ]
-        }
-      }
     }
   },
   "appointments": {
@@ -1038,55 +1781,6 @@
       "action": "Yes, Complete"
     }
   },
-  "appointmentDetail": {
-    "title": "Appointment Details",
-    "appointmentId": "Appointment ID",
-    "error": "Error",
-    "appointmentNotFound": "Appointment not found",
-    "appointmentNotFoundDesc": "The appointment you are looking for does not exist or has been removed.",
-    "backToAppointments": "Back to Appointments",
-    "backToList": "Back to List",
-    "edit": "Edit",
-    "markAsCompleted": "Mark as Completed",
-    "cancelAppointment": "Cancel Appointment",
-    "markAsNoShow": "Mark as No Show",
-    "appointmentInfo": "Appointment Information",
-    "patientInfo": "Patient Information",
-    "notes": "Notes",
-    "noNotes": "No notes available for this appointment.",
-    "appointmentHistory": "Appointment History",
-    "date": "Date",
-    "time": "Time",
-    "type": "Type",
-    "status": "Status",
-    "doctor": "Doctor",
-    "clinic": "Clinic",
-    "name": "Name",
-    "email": "Email",
-    "phone": "Phone",
-    "viewPatientProfile": "View Patient Profile",
-    "created": "Created",
-    "lastUpdated": "Last Updated",
-    "errorFetching": "Failed to fetch appointment details",
-    "accessDenied": "Access denied. You can only view your own appointments.",
-    "notFound": "Appointment not found.",
-    "unauthorized": "Please log in to view appointment details.",
-    "cancelSuccess": "Appointment cancelled successfully",
-    "cancelError": "Failed to cancel appointment",
-    "completeSuccess": "Appointment marked as completed",
-    "completeError": "Failed to complete appointment",
-    "noShowSuccess": "Appointment marked as no-show",
-    "noShowError": "Failed to mark appointment as no-show",
-    "cancelConfirmTitle": "Cancel Appointment",
-    "cancelConfirmMessage": "Are you sure you want to cancel this appointment? This action cannot be undone.",
-    "yesCancel": "Yes, Cancel",
-    "completeConfirmTitle": "Complete Appointment",
-    "completeConfirmMessage": "Are you sure you want to mark this appointment as completed?",
-    "yesComplete": "Yes, Complete",
-    "noShowConfirmTitle": "Mark as No-Show",
-    "noShowConfirmMessage": "Are you sure you want to mark this appointment as no-show?",
-    "yesNoShow": "Yes, Mark as No-Show"
-  },
   "patientDashboard": {
     "welcome": "Welcome back, {{name}}!",
     "subtitle": "Here's an overview of your health journey and upcoming appointments.",
@@ -1115,61 +1809,40 @@
     "scheduleVisit": "Schedule a new visit"
   },
   "prescriptions": {
-    "title": "My Prescriptions",
-    "patientSubtitle": "View and manage your prescribed medications and treatment history.",
-    "description": "Manage your prescriptions and medications",
-    "noPatientRecord": "No patient record found. Please contact your healthcare provider.",
-    "errorLoading": "Failed to load prescriptions",
-    "totalPrescriptions": "Total Prescriptions",
-    "activePrescriptions": "Active Prescriptions",
-    "expiredPrescriptions": "Expired Prescriptions",
-    "pendingRefills": "Pending Refills",
-    "searchPlaceholder": "Search medications, diagnosis, or doctor...",
-    "allStatuses": "All Statuses",
+    "doctor": "Dr. {{firstName}} {{lastName}}",
+    "title": "Prescriptions",
+    "description": "Manage patient prescriptions and medication orders",
+    "patientPrescriptions": "Patient Prescriptions",
+    "newPrescription": "New Prescription",
+    "searchPlaceholder": "Search prescriptions...",
+    "filterByStatus": "Filter by status",
+    "allStatus": "All Status",
     "active": "Active",
     "completed": "Completed",
-    "expired": "Expired",
     "cancelled": "Cancelled",
-    "sortByNewest": "Newest First",
-    "sortByOldest": "Oldest First",
-    "sortByMedication": "Medication Name",
-    "sortByDoctor": "Doctor Name",
-    "noMatchingPrescriptions": "No matching prescriptions found",
-    "noPrescriptions": "No prescriptions found",
-    "adjustFilters": "Try adjusting your search or filter criteria.",
-    "noPrescriptionsDescription": "You don't have any prescriptions yet. Book an appointment to receive medical consultation.",
-    "bookAppointment": "Book Appointment",
-    "moreMedications": "more",
-    "prescribedBy": "Prescribed by",
-    "prescribedDate": "Prescribed Date",
-    "expiryDate": "Expiry Date",
-    "refills": "Refills",
-    "diagnosis": "Diagnosis",
-    "view": "View",
-    "print": "Print",
-    "download": "Download",
+    "prescriptionNumber": "Prescription #{{id}}",
+    "expired": "Expired",
+    "issued": "Issued: {{date}}",
+    "diagnosis": "Diagnosis:",
+    "medications": "Medications:",
+    "dosage": "Dosage: {{dosage}}",
+    "frequency": "Frequency: {{frequency}}",
+    "duration": "Duration: {{duration}}",
+    "refills": "Refills: {{current}}/{{max}}",
+    "expires": "Expires: {{date}}",
+    "noPrescriptionsFound": "No prescriptions found",
+    "noPatientPrescriptions": "This patient has no prescriptions yet.",
+    "noFilteredPrescriptions": "No prescriptions match your current filters.",
+    "createFirstPrescription": "Create First Prescription",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{currentPage}} of {{totalPages}}",
+    "editPrescription": "Edit Prescription",
     "prescriptionDetails": "Prescription Details",
-    "prescriptionInfo": "Prescription Information",
-    "prescriptionId": "Prescription ID",
-    "status": "Status",
-    "clinic": "Clinic",
-    "patient": "Patient",
-    "patientInfo": "Patient Information",
-    "medications": "Medications",
-    "dosage": "Dosage",
-    "frequency": "Frequency",
-    "duration": "Duration",
-    "instructions": "Instructions",
-    "category": "Category",
-    "refillInformation": "Refill Information",
-    "maxRefills": "Maximum Refills",
-    "currentRefills": "Current Refills",
-    "refillsRemaining": "Refills Remaining",
-    "notes": "Notes",
-    "close": "Close",
-    "prescription": "Prescription",
-    "printDisclaimer": "This is a printed copy of your prescription. Please consult with your healthcare provider for any questions.",
-    "printDate": "Printed on"
+    "deleteConfirmation": "Are you sure you want to delete this prescription?",
+    "deleteSuccess": "Prescription deleted successfully",
+    "deleteError": "Failed to delete prescription",
+    "fetchError": "Failed to fetch prescriptions"
   },
   "patients": {
     "title": "Patients",
@@ -1229,6 +1902,10 @@
   },
   "medications": {
     "title": "Medications",
+    "medications": "Medications",
+    "my_medications": "My Medications",
+    "view_prescribed_medications": "View your prescribed medications",
+    "manage_medication_inventory": "Manage medication inventory",
     "addMedication": "Add Medication",
     "editMedication": "Edit Medication",
     "medicationDetails": "Medication Details",
@@ -1250,70 +1927,132 @@
     "medicationUpdated": "Medication updated successfully",
     "medicationDeleted": "Medication deleted successfully"
   },
-  "prescriptions": {
-    "doctor": "Dr. {{firstName}} {{lastName}}",
-    "title": "Prescriptions",
-    "description": "Manage patient prescriptions and medication orders",
-    "patientPrescriptions": "Patient Prescriptions",
-    "newPrescription": "New Prescription",
-    "searchPlaceholder": "Search prescriptions...",
-    "filterByStatus": "Filter by status",
-    "allStatus": "All Status",
+  "medicationForm": {
+    "medicationName": "Medication Name",
+    "medicationNamePlaceholder": "Enter medication name",
+    "genericName": "Generic Name",
+    "genericNamePlaceholder": "Enter generic name (optional)",
+    "dosage": "Dosage",
+    "dosagePlaceholder": "e.g., 500mg",
+    "frequency": "Frequency",
+    "frequencyPlaceholder": "e.g., Twice daily",
+    "duration": "Duration",
+    "durationPlaceholder": "e.g., 7 days",
+    "category": "Category",
+    "activeMedication": "Active Medication",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Enter usage instructions",
+    "sideEffects": "Side Effects",
+    "addSideEffect": "Add Side Effect",
+    "sideEffectPlaceholder": "Enter side effect",
+    "contraindications": "Contraindications",
+    "addContraindication": "Add Contraindication",
+    "contraindicationPlaceholder": "Enter contraindication",
+    "cancel": "Cancel",
+    "createMedication": "Create Medication",
+    "updateMedication": "Update Medication",
+    "successCreate": "Medication created successfully",
+    "successUpdate": "Medication updated successfully",
+    "errorSave": "Error saving medication",
+    "categories": {
+      "antibiotic": "Antibiotic",
+      "painkiller": "Painkiller",
+      "anti-inflammatory": "Anti-inflammatory",
+      "anesthetic": "Anesthetic",
+      "antiseptic": "Antiseptic",
+      "other": "Other"
+    },
+    "validation": {
+      "medicationNameRequired": "Medication name is required",
+      "dosageRequired": "Dosage is required",
+      "frequencyRequired": "Frequency is required",
+      "durationRequired": "Duration is required",
+      "sideEffectRequired": "Side effect cannot be empty",
+      "contraindicationRequired": "Contraindication cannot be empty"
+    }
+  },
+  "medicationList": {
+    "title": "Medication Inventory",
+    "myTitle": "My Prescribed Medications",
+    "selectTitle": "Select a Medication",
+    "addMedication": "Add Medication",
+    "addModalTitle": "Add New Medication",
+    "editMedication": "Edit Medication",
+    "searchPlaceholder": "Search medications...",
+    "patientInfoTitle": "Your Medications",
+    "patientInfoText": "These are medications prescribed to you by your dentist. Please follow the instructions carefully.",
+    "noMedicationsPrescribed": "No medications prescribed",
+    "noMedicationsPrescribedInfo": "You don't have any prescribed medications at the moment.",
+    "noMedicationsFound": "No medications found",
+    "noMedicationsMatchFilters": "Try adjusting your search or filters",
+    "genericName": "Generic: {{name}}",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "duration": "Duration",
+    "instructions": "Instructions",
+    "sideEffects": "Side Effects",
+    "moreItems": "+{{count}} more",
+    "select": "Select",
     "active": "Active",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "prescriptionNumber": "Prescription #{{id}}",
-    "expired": "Expired",
-    "issued": "Issued: {{date}}",
-    "diagnosis": "Diagnosis:",
-    "medications": "Medications:",
-    "dosage": "Dosage: {{dosage}}",
-    "frequency": "Frequency: {{frequency}}",
-    "duration": "Duration: {{duration}}",
-    "refills": "Refills: {{current}}/{{max}}",
-    "expires": "Expires: {{date}}",
-    "noPrescriptionsFound": "No prescriptions found",
-    "noPatientPrescriptions": "This patient has no prescriptions yet.",
-    "noFilteredPrescriptions": "No prescriptions match your current filters.",
-    "createFirstPrescription": "Create First Prescription",
-    "previous": "Previous",
-    "next": "Next",
-    "pageOf": "Page {{currentPage}} of {{totalPages}}",
-    "editPrescription": "Edit Prescription",
-    "prescriptionDetails": "Prescription Details",
-    "deleteConfirmation": "Are you sure you want to delete this prescription?",
-    "deleteSuccess": "Prescription deleted successfully",
-    "deleteError": "Failed to delete prescription",
-    "fetchError": "Failed to fetch prescriptions"
+    "inactive": "Inactive",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pageInfo": "Page {{currentPage}} of {{totalPages}}",
+    "fetchError": "Error loading medications",
+    "deleteConfirmation": "Are you sure you want to delete this medication?",
+    "deleteSuccess": "Medication deleted successfully",
+    "deleteError": "Error deleting medication",
+    "categories": {
+      "all": "All Categories",
+      "antibiotic": "Antibiotic",
+      "painkiller": "Painkiller",
+      "anti-inflammatory": "Anti-inflammatory",
+      "anesthetic": "Anesthetic",
+      "antiseptic": "Antiseptic",
+      "other": "Other"
+    }
   },
   "prescriptionForm": {
-    "selectMedicationTitle": "Select Medication"
-  },
-  "billing": {
-    "title": "Billing",
-    "addBill": "Add Bill",
-    "editBill": "Edit Bill",
-    "billDetails": "Bill Details",
-    "patient": "Patient",
-    "appointment": "Appointment",
-    "services": "Services",
-    "amount": "Amount",
-    "tax": "Tax",
-    "discount": "Discount",
-    "total": "Total",
-    "paymentMethod": "Payment Method",
-    "paymentStatus": "Payment Status",
-    "dueDate": "Due Date",
-    "paidDate": "Paid Date",
-    "pending": "Pending",
-    "paid": "Paid",
-    "overdue": "Overdue",
-    "cash": "Cash",
-    "card": "Card",
-    "insurance": "Insurance",
-    "billCreated": "Bill created successfully",
-    "billUpdated": "Bill updated successfully",
-    "billDeleted": "Bill deleted successfully"
+    "patientLabel": "Patient",
+    "relatedAppointmentLabel": "Related Appointment (Optional)",
+    "noSpecificAppointment": "No specific appointment",
+    "diagnosisLabel": "Diagnosis",
+    "diagnosisPlaceholder": "Enter the diagnosis for this prescription",
+    "medicationsLabel": "Medications",
+    "addMedication": "Add Medication",
+    "medicationItem": "Medication {{index}}",
+    "selectMedicationButton": "Select Medication",
+    "medicationLabel": "Medication",
+    "medicationNamePlaceholder": "Click 'Select Medication' to choose a medication",
+    "dosageLabel": "Dosage",
+    "dosagePlaceholder": "e.g., 500mg",
+    "frequencyLabel": "Frequency",
+    "frequencyPlaceholder": "e.g., 3 times daily",
+    "durationLabel": "Duration",
+    "durationPlaceholder": "e.g., 7 days",
+    "instructionsLabel": "Instructions",
+    "instructionsPlaceholder": "Special instructions for taking this medication",
+    "expiryDateLabel": "Expiry Date",
+    "maxRefillsLabel": "Maximum Refills",
+    "additionalNotesLabel": "Additional Notes (Optional)",
+    "notesPlaceholder": "Any additional notes or special instructions",
+    "cancelButton": "Cancel",
+    "createButton": "Create Prescription",
+    "updateButton": "Update Prescription",
+    "selectMedicationTitle": "Select Medication",
+    "successCreate": "Prescription created successfully",
+    "successUpdate": "Prescription updated successfully",
+    "errorSave": "Failed to save prescription",
+    "validation": {
+      "patientRequired": "Patient is required",
+      "medicationRequired": "Medication is required",
+      "dosageRequired": "Dosage is required",
+      "frequencyRequired": "Frequency is required",
+      "durationRequired": "Duration is required",
+      "atLeastOneMedication": "At least one medication is required",
+      "diagnosisRequired": "Diagnosis is required",
+      "expiryDateRequired": "Expiry date is required"
+    }
   },
   "notFound": {
     "title": "Page Not Found",
@@ -1360,173 +2099,6 @@
       "description": "Create and save custom reports with your preferred metrics and visualizations."
     }
   },
-  "reports": {
-    "title": "Reports & Analytics",
-    "exportData": "Export Data",
-    "saveReport": "Save Report",
-    "reportTypes": "Report Types",
-    "configureReport": "Configure {{reportName}}",
-    "selectReportType": "Select a Report Type",
-    "dateRange": "Date Range",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "status": "Status",
-    "doctor": "Doctor",
-    "ageGroup": "Age Group",
-    "patientType": "Patient Type",
-    "serviceType": "Service Type","paymentMethod": "Payment Method",
-    "generateReport": "Generate Report",
-    "cancel": "Cancel",
-    "reportPreview": "Report Preview",
-    "previewGenerated": "Preview will be generated after you click \"Generate Report\"",
-    "viewSampleReport": "View sample report",
-    "myMedicalReports": "My Medical Reports",
-    "noMedicalReports": "No medical reports found.",
-    "viewReport": "View Report",
-    "reportDate": "Date",
-    "fetchingReportsError": "Failed to fetch reports",
-    "selectReportTypePrompt": "Please select a report type from the left panel to configure and generate a report.",
-    "profile": {
-      "title": "My Profile",
-      "description": "Manage your personal information and account settings."
-    },
-    "reportTypesConfig": {
-      "my-reports": {
-        "name": "My Medical Reports",
-        "description": "View your personal medical reports and test results"
-      },
-      "my-appointments": {
-        "name": "My Appointments",
-        "description": "View your appointment history and upcoming appointments"
-      },
-      "appointments": {
-        "name": "Appointment Reports",
-        "description": "View appointment statistics, no-shows, cancellations, and booking trends",
-        "numberOfAppointments": "Number of Appointments"
-      },
-      "patients": {
-        "name": "Patient Reports",
-        "description": "Analyze patient demographics, new patients, and retention rates"
-      },
-      "revenue": {
-        "name": "Revenue Reports",
-        "description": "Track revenue by service, doctor, or time period"
-      },
-      "performance": {
-        "name": "Performance Reports",
-        "description": "Measure clinic and doctor performance metrics"
-      },
-      "custom": {
-        "name": "Custom Reports",
-        "description": "Create and save custom reports with your preferred metrics"
-      }
-    },
-    "dateRanges": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "thisWeek": "This Week",
-      "lastWeek": "Last Week",
-      "thisMonth": "This Month",
-      "lastMonth": "Last Month",
-      "last30days": "Last 30 Days",
-      "last90days": "Last 90 Days",
-      "thisYear": "This Year",
-      "lastYear": "Last Year",
-      "custom": "Custom Range"
-    },
-    "appointmentStatuses": {
-      "all": "All Statuses",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "no-show": "No Show",
-      "scheduled": "Scheduled"
-    },
-    "doctors": {
-      "all": "All Doctors",
-      "dr-smith": "Dr. Smith",
-      "dr-johnson": "Dr. Johnson",
-      "dr-williams": "Dr. Williams"
-    },
-    "ageGroups": {
-      "all": "All Ages",
-      "0-18": "0-18",
-      "19-35": "19-35",
-      "36-50": "36-50",
-      "51-65": "51-65",
-      "65+": "65+"
-    },
-    "patientTypes": {
-      "all": "All Patients",
-      "new": "New Patients",
-      "returning": "Returning Patients"
-    },
-    "serviceTypes": {
-      "all": "All Services",
-      "consultation": "Consultation",
-      "procedure": "Procedure",
-      "test": "Test/Lab Work",
-      "followup": "Follow-up"
-    },
-    "paymentMethods": {
-      "all": "All Methods",
-      "insurance": "Insurance",
-      "cash": "Cash",
-      "credit": "Credit Card",
-      "online": "Online Payment"
-    }
-  },
-  "about": {
-    "hero": {
-      "title": "About Us",
-      "description": "We're on a mission to transform healthcare management with innovative technology solutions."
-    },
-    "story": {
-      "title": "Our Story",
-      "paragraph1": "Founded in 2020, our company was born from a simple observation: healthcare professionals spend too much time on administrative tasks and not enough time with patients.",
-      "paragraph2": "Our team of healthcare professionals and software engineers came together to create a solution that streamlines clinic operations, simplifies appointment management, and improves the overall patient experience.",
-      "paragraph3": "Today, our platform is used by hundreds of healthcare providers across the country, helping them deliver better care to thousands of patients every day."
-    },
-    "mission": {
-      "title": "Our Mission",
-      "description": "To empower healthcare providers with technology that simplifies their work and enhances patient care.",
-      "simplify": {
-        "title": "Simplify",
-        "description": "We simplify complex healthcare workflows to save time and reduce administrative burden."
-      },
-      "empower": {
-        "title": "Empower",
-        "description": "We empower healthcare providers with data-driven insights to make better decisions."
-      },
-      "enhance": {
-        "title": "Enhance",
-        "description": "We enhance the patient experience through better communication and care coordination."
-      }
-    },
-    "team": {
-      "title": "Our Leadership Team",
-      "member1": {
-        "name": "Dr. Michael Johnson",
-        "role": "CEO & Co-Founder",
-        "bio": "Former physician with 15+ years of clinical experience and a passion for healthcare innovation."
-      },
-      "member2": {
-        "name": "Sarah Chen",
-        "role": "CTO & Co-Founder",
-        "bio": "Software engineer with expertise in healthcare IT systems and a focus on user-centered design."
-      },
-      "member3": {
-        "name": "David Rodriguez",
-        "role": "COO",
-        "bio": "Healthcare administrator with a track record of optimizing clinic operations and improving patient satisfaction."
-      }
-    },
-    "cta": {
-      "title": "Join Our Mission",
-      "description": "We're always looking for talented individuals who are passionate about improving healthcare through technology.",
-      "contact": "Contact Us",
-      "getStarted": "Get Started"
-    }
-  },
   "multiClinicDashboard": {
     "header": {
       "title": "Multi-Clinic Management",
@@ -1565,270 +2137,6 @@
         "revenue": "Revenue"
       }
     }
-  },
-  "home": {
-    "whyChooseUs": {
-      "title": "Why Choose SmileCare?",
-      "description": "Experience dental care that's personalized, comfortable, and delivered by a team that truly cares about your smile.",
-      "cards": {
-        "experiencedTeam": {
-          "title": "Experienced Team",
-          "description": "Our dentists have over 50 years of combined experience."
-        },
-        "patientCenteredCare": {
-          "title": "Patient-Centered Care",
-          "description": "We prioritize your comfort and individual needs at every visit."
-        },
-        "modernTechnology": {
-          "title": "Modern Technology",
-          "description": "Utilizing the latest in dental tech for precise and efficient treatments."
-        }
-      }
-    },
-    "footer": {
-      "company": {
-        "name": "SmileCare Dental",
-        "description": "Providing exceptional dental care with a gentle touch for over 20 years."
-      },
-      "quickLinks": {
-        "title": "Quick Links",
-        "aboutUs": "About Us",
-        "ourServices": "Our Services",
-        "ourTeam": "Our Team",
-        "patientPortal": "Patient Portal",
-        "insurance": "Insurance"
-      },
-      "services": {
-        "title": "Services",
-        "generalDentistry": "General Dentistry",
-        "cosmeticDentistry": "Cosmetic Dentistry",
-        "oralSurgery": "Oral Surgery",
-        "pediatricCare": "Pediatric Care",
-        "emergencyCare": "Emergency Care"
-      },
-      "contactInfo": {
-        "title": "Contact Info",
-        "phone": "(555) 123-4567",
-        "email": "info@smilecare.com",
-        "addressAttsa": "Attsa: In front of Attsa Preparatory School, Fayoum",
-        "addressFayoum": "Fayoum: Al-Nabawi Street, in front of General Hospital"
-      },
-      "copyright": "© 2024 SmileCare Dental. All rights reserved.",
-      "privacyPolicy": "Privacy Policy",
-      "termsOfService": "Terms of Service",
-      "hipaaNotice": "HIPAA Notice"
-    },
-    "clinicLocations": {
-      "attsa": {
-        "name": "Dr. Gamal Abdel Nasser Center for Laser Dental Implants and Aesthetics",
-        "address": "In front of Attsa Preparatory School, Attsa, Fayoum 63511, Egypt",
-        "hours": {
-          "weekdays": "Mon-Thu, Sat-Sun: 12:00 PM - 11:00 PM",
-          "friday": "Fri: Closed",
-          "emergency": "24/7 Emergency Available"
-        }
-      },
-      "fayoum": {
-        "name": "Center for Laser Dental Implants and Aesthetics",
-        "address": "Al-Nabawi Street, in front of General Hospital, Fayoum 63514, Egypt",
-        "hours": {
-          "weekdays": "Mon-Thu, Sat-Sun: 12:00 PM - 11:00 PM",
-          "friday": "Fri: Closed",
-          "emergency": "24/7 Emergency Available"
-        }
-      }
-    }
-  },
-  "contact": {
-    "hero": {
-      "title": "Contact Us",
-      "description": "Have questions or need assistance? We're here to help. Reach out to our team."
-    },
-    "form": {
-      "title": "Send Us a Message",
-      "success": "Success!",
-      "error": "Error",
-      "successMessage": "Thank you for your message. We will get back to you shortly!",
-      "name": {
-        "label": "Your Name",
-        "placeholder": "John Doe"
-      },
-      "email": {
-        "label": "Email Address",
-        "placeholder": "john@example.com"
-      },
-      "phone": {
-        "label": "Phone Number",
-        "placeholder": "(123) 456-7890"
-      },
-      "subject": {
-        "label": "Subject"
-      },
-      "subjectOptions": {
-        "select": "Select a subject",
-        "general": "General Inquiry",
-        "sales": "Sales Question",
-        "support": "Technical Support",
-        "demo": "Request a Demo",
-        "partnership": "Partnership Opportunity"
-      },
-      "message": {
-        "label": "Your Message",
-        "placeholder": "How can we help you?"
-      },
-      "submit": "Send Message"
-    },
-    "info": {
-      "title": "Contact Information",
-      "address": {
-        "title": "Our Address",
-        "value": "123 Healthcare Avenue<br />Suite 456<br />San Francisco, CA 94107<br />United States"
-      },
-      "contactDetails": {
-          "title": "Contact Details",
-          "email": "Email",
-          "phone": "Phone",
-          "support": "Support",
-          "emailValue": "info@healthcareapp.com",
-          "phoneValue": "+1 (555) 123-4567",
-          "supportValue": "support@healthcareapp.com"
-        },
-        "businessHours": {
-          "title": "Business Hours",
-          "weekdays": "Monday-Friday",
-          "weekends": "Saturday-Sunday",
-          "closed": "Closed",
-          "weekdaysValue": "9:00 AM - 6:00 PM (PST)"
-        },
-      "followUs": "Follow Us"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "profile": {
-      "title": "Profile Settings",
-      "personalInfo": {
-        "address": {
-          "title": "Address",
-          "stateOptions": {
-            "arizona": "Arizona",
-            "arkansas": "Arkansas",
-            "california": "California",
-            "colorado": "Colorado",
-            "connecticut": "Connecticut",
-            "delaware": "Delaware",
-            "florida": "Florida",
-            "georgia": "Georgia"
-          }
-        }
-      }
-    },
-    "clinic": {
-      "title": "Clinic Settings",
-      "active": "Active"
-    },
-    "billing": {
-        "title": "Billing Settings",
-        "plans": {
-          "basic": {
-            "name": "Basic",
-            "features": {
-              "0": "Up to 100 appointments/month",
-              "1": "Basic patient management",
-              "2": "Email support"
-            }
-          },
-          "professional": {
-            "name": "Professional",
-            "features": {
-              "0": "Unlimited appointments",
-              "1": "Advanced patient management",
-              "2": "Reporting & analytics",
-              "3": "Priority email support",
-              "4": "Multi-clinic support"
-            }
-          },
-          "enterprise": {
-            "name": "Enterprise",
-            "features": {
-              "0": "Everything in Professional",
-              "1": "Custom integrations",
-              "2": "Dedicated account manager",
-              "3": "Phone support",
-              "4": "Custom reporting"
-            }
-          }
-        }
-      },
-    "notifications": "Notification Settings",
-    "security": {
-      "title": "Security Settings",
-      "changePassword": {
-        "title": "Change Password",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password", 
-        "confirmNewPassword": "Confirm New Password",
-        "button": "Update Password"
-      },
-      "twoFactorAuth": {
-        "title": "Two-Factor Authentication",
-        "description": "Add extra security to your account",
-        "verificationCode": "Verification Code",
-        "verificationCodePlaceholder": "Enter 6-digit code",
-        "buttons": {
-          "enable": "Enable",
-          "disable": "Disable",
-          "verifyAndEnable": "Verify & Enable"
-        }
-      },
-      "activeSessions": {
-        "title": "Active Sessions",
-        "sessionInfo": "{{browser}} • {{location}}",
-        "mobileSessionInfo": "{{app}} • Last seen {{lastSeen}}"
-      },
-      "securityActivity": {
-        "title": "Security Activity",
-        "actions": {
-          "login": "Login",
-          "passwordchanged": "Password Changed"
-        }
-      }
-    },
-    "language": "Language",
-    "theme": "Theme",
-    "timezone": "Timezone",
-    "currency": "Currency",
-    "dateFormat": "Date Format",
-    "timeFormat": "Time Format",
-    "emailNotifications": "Email Notifications",
-    "smsNotifications": "SMS Notifications",
-    "pushNotifications": "Push Notifications",
-    "changePassword": "Change Password",
-    "currentPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmNewPassword": "Confirm New Password",
-    "settingsUpdated": "Settings updated successfully"
-  },
-  "errors": {
-    "general": "An error occurred. Please try again.",
-    "network": "Network error. Please check your connection.",
-    "unauthorized": "You are not authorized to perform this action.",
-    "notFound": "The requested resource was not found.",
-    "validation": "Please check your input and try again.",
-    "serverError": "Server error. Please try again later.",
-    "patientNotFound": "Patient not found",
-    "appointmentNotFound": "Appointment not found",
-    "clinicNotFound": "Clinic not found"
-  },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "phone": "Please enter a valid phone number",
-    "minLength": "Minimum length is {{min}} characters",
-    "maxLength": "Maximum length is {{max}} characters",
-    "dateInPast": "Date cannot be in the past",
-    "invalidDate": "Please enter a valid date",
-    "invalidTime": "Please enter a valid time"
   },
   "home": {
     "hero": {
@@ -1929,5 +2237,196 @@
       "emailPlaceholder": "Enter your email address",
       "subscribe": "Subscribe"
     }
+  },
+  "contact": {
+    "hero": {
+      "title": "Contact Us",
+      "description": "Have questions or need assistance? We're here to help. Reach out to our team."
+    },
+    "form": {
+      "title": "Send Us a Message",
+      "success": "Success!",
+      "error": "Error",
+      "successMessage": "Thank you for your message. We will get back to you shortly!",
+      "name": {
+        "label": "Your Name",
+        "placeholder": "John Doe"
+      },
+      "email": {
+        "label": "Email Address",
+        "placeholder": "john@example.com"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "(123) 456-7890"
+      },
+      "subject": {
+        "label": "Subject"
+      },
+      "subjectOptions": {
+        "select": "Select a subject",
+        "general": "General Inquiry",
+        "sales": "Sales Question",
+        "support": "Technical Support",
+        "demo": "Request a Demo",
+        "partnership": "Partnership Opportunity"
+      },
+      "message": {
+        "label": "Your Message",
+        "placeholder": "How can we help you?"
+      },
+      "submit": "Send Message"
+    },
+    "info": {
+      "title": "Contact Information",
+      "address": {
+        "title": "Our Address",
+        "value": "123 Healthcare Avenue<br />Suite 456<br />San Francisco, CA 94107<br />United States"
+      },
+      "contactDetails": {
+        "title": "Contact Details",
+        "email": "Email",
+        "phone": "Phone",
+        "support": "Support",
+        "emailValue": "info@healthcareapp.com",
+        "phoneValue": "+1 (555) 123-4567",
+        "supportValue": "support@healthcareapp.com"
+      },
+      "businessHours": {
+        "title": "Business Hours",
+        "weekdays": "Monday-Friday",
+        "weekends": "Saturday-Sunday",
+        "closed": "Closed",
+        "weekdaysValue": "9:00 AM - 6:00 PM (PST)"
+      },
+      "followUs": "Follow Us"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile Settings",
+      "personalInfo": {
+        "address": {
+          "title": "Address",
+          "stateOptions": {
+            "arizona": "Arizona",
+            "arkansas": "Arkansas",
+            "california": "California",
+            "colorado": "Colorado",
+            "connecticut": "Connecticut",
+            "delaware": "Delaware",
+            "florida": "Florida",
+            "georgia": "Georgia"
+          }
+        }
+      }
+    },
+    "clinic": {
+      "title": "Clinic Settings",
+      "active": "Active"
+    },
+    "billing": {
+      "title": "Billing Settings",
+      "plans": {
+        "basic": {
+          "name": "Basic",
+          "features": {
+            "0": "Up to 100 appointments/month",
+            "1": "Basic patient management",
+            "2": "Email support"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "features": {
+            "0": "Unlimited appointments",
+            "1": "Advanced patient management",
+            "2": "Reporting & analytics",
+            "3": "Priority email support",
+            "4": "Multi-clinic support"
+          }
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "features": {
+            "0": "Everything in Professional",
+            "1": "Custom integrations",
+            "2": "Dedicated account manager",
+            "3": "Phone support",
+            "4": "Custom reporting"
+          }
+        }
+      }
+    },
+    "notifications": "Notification Settings",
+    "security": {
+      "title": "Security Settings",
+      "changePassword": {
+        "title": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "button": "Update Password"
+      },
+      "twoFactorAuth": {
+        "title": "Two-Factor Authentication",
+        "description": "Add extra security to your account",
+        "verificationCode": "Verification Code",
+        "verificationCodePlaceholder": "Enter 6-digit code",
+        "buttons": {
+          "enable": "Enable",
+          "disable": "Disable",
+          "verifyAndEnable": "Verify & Enable"
+        }
+      },
+      "activeSessions": {
+        "title": "Active Sessions",
+        "sessionInfo": "{{browser}} • {{location}}",
+        "mobileSessionInfo": "{{app}} • Last seen {{lastSeen}}"
+      },
+      "securityActivity": {
+        "title": "Security Activity",
+        "actions": {
+          "login": "Login",
+          "passwordchanged": "Password Changed"
+        }
+      }
+    },
+    "language": "Language",
+    "theme": "Theme",
+    "timezone": "Timezone",
+    "currency": "Currency",
+    "dateFormat": "Date Format",
+    "timeFormat": "Time Format",
+    "emailNotifications": "Email Notifications",
+    "smsNotifications": "SMS Notifications",
+    "pushNotifications": "Push Notifications",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "settingsUpdated": "Settings updated successfully"
+  },
+  "errors": {
+    "general": "An error occurred. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "validation": "Please check your input and try again.",
+    "serverError": "Server error. Please try again later.",
+    "patientNotFound": "Patient not found",
+    "appointmentNotFound": "Appointment not found",
+    "clinicNotFound": "Clinic not found"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "phone": "Please enter a valid phone number",
+    "minLength": "Minimum length is {{min}} characters",
+    "maxLength": "Maximum length is {{max}} characters",
+    "dateInPast": "Date cannot be in the past",
+    "invalidDate": "Please enter a valid date",
+    "invalidTime": "Please enter a valid time"
   }
 }

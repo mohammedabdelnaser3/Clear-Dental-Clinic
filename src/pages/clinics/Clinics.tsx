@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Alert, Modal } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
 import { getClinic } from '../../services/clinicService';
@@ -20,6 +21,7 @@ interface ClinicFormData {
 }
 
 const Clinics: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [clinic, setClinic] = useState<Clinic | null>(null);
   const [loading, setLoading] = useState(true);
@@ -231,7 +233,10 @@ const Clinics: React.FC = () => {
                   <div className="space-y-1">
                     {clinic.operatingHours.map((hours, index) => (
                       <p key={index} className="text-sm text-gray-900">
-                        {hours}
+                        {typeof hours === 'object' ? 
+                          `${(hours as any).day || 'Day'}: ${(hours as any).openTime || '9:00'} - ${(hours as any).closeTime || '17:00'}` : 
+                          String(hours)
+                        }
                       </p>
                     ))}
                   </div>

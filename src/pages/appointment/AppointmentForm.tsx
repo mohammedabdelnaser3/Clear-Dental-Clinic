@@ -20,11 +20,20 @@ if (!customToast.warning) {
 }
 
 import { Alert } from '../../components/ui';
-import { useAuth, useClinic } from '../../hooks';
+import { useAuth} from '../../hooks';
 import { appointmentService, patientService } from '../../services';
- 
+import type { TimeSlot } from '../../services/appointmentService';
+import { getBranches, getAllClinics } from '../../services/clinicService';
+import { getAvailableDoctorsForDay } from '../../services/doctorScheduleService';
+import type { Clinic } from '../../types';
+import type { DoctorSchedule } from '../../services/doctorScheduleService';
 
 import { validateAppointmentForm, validateTimeSlotAvailability } from '../../utils/appointmentValidationUtils';
+import { 
+  generateTimeSlotsFromMultipleSchedules, 
+  formatTime12Hour, 
+  getFirstAvailableSlot
+} from '../../utils/timeSlotUtils';
 
 
 interface Patient {
@@ -60,7 +69,7 @@ interface Step {
 const AppointmentForm: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { selectedClinic } = useClinic();
+  // const { selectedClinic } = useClinic();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -71,8 +80,7 @@ const AppointmentForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  // Use the actual clinic ID from the database (Dr. Gamal Abdel Nasser Center)
-  const FALLBACK_CLINIC_ID = '687468107e70478314c346be';
+  // Use the actual clinic ID from the database (Clear - Fayoum Branch with schedules)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,8 +103,28 @@ const AppointmentForm: React.FC = () => {
     notes: '',
     emergency: false,
     patientSearch: '',
-    clinicId: FALLBACK_CLINIC_ID
+    clinicId: '' // Let user select clinic via branch selection
   });
+  
+  // Multi-branch state
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [branches, setBranches] = useState<string[]>([]);
+  const [filteredClinics, setFilteredClinics] = useState<Clinic[]>([]);
+  const [allClinics, setAllClinics] = useState<Clinic[]>([]);
+  
+  // Doctor availability state
+  const [availableDoctors, setAvailableDoctors] = useState<any[]>([]);
+  const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
+  
+  // Time slot state (align with service TimeSlot type so dentistId is available)
+  const [generatedTimeSlots, setGeneratedTimeSlots] = useState<TimeSlot[]>([]);
+  
+  // Get the form's selected clinic (not the global one from context)
+  const formSelectedClinic = useMemo(() => {
+    if (!formData.clinicId) return null;
+    return allClinics.find(clinic => clinic.id === formData.clinicId) || null;
+  }, [formData.clinicId, allClinics]);
+  const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
   
   // Services data
   const services: ServiceOption[] = [
@@ -272,7 +300,7 @@ const AppointmentForm: React.FC = () => {
   }, []);
 
   const fetchTimeSlots = useCallback(() => {
-    const clinicId = formData.clinicId || selectedClinic?.id || FALLBACK_CLINIC_ID;
+    const clinicId = formData.clinicId;
     
     if (!formData.date) {
       return;
@@ -333,11 +361,11 @@ const AppointmentForm: React.FC = () => {
       
       fetchTimeSlotsImmediate(params);
     }, 500); // Increased to 500ms for better debouncing
-  }, [formData.date, formData.service, formData.clinicId, selectedClinic?.id]);
+  }, [formData.date, formData.service, formData.clinicId]);
 
   // Enhanced memoized form data to prevent unnecessary fetchTimeSlots calls
   const memoizedFormData = useMemo(() => {
-    const effectiveClinicId = FALLBACK_CLINIC_ID;
+    const effectiveClinicId = formData.clinicId;
     // Get service duration or default to 60 (services array is static)
     const duration = formData.service === 'cleaning' ? 60 : formData.service === 'examination' ? 30 : 60;
     
@@ -352,7 +380,7 @@ const AppointmentForm: React.FC = () => {
       // Include a stability key to prevent unnecessary changes - only include essential fields
       stabilityKey: `${formData.date}-${duration}-${effectiveClinicId}`
     };
-  }, [formData.date, formData.service, FALLBACK_CLINIC_ID]);
+  }, [formData.date, formData.service, formData.clinicId]);
 
   // Simplified useEffect - debouncing is now handled in fetchTimeSlots
   useEffect(() => {
@@ -403,6 +431,203 @@ const AppointmentForm: React.FC = () => {
     }
   }, [isEditMode]);
 
+  // Load branches on mount
+  useEffect(() => {
+    const loadBranches = async () => {
+      try {
+        console.log('🌱 Loading branches...');
+        const response = await getBranches();
+        console.log('📊 Branches response:', response);
+        if (response.success && response.data) {
+          setBranches(response.data);
+          console.log('✅ Branches loaded:', response.data);
+          // Auto-select first branch if only one exists
+          if (response.data.length === 1) {
+            setSelectedBranch(response.data[0]);
+            console.log('✅ Auto-selected branch:', response.data[0]);
+          }
+        } else {
+          console.warn('⚠️ No branches found in response');
+        }
+      } catch (error) {
+        console.error('❌ Error loading branches:', error);
+      }
+    };
+    loadBranches();
+  }, []);
+
+  // Load and filter clinics when branch changes
+  useEffect(() => {
+    const loadClinics = async () => {
+      try {
+        const response = await getAllClinics();
+        console.log('📊 Clinics response:', response);
+        if (response.success && response.data) {
+          // Store all clinics for lookup
+          setAllClinics(response.data);
+          
+          // Filter by selected branch
+          if (selectedBranch) {
+            const filtered = response.data.filter(
+              (c: Clinic) => c.branchName === selectedBranch
+            );
+            setFilteredClinics(filtered);
+            
+            // Auto-select clinic if only one in branch
+            if (filtered.length === 1) {
+              console.log('🏥 Auto-selecting clinic for branch:', filtered[0].id);
+              setFormData(prev => ({
+                ...prev,
+                clinicId: filtered[0].id,
+              }));
+
+              console.log('✅ Auto-selected clinic:', filtered[0]);
+              // setSelectedClinic(filtered[0]);
+            } else if (filtered.length === 0) {
+              // Reset clinic ID if no clinics in branch
+              setFormData(prev => ({
+                ...prev,
+                clinicId: ''
+              }));
+            }
+          } else {
+            // Show all clinics if no branch selected
+            setFilteredClinics(response.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading clinics:', error);
+      }
+    };
+    loadClinics();
+  }, [selectedBranch]);
+
+  // Load available doctors when clinic and date are selected
+  useEffect(() => {
+    const loadAvailableDoctors = async () => {
+      const clinicId = formData.clinicId;
+      
+      console.log('🏥 loadAvailableDoctors - Clinic ID:', clinicId, 'Date:', formData.date);
+      console.log('🏥 formData.clinicId:', formData.clinicId);
+      console.log('🏥 selectedClinic?.id:');
+      
+      if (!clinicId || !formData.date) {
+        console.log('⚠️ Missing clinic or date, clearing doctors');
+        setAvailableDoctors([]);
+        return;
+      }
+      
+      try {
+        setIsLoadingDoctors(true);
+        const selectedDate = new Date(formData.date);
+        
+        console.log(`📞 Calling getAvailableDoctorsForDay(${clinicId}, ${selectedDate})`);
+        const response = await getAvailableDoctorsForDay(clinicId, selectedDate);
+        console.log('📊 Doctor availability response:', response);
+        
+        if (response.success && response.data) {
+          setAvailableDoctors(response.data);
+          console.log('📋 Available Doctors:', response.data);
+  
+          console.log(`✅ Loaded ${response.data.length} available doctors for ${formData.date}`);
+          
+          // If no doctors available, show helpful message
+          if (response.data.length === 0) {
+            setApiError('No doctors are scheduled for this date at the selected clinic. Please choose a different date or contact the clinic.');
+          } else {
+            // Clear error if doctors are available
+            if (apiError.includes('No doctors')) {
+              setApiError('');
+            }
+          }
+        }
+      } catch (error: any) {
+        console.error('❌ Error loading available doctors:', error);
+        setAvailableDoctors([]);
+        setApiError('Unable to load doctor availability. Please try again.');
+      } finally {
+        setIsLoadingDoctors(false);
+      }
+    };
+    
+    loadAvailableDoctors();
+    console.log('Available doctors updated:', availableDoctors);
+  }, [formData.clinicId, formData.date, apiError]);
+
+  // Generate time slots when doctor is selected
+  useEffect(() => {
+    const generateTimeSlots = async () => {
+      // Need date and either a selected doctor or available doctors for auto-assign
+      if (!formData.date) {
+        setGeneratedTimeSlots([]);
+        return;
+      }
+
+      const clinicId = formData.clinicId;
+      if (!clinicId) {
+        setGeneratedTimeSlots([]);
+        return;
+      }
+
+      try {
+        setIsLoadingTimeSlots(true);
+
+        let schedulesToUse: DoctorSchedule[] = [];
+
+        // Auto-assignment: Use all available doctors' schedules
+        if (availableDoctors.length > 0) {
+          console.log('🔍 Available doctors data structure:', availableDoctors);
+          // Extract schedules from the API response structure
+          // The API returns objects with {doctor, clinic, schedules: [...]}
+          schedulesToUse = availableDoctors.flatMap((doctorData: any) => {
+            if (doctorData.schedules && Array.isArray(doctorData.schedules)) {
+              console.log('📅 Processing schedules for doctor:', doctorData.doctor, 'Schedules:', doctorData.schedules);
+              return doctorData.schedules.map((schedule: any) => ({
+                ...schedule,
+                doctorId: doctorData.doctor,
+                clinicId: doctorData.clinic
+              }));
+            }
+            console.log('⚠️ No schedules found for doctor:', doctorData);
+            return [];
+          });
+          console.log('📋 Extracted schedules:', schedulesToUse);
+        }
+
+        if (schedulesToUse.length === 0) {
+          setGeneratedTimeSlots([]);
+          return;
+        }
+
+        // Fetch actually booked slots from backend
+        console.log('📍 Fetching booked slots for:', { date: formData.date, clinicId, doctorId: formData.dentistId });
+        const bookedSlots = await appointmentService.getBookedSlots(
+          formData.date,
+          clinicId,
+          formData.dentistId || undefined
+        );
+        
+        console.log(`📍 Found ${bookedSlots.length} booked slots:`, bookedSlots);
+
+        // Generate time slots
+        const slots = generateTimeSlotsFromMultipleSchedules(schedulesToUse, bookedSlots);
+        
+        setGeneratedTimeSlots(slots);
+        
+        const availableCount = slots.filter(s => s.available).length;
+        console.log(`✅ Generated ${slots.length} time slots (${availableCount} available, ${bookedSlots.length} booked) for ${formData.date}`);
+        
+      } catch (error) {
+        console.error('Error generating time slots:', error);
+        setGeneratedTimeSlots([]);
+      } finally {
+        setIsLoadingTimeSlots(false);
+      }
+    };
+
+    generateTimeSlots();
+  }, [formData.date, formData.dentistId, formData.clinicId, availableDoctors]);
+
   // Sync clinicId when selectedClinic changes - Removed as we're hardcoding the clinic ID
   /* useEffect(() => {
     if (selectedClinic?.id && !formData.clinicId) {
@@ -435,7 +660,11 @@ const AppointmentForm: React.FC = () => {
         setCurrentStep('service');
         setIsTransitioning(false);
       }, 300);
-    } else if (currentStep === 'service' && formData.service) {
+    } else if (currentStep === 'service') {
+      if (!formData.service) {
+        toast.error(t('appointmentForm.error_selectService'));
+        return;
+      }
       setTransitionDirection('next');
       setIsTransitioning(true);
       setCompletedSteps(prev => [...new Set([...prev, 'service' as FormStep])]);
@@ -563,7 +792,7 @@ const AppointmentForm: React.FC = () => {
                 notes: ''
               },
               treatmentRecords: [], // Add required treatment records property
-              preferredClinicId: FALLBACK_CLINIC_ID, // Use fallback clinic
+              preferredClinicId: formData.clinicId, // Use fallback clinic
               userId: user.id, // Link to user account
             };
             
@@ -657,6 +886,7 @@ const AppointmentForm: React.FC = () => {
     
     
     // Use the centralized validation utility with the current form data
+    console.log('🐛 DEBUG - Validating step:', currentStep, 'with data:', currentFormData);
     const validationResult = validateAppointmentForm(currentFormData, t, currentStep);
     
     
@@ -692,7 +922,7 @@ const AppointmentForm: React.FC = () => {
     
     // Less strict validation for time slot availability
     if (currentStep === 'datetime' && formData.date && formData.timeSlot) {
-      const clinicId = FALLBACK_CLINIC_ID;
+      const clinicId = formData.clinicId;
       // Run validation in background but don't block UI
       setTimeout(async () => {
         const timeSlotValidation = await validateTimeSlotAvailability(
@@ -738,9 +968,10 @@ const AppointmentForm: React.FC = () => {
   // Removing commented code to fix syntax errors
 
   // Handle auto-booking functionality - assigns next slot after last booking
-  const handleAssignFirstAvailableSlot = async () => {
+  // Temporarily commented out to fix build error - kept for future use
+  /* const handleAssignFirstAvailableSlot = async () => {
     setIsLoading(true);
-    setApiError('');
+    setApiimage.pngError('');
 
     try {
         // Validation for patient is important for the whole form, but for slots we just need date/service/clinic
@@ -779,7 +1010,7 @@ const AppointmentForm: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }; */
 
   const handleFinalSubmit = async () => {
     setIsLoading(true);
@@ -826,7 +1057,7 @@ const AppointmentForm: React.FC = () => {
       }
 
       // Ensure clinicId is set to hardcoded value
-      const clinicId = FALLBACK_CLINIC_ID;
+      const clinicId = formData.clinicId;
       if (!clinicId) {
         toast.error(t('appointmentForm.error_clinicRequired') || 'No clinic selected. Please select a clinic.');
         setIsLoading(false);
@@ -850,15 +1081,19 @@ const AppointmentForm: React.FC = () => {
         clinicId: clinicId
       };
 
-      // For patients: Never send dentistId - let backend auto-assign
-      // For staff/admin: Only include dentistId if explicitly selected
-      if (!isPatientUser && formData.dentistId && formData.dentistId.trim() !== '') {
+      console.log('📋 Appointment data before dentist assignment:', appointmentData);
+      console.log('📋 Form data dentistId:', formData.dentistId);
+
+      // Include dentistId if it was auto-assigned or explicitly selected
+      if (formData.dentistId && formData.dentistId.trim() !== '') {
         appointmentData.dentistId = formData.dentistId;
-        console.log('Staff/Admin selected specific dentist:', formData.dentistId);
+        console.log('Dentist assigned:', formData.dentistId, 'for user type:', isPatientUser ? 'patient' : 'staff/admin');
       } else {
         // Backend will auto-assign the best available dentist
         console.log('No dentist specified - backend will auto-assign based on availability and clinic');
       }
+
+      console.log('📋 Final appointment data being sent:', appointmentData);
 
 
 
@@ -926,7 +1161,7 @@ const AppointmentForm: React.FC = () => {
       console.error('Error saving appointment:', error);
       
       // Ensure clinicId is accessible in this scope
-      const clinicId = FALLBACK_CLINIC_ID;
+      const clinicId = formData.clinicId;
       
       // Provide more specific error messages based on error type
       if (error.response) {
@@ -1071,7 +1306,7 @@ const AppointmentForm: React.FC = () => {
   const selectedPatient = patients.find(p => p.id === formData.patientId);
 
   // Add this function after the other utility functions
-  const validateField = (fieldName: string, value: any): void => {
+  const validateField = (fieldName: keyof FormFields, value: FormFields[keyof FormFields]): void => {
     // Create a partial form data object with just this field
     const fieldData = {
       ...formData,
@@ -1098,13 +1333,28 @@ const AppointmentForm: React.FC = () => {
   };
 
   // Modify the handleInputChange function to clear errors when a field changes
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+interface FormFields {
+  patientId: string;
+  dentistId: string;
+  service: string;
+  date: string;
+  timeSlot: string;
+  notes: string;
+  emergency: boolean;
+  patientSearch: string;
+  clinicId: string;
+}
+
+const handleInputChange = (field: keyof FormFields, value: FormFields[keyof FormFields]) => {
+  console.log(`📝 handleInputChange called: field="${field}", value=`, value);
+  setFormData(prev => {
+    const newData = {
       ...prev,
       [field]: value,
-    }));
-    
-    // Clear error when user starts typing
+    };
+    console.log(`📝 Updated formData.${field}:`, newData[field]);
+    return newData;
+  });    // Clear error when user starts typing
     if (fieldErrors[field]) {
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -1116,9 +1366,9 @@ const AppointmentForm: React.FC = () => {
 
   // Progress steps
   const steps: Step[] = [
-    { id: 'patient', label: t('appointmentForm.step_patient'), icon: User, completed: Boolean(formData.patientId) },
+    { id: 'patient', label: t('appointmentForm.step_patient'), icon: User, completed: isPatientUser || Boolean(formData.patientId) },
     { id: 'service', label: t('appointmentForm.step_service'), icon: Stethoscope, completed: Boolean(formData.service) },
-    { id: 'datetime', label: t('appointmentForm.step_datetime'), icon: Calendar, completed: Boolean(formData.date && formData.timeSlot) },
+    { id: 'datetime', label: t('appointmentForm.step_datetime'), icon: Calendar, completed: Boolean(formData.date) },
     { id: 'details', label: t('appointmentForm.step_details'), icon: AlertTriangle, completed: true },
     { id: 'review', label: t('appointmentForm.step_review'), icon: CheckCircle, completed: false }
   ];
@@ -1347,8 +1597,8 @@ const AppointmentForm: React.FC = () => {
                           <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
                         </div>
                         <div className="mt-2 space-y-2">
-                          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div key={`line1-${index}`} className="h-3 bg-gray-200 rounded w-2/3"></div>
+                          <div key={`line2-${index}`} className="h-3 bg-gray-200 rounded w-1/2"></div>
                         </div>
                       </div>
                     ))}
@@ -1405,6 +1655,78 @@ const AppointmentForm: React.FC = () => {
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('appointmentForm.selectYourService')}</h3>
                 <p className="text-gray-600">{t('appointmentForm.serviceSelectionDescription')}</p>
               </div>
+              
+              {/* Branch Selection - Always show if branches exist */}
+              {branches.length > 0 && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <MapPin className="h-5 w-5 text-blue-600" />
+                    <label className="block text-sm font-semibold text-gray-900">
+                      {t('appointmentForm.selectBranch') || 'Select Clinic Branch'}
+                    </label>
+                  </div>
+                  <select
+                    value={selectedBranch}
+                    onChange={(e) => {
+                      setSelectedBranch(e.target.value);
+                      // Reset clinic selection when branch changes
+                      setFormData(prev => ({ ...prev, clinicId: '' }));
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  >
+                    {/* <option value="">{t('appointmentForm.selectBranchPlaceholder') || 'Choose a branch...'}</option> */}
+                    {branches.map(branch => (
+                      <option key={branch} value={branch}>{branch}</option>
+                    ))}
+                  </select>
+                  {selectedBranch && filteredClinics.length > 0 && (
+                    <div className="mt-3 text-sm text-gray-600">
+                      ✓ {filteredClinics.length} clinic{filteredClinics.length > 1 ? 's' : ''} available in {selectedBranch}
+                    </div>
+                  )}
+                  {selectedBranch && filteredClinics.length === 0 && (
+                    <div className="mt-3 text-sm text-amber-600">
+                      ⚠️ {t('appointmentForm.noClinicsInBranch') || 'No clinics available in this branch'}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Clinic Selection - Show when branch is selected and clinics available */}
+              {selectedBranch && filteredClinics.length > 0 && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <MapPin className="h-5 w-5 text-green-600" />
+                    <label className="block text-sm font-semibold text-gray-900">
+                      {t('appointmentForm.selectClinic') || 'Select Clinic'}
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {filteredClinics.map(clinic => (
+                      <div
+                        key={clinic.id}
+                        onClick={() => handleInputChange('clinicId', clinic.id)}
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          formData.clinicId === clinic.id
+                            ? 'border-green-500 bg-green-100'
+                            : 'border-gray-200 hover:border-green-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{clinic.name}</h4>
+                            <p className="text-sm text-gray-600">{clinic.address.street}, {clinic.address.city}</p>
+                            {clinic.phone && <p className="text-xs text-gray-500">📞 {clinic.phone}</p>}
+                          </div>
+                          {formData.clinicId === clinic.id && (
+                            <CheckCircle className="h-6 w-6 text-green-500" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {services.map((service, index) => (
@@ -1485,7 +1807,7 @@ const AppointmentForm: React.FC = () => {
               {/* Clinic Selection and Display */}
               <div className="space-y-4">
                 {/* Current Clinic Display */}
-                {FALLBACK_CLINIC_ID && (
+                {formData.clinicId ? (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
@@ -1493,15 +1815,18 @@ const AppointmentForm: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-blue-900">
-                          Selected Clinic: { 'Dr. Gamal Abdel Nasser Center'}
+                          Selected Clinic: {formSelectedClinic?.name || 'Loading...'}
                         </p>
-                        {selectedClinic?.address && (
+                        {formSelectedClinic?.address && (
                           <p className="text-sm text-blue-700">
-                            {selectedClinic.address.street}, {selectedClinic.address.city}
+                            {formSelectedClinic.address.street}, {formSelectedClinic.address.city}
                           </p>
                         )}
-                        {selectedClinic?.phone && (
-                          <p className="text-xs text-blue-600">📞 {selectedClinic.phone}</p>
+                        {formSelectedClinic?.phone && (
+                          <p className="text-xs text-blue-600">📞 {formSelectedClinic.phone}</p>
+                        )}
+                        {!formSelectedClinic && (
+                          <p className="text-xs text-gray-500">Clinic ID: {formData.clinicId}</p>
                         )}
                       </div>
                       <div className="flex-shrink-0">
@@ -1510,6 +1835,12 @@ const AppointmentForm: React.FC = () => {
                         </span>
                       </div>
                     </div>
+                  </div>
+                ) : (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-sm text-red-600">
+                      ⚠️ No clinic selected. Please go back and select a branch and clinic.
+                    </p>
                   </div>
                 )}
 
@@ -1534,12 +1865,11 @@ const AppointmentForm: React.FC = () => {
                 </div> */}
               </div>
               
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                {/* Date Selection */}
-                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
-                  <label htmlFor="date" className="block text-lg font-semibold text-gray-900 mb-3">
-                    📅 {t('appointmentForm.label_date')}
-                  </label>
+              {/* Date Selection */}
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                <label htmlFor="date" className="block text-lg font-semibold text-gray-900 mb-3">
+                  📅 {t('appointmentForm.label_date')}
+                </label>
                   <div className="relative">
                     <input
                       type="date"
@@ -1576,12 +1906,116 @@ const AppointmentForm: React.FC = () => {
                   </p>
                 </div>
                 
-                {/* Time Slot Selection */}
-                {formData.date && (
-                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                {/* Doctor Selection - Shows available doctors based on schedule */}
+                {/* Doctor selection hidden for auto-assignment */}
+                {false && formData.date && (
+                  <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-2xl border-2 border-purple-200 shadow-sm">
                     <label className="block text-lg font-semibold text-gray-900 mb-3">
-                      🕐 {t('appointmentForm.label_timeSlot')}
+                      👨‍⚕️ {t('appointmentForm.label_doctor', 'Available Doctors')}
                     </label>
+                    
+                    {isLoadingDoctors ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mr-3"></div>
+                        <p className="text-purple-700">Loading available doctors...</p>
+                      </div>
+                    ) : availableDoctors.length === 0 ? (
+                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                        <div className="flex items-center">
+                          <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
+                          <p className="text-yellow-800 text-sm font-medium">
+                            No doctors scheduled for this date. Please select another date.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-1 gap-3">
+                          {/* Show unique doctors (not individual schedules) */}
+                        
+                          {Array.from(new Map(
+                            availableDoctors
+                              .filter(schedule => schedule.doctorId && schedule.doctorId._id)
+                              .map(schedule => [
+                                schedule.doctorId._id,
+                                schedule
+                              ])
+                          ).values()).map((schedule) => {
+                            const doctorId = schedule.doctorId._id;
+                            return (
+                            <button
+                              key={doctorId}
+                              type="button"
+                              onClick={() => {
+                                handleInputChange('dentistId', doctorId);
+                                // Clear time slot when doctor changes
+                                handleInputChange('timeSlot', '');
+                              }}
+                              className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                                formData.dentistId === doctorId
+                                  ? 'bg-purple-100 border-purple-500 shadow-md'
+                                  : 'bg-white border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                    formData.dentistId === doctorId
+                                      ? 'bg-purple-500'
+                                      : 'bg-gray-300'
+                                  }`}>
+                                    <User className="h-5 w-5 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-gray-900">
+                                      Dr. {schedule.doctorId?.firstName || 'Unknown'} {schedule.doctorId?.lastName || 'Doctor'}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                      Available: {schedule.startTime} - {schedule.endTime}
+                                    </p>
+                                  </div>
+                                </div>
+                                {formData.dentistId === doctorId && (
+                                  <CheckCircle className="h-6 w-6 text-purple-500" />
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                        </div>
+                        <div className="pt-2 border-t border-purple-200">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleInputChange('dentistId', '');
+                              handleInputChange('timeSlot', '');
+                            }}
+                            className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                          >
+                            Or let us auto-assign a doctor for you
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              
+              {/* Time Slot Selection */}
+              {formData.date && availableDoctors.length > 0 && (
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-2xl border-2 border-blue-200 shadow-sm">
+                    <label className="block text-lg font-semibold text-gray-900 mb-3">
+                      🕐 {t('appointmentForm.label_timeSlot', 'Select Time Slot')}
+                    </label>
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                          <span className="text-white text-xs">ℹ</span>
+                        </div>
+                        <p className="text-blue-800 text-sm font-medium">
+                          A doctor will be automatically assigned based on your selected time slot.
+                        </p>
+                      </div>
+                    </div>
                     
                     {fieldErrors.timeSlot && (
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
@@ -1589,67 +2023,126 @@ const AppointmentForm: React.FC = () => {
                       </div>
                     )}
                     
-                    {apiError && (
-                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-                        <div className="flex items-center">
-                          <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
-                          <h4 className="text-red-800 font-medium">{t('appointmentForm.timeSlotLoadingError')}</h4>
-                            </div>
-                        <p className="text-red-700 mt-1 text-sm">{apiError}</p>
-                        </div>
-                    )}
-                    
-                    {formData.timeSlot ? (
+                    {isLoadingTimeSlots ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mr-3"></div>
+                        <p className="text-blue-700">Loading available time slots...</p>
+                      </div>
+                    ) : formData.timeSlot ? (
                       <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl shadow-sm">
-                      <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mr-3">
                               <CheckIcon className="h-5 w-5 text-white" />
                             </div>
-                        <div>
-                              <p className="font-semibold text-green-800">{t('appointmentForm.timeSlotConfirmed')}</p>
-                              <p className="text-2xl font-bold text-green-700">{formData.timeSlot}</p>
-                        </div>
+                            <div>
+                              <p className="font-semibold text-green-800">Time slot confirmed</p>
+                              <p className="text-2xl font-bold text-green-700">{formatTime12Hour(formData.timeSlot)}</p>
+                              {formData.dentistId && (
+                                <p className="text-sm text-green-600 mt-1">
+                                  Doctor: {availableDoctors.find(d => d.doctorId?._id === formData.dentistId)?.doctorId?.firstName} {availableDoctors.find(d => d.doctorId?._id === formData.dentistId)?.doctorId?.lastName}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <button
-                          type="button"
-                            onClick={() => handleInputChange('timeSlot', '')}
+                            type="button"
+                            onClick={() => {
+                              handleInputChange('timeSlot', '');
+                              handleInputChange('dentistId', '');
+                            }}
                             className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-xl transition-all duration-200 font-medium"
                           >
-                            {t('common.change')}
+                            {t('common.change', 'Change')}
                           </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : generatedTimeSlots.length === 0 ? (
+                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                        <div className="flex items-center">
+                          <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
+                          <p className="text-yellow-800 text-sm font-medium">
+                            No available time slots for this date. Please select another date.
+                          </p>
+                        </div>
+                      </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={handleAssignFirstAvailableSlot}
-                        disabled={isLoading || isSubmitting || !formData.date || !formData.service}
-                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-semibold text-lg ${
-                          isLoading || isSubmitting || !formData.date || !formData.service
-                            ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-blue-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-                        }`}
-                      >
-                        {isLoading ? (
-                          <div className="flex items-center justify-center">
-                            <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                            {t('appointmentForm.findingSlot', 'Finding Slot...')}
-                    </div>
-                        ) : (
-                          <div className="flex items-center justify-center">
-                            <Calendar className="h-5 w-5 mr-2" />
-                            {t('appointmentForm.button_assignFirstAvailable', 'Assign First Available Slot')}
-                  </div>
-                )}
-                      </button>
+                      <div className="space-y-4">
+                        {/* Time slot grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                          {generatedTimeSlots.slice(0, 20).map((slot) => (
+                            <button
+                              key={slot.time}
+                              type="button"
+                              onClick={() => {
+                                if (slot.available) {
+                                  console.log('🕐 Time slot selected:', slot.time);
+                                  handleInputChange('timeSlot', slot.time);
+                                  // Auto-assign doctor based on selected time slot
+                                  if (slot.dentistId) {
+                                    console.log('👨‍⚕️ Auto-assigning dentist:', slot.dentistId);
+                                    handleInputChange('dentistId', slot.dentistId);
+                                  } else {
+                                    console.log('⚠️ No dentistId found in time slot');
+                                  }
+                                }
+                              }}
+                              disabled={!slot.available}
+                              className={`p-3 rounded-lg border-2 transition-all duration-200 font-medium text-sm ${
+                                !slot.available
+                                  ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                                  : slot.isPeak
+                                  ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:border-amber-400'
+                                  : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-50 hover:border-blue-400'
+                              }`}
+                            >
+                              <div className="flex flex-col items-center">
+                                <Clock className="h-4 w-4 mb-1" />
+                                <span>{formatTime12Hour(slot.time)}</span>
+                                {slot.isPeak && <span className="text-xs mt-1">⭐ Peak</span>}
+                                {!slot.available && <span className="text-xs mt-1">Booked</span>}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                        
+                        {generatedTimeSlots.length > 20 && (
+                          <p className="text-sm text-gray-600 text-center">
+                            Showing first 20 slots. {generatedTimeSlots.length - 20} more available.
+                          </p>
+                        )}
+                        
+                        {/* Quick select first available */}
+                        <div className="pt-4 border-t border-blue-200">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const firstAvailable = getFirstAvailableSlot(generatedTimeSlots);
+                              if (firstAvailable) {
+                                const dentistId = (firstAvailable as TimeSlot).dentistId;
+                                console.log('🕐 First available slot selected:', firstAvailable.time, 'with dentistId:', dentistId);
+                                handleInputChange('timeSlot', firstAvailable.time);
+                                // Auto-assign doctor based on selected time slot
+                                if ((firstAvailable as TimeSlot).dentistId) {
+                                  console.log('👨‍⚕️ Auto-assigning dentist from first available:', (firstAvailable as TimeSlot).dentistId);
+                                  handleInputChange('dentistId', (firstAvailable as TimeSlot).dentistId as string);
+                                } else {
+                                  console.log('⚠️ No dentistId found in first available slot');
+                                }
+                              }
+                            }}
+                            className="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                          >
+                            <div className="flex items-center justify-center">
+                              <Calendar className="h-5 w-5 mr-2" />
+                              Select First Available ({formatTime12Hour(getFirstAvailableSlot(generatedTimeSlots)?.time || '00:00')})
+                            </div>
+                          </button>
+                        </div>
+                      </div>
                     )}
-                    <p className="mt-3 text-xs text-gray-500 text-center">
-                      We'll automatically find the next available time slot for you
-                    </p>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
 

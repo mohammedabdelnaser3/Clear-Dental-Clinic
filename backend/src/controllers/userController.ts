@@ -221,7 +221,7 @@ export const getDentists = catchAsync(async (req: Request, res: Response) => {
   if (clinicId && dentists.length === 0) {
     // First verify the clinic exists
     const Clinic = require('../models/Clinic').default;
-    const clinic = await Clinic.findById(clinicId);
+    const clinic = await (Clinic as any).findById(clinicId);
     
     if (!clinic) {
       return res.status(404).json({

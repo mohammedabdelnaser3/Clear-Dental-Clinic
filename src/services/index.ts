@@ -8,6 +8,7 @@ export * from './medicationService';
 export * from './prescriptionService';
 export * from './billingService';
 export * from './adminService';
+export * from './notificationService';
 
 // Re-export the API instance
 import api from './api';

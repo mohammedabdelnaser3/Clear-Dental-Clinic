@@ -31,7 +31,7 @@ export const createDentistSchedules = async (): Promise<void> => {
     console.log('🏥 Setting up dentist schedules...');
     
     // Get the clinic
-    const clinic = await Clinic.findOne();
+    const clinic = await (Clinic as any).findOne();
     if (!clinic) {
       console.log('❌ No clinic found. Cannot create schedules.');
       return;

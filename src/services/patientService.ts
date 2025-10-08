@@ -1,5 +1,6 @@
 import api from './api';
 import type { Patient, PatientReport, ApiResponse, PaginatedResponse } from '../types';
+import { createSafeApiParams } from '../utils/clinicUtils';
 
 // Helper function to transform backend patient data
 const transformPatientData = (patient: any): Patient => {
@@ -21,7 +22,9 @@ const transformPatientData = (patient: any): Patient => {
       notes: ''
     },
     treatmentRecords: patient.treatmentRecords || [],
-    preferredClinicId: patient.preferredClinic,
+    preferredClinicId: patient.preferredClinicId || patient.preferredClinic,
+    emergencyContact: patient.emergencyContact,
+    isActive: patient.isActive !== undefined ? patient.isActive : true,
     userId: patient.userId, // Link to user account
     createdAt: new Date(patient.createdAt),
     updatedAt: new Date(patient.updatedAt)
@@ -37,7 +40,13 @@ export const getPatients = async (params?: {
   patientId?: string; // For patient role - only their own data
 }): Promise<PaginatedResponse<Patient>> => {
   try {
-    const response = await api.get<PaginatedResponse<any>>('/api/v1/patients', { params });
+    // Ensure clinic ID is properly formatted
+    const safeParams = params ? {
+      ...params,
+      ...createSafeApiParams(params.clinicId)
+    } : undefined;
+    
+    const response = await api.get<PaginatedResponse<any>>('/api/v1/patients', { params: safeParams });
     
 
     
@@ -99,6 +108,7 @@ export const deletePatient = async (id: string): Promise<void> => {
 export const getPatientReports = async (patientId?: string): Promise<PatientReport[]> => {
   try {
     // If no patientId provided, backend will return reports based on user role
+    console.log('patientId', patientId);
     const endpoint = patientId ? `/api/v1/patients/${patientId}/reports` : '/api/v1/reports/my-reports';
     const response = await api.get<ApiResponse<PatientReport[]>>(endpoint);
     return response.data.data || [];

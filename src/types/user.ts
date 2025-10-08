@@ -24,6 +24,7 @@ export interface User {
   };
   licenseNumber?: string;
   bio?: string;
+  permissions?: string[];
 }
 
 export type UserRole = 'patient' | 'dentist' | 'staff' | 'admin' | 'super_admin';

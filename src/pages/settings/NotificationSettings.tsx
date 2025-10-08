@@ -1,391 +1,399 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, Button, Alert } from '../../components/ui';
-import { useAuth } from '../../hooks/useAuth';
+import React, { useState, useEffect } from 'react';
+import { Bell, Mail, MessageSquare, Smartphone, Clock, CheckCircle, Save, AlertCircle } from 'lucide-react';
+import api from '../../services/api';
+import { toast } from 'react-hot-toast';
 
-interface NotificationPreference {
-  id: string;
-  title: string;
-  description: string;
-  category: 'appointments' | 'patients' | 'system' | 'marketing';
-  channels: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-    inApp: boolean;
+interface NotificationPreferences {
+  email: {
+    enabled: boolean;
+    appointments: boolean;
+    reminders: boolean;
+    cancellations: boolean;
+    prescriptions: boolean;
+    messages: boolean;
+  };
+  sms: {
+    enabled: boolean;
+    appointments: boolean;
+    reminders: boolean;
+    cancellations: boolean;
+    prescriptions: boolean;
+  };
+  inApp: {
+    enabled: boolean;
+    appointments: boolean;
+    reminders: boolean;
+    cancellations: boolean;
+    prescriptions: boolean;
+    messages: boolean;
+    system: boolean;
+  };
+  reminderIntervals: {
+    '24h': boolean;
+    '1h': boolean;
+    '15min': boolean;
+  };
+  quietHours: {
+    enabled: boolean;
+    start: string;
+    end: string;
   };
 }
 
 const NotificationSettings: React.FC = () => {
-  const { t } = useTranslation();
-  const { } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  
-  const [preferences, setPreferences] = useState<NotificationPreference[]>([
-    {
-      id: 'appointment-reminders',
-      title: t('notificationSettings.preferences.appointmentReminders.title'),
-      description: t('notificationSettings.preferences.appointmentReminders.description'),
-      category: 'appointments',
-      channels: { email: true, sms: true, push: true, inApp: true }
-    },
-    {
-      id: 'appointment-confirmations',
-      title: t('notificationSettings.preferences.appointmentConfirmations.title'),
-      description: t('notificationSettings.preferences.appointmentConfirmations.description'),
-      category: 'appointments',
-      channels: { email: true, sms: false, push: true, inApp: true }
-    },
-    {
-      id: 'appointment-cancellations',
-      title: t('notificationSettings.preferences.appointmentCancellations.title'),
-      description: t('notificationSettings.preferences.appointmentCancellations.description'),
-      category: 'appointments',
-      channels: { email: true, sms: true, push: true, inApp: true }
-    },
-    {
-      id: 'new-patient-registration',
-      title: t('notificationSettings.preferences.newPatientRegistration.title'),
-      description: t('notificationSettings.preferences.newPatientRegistration.description'),
-      category: 'patients',
-      channels: { email: true, sms: false, push: true, inApp: true }
-    },
-    {
-      id: 'patient-messages',
-      title: t('notificationSettings.preferences.patientMessages.title'),
-      description: t('notificationSettings.preferences.patientMessages.description'),
-      category: 'patients',
-      channels: { email: true, sms: false, push: true, inApp: true }
-    },
-    {
-      id: 'system-updates',
-      title: t('notificationSettings.preferences.systemUpdates.title'),
-      description: t('notificationSettings.preferences.systemUpdates.description'),
-      category: 'system',
-      channels: { email: true, sms: false, push: false, inApp: true }
-    },
-    {
-      id: 'security-alerts',
-      title: t('notificationSettings.preferences.securityAlerts.title'),
-      description: t('notificationSettings.preferences.securityAlerts.description'),
-      category: 'system',
-      channels: { email: true, sms: true, push: true, inApp: true }
-    },
-    {
-      id: 'promotional-offers',
-      title: t('notificationSettings.preferences.promotionalOffers.title'),
-      description: t('notificationSettings.preferences.promotionalOffers.description'),
-      category: 'marketing',
-      channels: { email: false, sms: false, push: false, inApp: false }
-    },
-    {
-      id: 'newsletter',
-      title: t('notificationSettings.preferences.newsletter.title'),
-      description: t('notificationSettings.preferences.newsletter.description'),
-      category: 'marketing',
-      channels: { email: false, sms: false, push: false, inApp: false }
-    }
-  ]);
-
-  const [globalSettings, setGlobalSettings] = useState({
-    emailNotifications: true,
-    smsNotifications: true,
-    pushNotifications: true,
-    inAppNotifications: true,
-    quietHours: {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    email: {
       enabled: true,
+      appointments: true,
+      reminders: true,
+      cancellations: true,
+      prescriptions: true,
+      messages: true
+    },
+    sms: {
+      enabled: false,
+      appointments: false,
+      reminders: false,
+      cancellations: false,
+      prescriptions: false
+    },
+    inApp: {
+      enabled: true,
+      appointments: true,
+      reminders: true,
+      cancellations: true,
+      prescriptions: true,
+      messages: true,
+      system: true
+    },
+    reminderIntervals: {
+      '24h': true,
+      '1h': true,
+      '15min': true
+    },
+    quietHours: {
+      enabled: false,
       start: '22:00',
       end: '08:00'
-    },
-    frequency: 'immediate' as 'immediate' | 'hourly' | 'daily'
+    }
   });
 
-  const handlePreferenceChange = (preferenceId: string, channel: keyof NotificationPreference['channels'], value: boolean) => {
-    setPreferences(prev => prev.map(pref => 
-      pref.id === preferenceId 
-        ? { ...pref, channels: { ...pref.channels, [channel]: value } }
-        : pref
-    ));
-  };
+  useEffect(() => {
+    fetchPreferences();
+  }, []);
 
-  const handleGlobalSettingChange = (setting: string, value: any) => {
-    if (setting.startsWith('quietHours.')) {
-      const field = setting.split('.')[1];
-      setGlobalSettings(prev => ({
-        ...prev,
-        quietHours: {
-          ...prev.quietHours,
-          [field]: value
-        }
-      }));
-    } else {
-      setGlobalSettings(prev => ({
-        ...prev,
-        [setting]: value
-      }));
-    }
-  };
-
-  const handleSaveSettings = async () => {
-    setLoading(true);
-    setMessage(null);
-
+  const fetchPreferences = async () => {
     try {
-      // API call to save notification preferences
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      setMessage({ type: 'success', text: t('notificationSettings.messages.saveSuccess') });
-    } catch (_error) {
-      setMessage({ type: 'error', text: t('notificationSettings.messages.saveError') });
+      setLoading(true);
+      const response = await api.get('/users/notification-preferences');
+      if (response.data.success && response.data.data) {
+        setPreferences(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch preferences:', error);
+      // Use defaults if fetch fails
     } finally {
       setLoading(false);
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'appointments':
-        return (
-          <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        );
-      case 'patients':
-        return (
-          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        );
-      case 'system':
-        return (
-          <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        );
-      case 'marketing':
-        return (
-          <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-          </svg>
-        );
-      default:
-        return null;
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await api.put('/users/notification-preferences', preferences);
+      toast.success('Notification preferences saved successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save preferences');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const getChannelIcon = (channel: string) => {
-    switch (channel) {
-      case 'email':
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        );
-      case 'sms':
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        );
-      case 'push':
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.868 19.718A8.97 8.97 0 003 12a9 9 0 0118 0 8.97 8.97 0 01-1.868 7.718M12 9v4" />
-          </svg>
-        );
-      case 'inApp':
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        );
-      default:
-        return null;
-    }
+  const updatePreference = (category: keyof NotificationPreferences, key: string, value: boolean | string) => {
+    setPreferences(prev => ({
+      ...prev,
+      [category]: {
+        ...(prev[category] as any),
+        [key]: value
+      }
+    }));
   };
 
-  const groupedPreferences = preferences.reduce((acc, pref) => {
-    if (!acc[pref.category]) {
-      acc[pref.category] = [];
-    }
-    acc[pref.category].push(pref);
-    return acc;
-  }, {} as Record<string, NotificationPreference[]>);
-
-  const categoryLabels = {
-    appointments: t('notificationSettings.categories.appointments'),
-    patients: t('notificationSettings.categories.patients'),
-    system: t('notificationSettings.categories.system'),
-    marketing: t('notificationSettings.categories.marketing')
+  const toggleAllInCategory = (category: 'email' | 'sms' | 'inApp', enabled: boolean) => {
+    setPreferences(prev => {
+      const categoryPrefs = prev[category];
+      const updated: any = { enabled };
+      
+      Object.keys(categoryPrefs).forEach(key => {
+        if (key !== 'enabled') {
+          updated[key] = enabled;
+        }
+      });
+      
+      return {
+        ...prev,
+        [category]: updated
+      };
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {message && (
-        <Alert
-            variant={message.type}
-            dismissible
-          >
-            {message.text}
-          </Alert>
-      )}
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Notification Settings</h1>
+        <p className="text-gray-600">
+          Manage how and when you receive notifications about appointments, prescriptions, and messages.
+        </p>
+      </div>
 
-      {/* Global Settings */}
-      <Card className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-6">{t('notificationSettings.global.title')}</h3>
-        
-        <div className="space-y-6">
-          {/* Master Toggles */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[ 
-              { key: 'emailNotifications', label: t('notificationSettings.global.channels.email'), icon: 'email' },
-              { key: 'smsNotifications', label: t('notificationSettings.global.channels.sms'), icon: 'sms' },
-              { key: 'pushNotifications', label: t('notificationSettings.global.channels.push'), icon: 'push', type: 'success' },
-              { key: 'inAppNotifications', label: t('notificationSettings.global.channels.inApp'), icon: 'inApp' }
-            ].map(({ key, label, icon }) => (
-              <div key={key} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  {getChannelIcon(icon)}
-                  <span className="text-sm font-medium text-gray-900">{label}</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={globalSettings[key as keyof typeof globalSettings] as boolean}
-                    onChange={(e) => handleGlobalSettingChange(key, e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-            ))}
+      {/* Email Notifications */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <Mail className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Email Notifications</h2>
+              <p className="text-sm text-gray-600">Receive updates via email</p>
+            </div>
           </div>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={preferences.email.enabled}
+              onChange={(e) => toggleAllInCategory('email', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
 
-          {/* Quiet Hours */}
-          <div className="border-t border-gray-200 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h4 className="text-md font-medium text-gray-900">{t('notificationSettings.global.quietHours.title')}</h4>
-                <p className="text-sm text-gray-600">{t('notificationSettings.global.quietHours.description')}</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+        {preferences.email.enabled && (
+          <div className="space-y-3 pl-13">
+            {[
+              { key: 'appointments', label: 'Appointment confirmations', icon: CheckCircle },
+              { key: 'reminders', label: 'Appointment reminders', icon: Clock },
+              { key: 'cancellations', label: 'Cancellation notifications', icon: AlertCircle },
+              { key: 'prescriptions', label: 'Prescription updates', icon: Bell },
+              { key: 'messages', label: 'New messages', icon: MessageSquare }
+            ].map(({ key, label, icon: Icon }) => (
+              <label key={key} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                <div className="flex items-center">
+                  <Icon className="w-4 h-4 text-gray-400 mr-3" />
+                  <span className="text-sm text-gray-700">{label}</span>
+                </div>
                 <input
                   type="checkbox"
-                  checked={globalSettings.quietHours.enabled}
-                  onChange={(e) => handleGlobalSettingChange('quietHours.enabled', e.target.checked)}
-                  className="sr-only peer"
+                  checked={(preferences.email as any)[key]}
+                  onChange={(e) => updatePreference('email', key, e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
-            </div>
-            
-            {globalSettings.quietHours.enabled && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('notificationSettings.global.quietHours.startTime')}</label>
-                  <input
-                    type="time"
-                    value={globalSettings.quietHours.start}
-                    onChange={(e) => handleGlobalSettingChange('quietHours.start', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('notificationSettings.global.quietHours.endTime')}</label>
-                  <input
-                    type="time"
-                    value={globalSettings.quietHours.end}
-                    onChange={(e) => handleGlobalSettingChange('quietHours.end', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Notification Frequency */}
-          <div className="border-t border-gray-200 pt-6">
-            <h4 className="text-md font-medium text-gray-900 mb-4">{t('notificationSettings.global.frequency.title')}</h4>
-            <div className="space-y-2">
-              {[ 
-                { value: 'immediate', label: t('notificationSettings.global.frequency.immediate.label'), description: t('notificationSettings.global.frequency.immediate.description') },
-                { value: 'hourly', label: t('notificationSettings.global.frequency.hourly.label'), description: t('notificationSettings.global.frequency.hourly.description') },
-                { value: 'daily', label: t('notificationSettings.global.frequency.daily.label'), description: t('notificationSettings.global.frequency.daily.description') }
-              ].map((option) => (
-                <label key={option.value} className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="frequency"
-                    value={option.value}
-                    checked={globalSettings.frequency === option.value}
-                    onChange={(e) => handleGlobalSettingChange('frequency', e.target.value)}
-                    className="mt-1 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{option.label}</div>
-                    <div className="text-xs text-gray-600">{option.description}</div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Notification Preferences by Category */}
-      {Object.entries(groupedPreferences).map(([category, prefs]) => (
-        <Card key={category} className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            {getCategoryIcon(category)}
-            <h3 className="text-lg font-medium text-gray-900">
-              {categoryLabels[category as keyof typeof categoryLabels]}
-            </h3>
-          </div>
-          
-          <div className="space-y-4">
-            {prefs.map((pref) => (
-              <div key={pref.id} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900">{pref.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1">{pref.description}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {Object.entries(pref.channels).map(([channel, enabled]) => (
-                    <label key={channel} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={enabled}
-                        onChange={(e) => handlePreferenceChange(pref.id, channel as keyof NotificationPreference['channels'], e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="flex items-center gap-1">
-                        {getChannelIcon(channel)}
-                        <span className="text-xs text-gray-700">
-                          {t(`notificationSettings.channels.${channel}`)}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
             ))}
           </div>
-        </Card>
-      ))}
+        )}
+      </div>
+
+      {/* SMS Notifications */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+              <Smartphone className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">SMS Notifications</h2>
+              <p className="text-sm text-gray-600">Receive text messages for important updates</p>
+            </div>
+          </div>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={preferences.sms.enabled}
+              onChange={(e) => toggleAllInCategory('sms', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+          </label>
+        </div>
+
+        {preferences.sms.enabled && (
+          <div className="space-y-3 pl-13">
+            {[
+              { key: 'appointments', label: 'Appointment confirmations' },
+              { key: 'reminders', label: 'Appointment reminders' },
+              { key: 'cancellations', label: 'Cancellation notifications' },
+              { key: 'prescriptions', label: 'Prescription ready notifications' }
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                <span className="text-sm text-gray-700">{label}</span>
+                <input
+                  type="checkbox"
+                  checked={(preferences.sms as any)[key]}
+                  onChange={(e) => updatePreference('sms', key, e.target.checked)}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* In-App Notifications */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+              <Bell className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">In-App Notifications</h2>
+              <p className="text-sm text-gray-600">Show notifications in the application</p>
+            </div>
+          </div>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={preferences.inApp.enabled}
+              onChange={(e) => toggleAllInCategory('inApp', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+          </label>
+        </div>
+
+        {preferences.inApp.enabled && (
+          <div className="space-y-3 pl-13">
+            {[
+              { key: 'appointments', label: 'Appointment updates' },
+              { key: 'reminders', label: 'Appointment reminders' },
+              { key: 'cancellations', label: 'Cancellations' },
+              { key: 'prescriptions', label: 'Prescription updates' },
+              { key: 'messages', label: 'New messages' },
+              { key: 'system', label: 'System notifications' }
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                <span className="text-sm text-gray-700">{label}</span>
+                <input
+                  type="checkbox"
+                  checked={(preferences.inApp as any)[key]}
+                  onChange={(e) => updatePreference('inApp', key, e.target.checked)}
+                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                />
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Reminder Intervals */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <Clock className="w-5 h-5 text-orange-600 mr-2" />
+            <h2 className="text-lg font-semibold text-gray-900">Appointment Reminder Schedule</h2>
+          </div>
+          <p className="text-sm text-gray-600">Choose when to receive appointment reminders</p>
+        </div>
+
+        <div className="space-y-3">
+          {[
+            { key: '24h', label: '24 hours before', description: 'Day before appointment' },
+            { key: '1h', label: '1 hour before', description: 'Shortly before appointment' },
+            { key: '15min', label: '15 minutes before', description: 'Last minute reminder' }
+          ].map(({ key, label, description }) => (
+            <label key={key} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg cursor-pointer border border-gray-200">
+              <div>
+                <div className="text-sm font-medium text-gray-900">{label}</div>
+                <div className="text-xs text-gray-500">{description}</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={(preferences.reminderIntervals as any)[key]}
+                onChange={(e) => updatePreference('reminderIntervals', key, e.target.checked)}
+                className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+              />
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Quiet Hours */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="flex items-center mb-2">
+              <Bell className="w-5 h-5 text-gray-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Quiet Hours</h2>
+            </div>
+            <p className="text-sm text-gray-600">Don't send notifications during specified hours</p>
+          </div>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={preferences.quietHours.enabled}
+              onChange={(e) => updatePreference('quietHours', 'enabled', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-600"></div>
+          </label>
+        </div>
+
+        {preferences.quietHours.enabled && (
+          <div className="grid grid-cols-2 gap-4 pl-7">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+              <input
+                type="time"
+                value={preferences.quietHours.start}
+                onChange={(e) => updatePreference('quietHours', 'start', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+              <input
+                type="time"
+                value={preferences.quietHours.end}
+                onChange={(e) => updatePreference('quietHours', 'end', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleSaveSettings}
-          isLoading={loading}
-          disabled={loading}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center font-medium"
         >
-          {t('notificationSettings.buttons.save')}
-        </Button>
+          {saving ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-5 h-5 mr-2" />
+              Save Preferences
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

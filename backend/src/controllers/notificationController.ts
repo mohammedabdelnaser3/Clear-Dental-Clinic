@@ -28,12 +28,12 @@ export const getUserNotifications = catchAsync(async (req: AuthenticatedRequest,
   }
 
   const [notifications, total] = await Promise.all([
-    Notification.find(query)
+    (Notification as any).find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean(),
-    Notification.countDocuments(query)
+    (Notification as any).countDocuments(query)
   ]);
 
   res.json({
@@ -44,7 +44,7 @@ export const getUserNotifications = catchAsync(async (req: AuthenticatedRequest,
 
 // Get unread notifications count
 export const getUnreadNotificationsCount = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const count = await Notification.countDocuments({
+  const count = await (Notification as any).countDocuments({
     userId: req.user._id,
     isRead: false
   });
@@ -55,13 +55,13 @@ export const getUnreadNotificationsCount = catchAsync(async (req: AuthenticatedR
 // Get unread notifications
 export const getUnreadNotifications = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 10;
-  const notifications = await Notification.findUnread(req.user._id.toString(), limit);
+  const notifications = await (Notification as any).findUnread(req.user._id.toString(), limit);
   res.json({ success: true, data: { notifications } });
 });
 
 // Mark notification as read
 export const markNotificationAsRead = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const notification = await Notification.findById(req.params.id);
+  const notification = await (Notification as any).findById(req.params.id);
   if (!notification) {
     throw createNotFoundError('Notification');
   }
@@ -82,7 +82,7 @@ export const markNotificationAsRead = catchAsync(async (req: AuthenticatedReques
 
 // Mark notification as unread
 export const markNotificationAsUnread = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const notification = await Notification.findById(req.params.id);
+  const notification = await (Notification as any).findById(req.params.id);
   if (!notification) {
     throw createNotFoundError('Notification');
   }
@@ -112,7 +112,7 @@ export const markAllNotificationsAsRead = catchAsync(async (req: AuthenticatedRe
 
 // Delete notification
 export const deleteNotification = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const notification = await Notification.findById(req.params.id);
+  const notification = await (Notification as any).findById(req.params.id);
   if (!notification) {
     throw createNotFoundError('Notification');
   }
@@ -127,7 +127,7 @@ export const deleteNotification = catchAsync(async (req: AuthenticatedRequest, r
 
 // Delete all notifications
 export const deleteAllNotifications = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const result = await Notification.deleteMany({ userId: req.user._id });
+  const result = await (Notification as any).deleteMany({ userId: req.user._id });
   res.json({
     success: true,
     message: `${result.deletedCount} notifications deleted`
@@ -138,7 +138,7 @@ export const deleteAllNotifications = catchAsync(async (req: AuthenticatedReques
 export const createNotification = catchAsync(async (req: Request, res: Response) => {
   const { userId, title, message, type = 'general', link } = req.body;
 
-  const notification = await Notification.createNotification({
+  const notification = await (Notification as any).createNotification({
     userId,
     title,
     message,
@@ -171,7 +171,7 @@ export const createBulkNotifications = catchAsync(async (req: Request, res: Resp
     createdAt: new Date()
   }));
 
-  const result = await Notification.insertMany(notifications);
+  const result = await (Notification as any).insertMany(notifications);
 
   res.status(201).json({
     success: true,
@@ -186,8 +186,8 @@ export const getNotificationsByType = catchAsync(async (req: AuthenticatedReques
   const { page, limit, skip } = getPaginationParams(req);
 
   const [notifications, total] = await Promise.all([
-    Notification.findByType(req.user._id.toString(), type, { skip, limit }),
-    Notification.countDocuments({ userId: req.user._id, type })
+    (Notification as any).findByType(req.user._id.toString(), type, { skip, limit }),
+    (Notification as any).countDocuments({ userId: req.user._id, type })
   ]);
 
   res.json({
@@ -199,9 +199,9 @@ export const getNotificationsByType = catchAsync(async (req: AuthenticatedReques
 // Get notification statistics
 export const getNotificationStatistics = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const [totalNotifications, unreadCount, typeStats] = await Promise.all([
-    Notification.countDocuments({ userId: req.user._id }),
-    Notification.countDocuments({ userId: req.user._id, isRead: false }),
-    Notification.aggregate([
+    (Notification as any).countDocuments({ userId: req.user._id }),
+    (Notification as any).countDocuments({ userId: req.user._id, isRead: false }),
+    (Notification as any).aggregate([
       { $match: { userId: req.user._id } },
       {
         $group: {
@@ -246,7 +246,7 @@ export const cleanupOldNotifications = catchAsync(async (req: Request, res: Resp
 export const getRecentNotifications = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 5;
 
-  const notifications = await Notification.find({ userId: req.user._id })
+  const notifications = await (Notification as any).find({ userId: req.user._id })
     .sort({ createdAt: -1 })
     .limit(limit)
     .lean();
@@ -256,7 +256,7 @@ export const getRecentNotifications = catchAsync(async (req: AuthenticatedReques
 
 // Get notification by ID
 export const getNotificationById = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-  const notification = await Notification.findById(req.params.id);
+  const notification = await (Notification as any).findById(req.params.id);
   if (!notification) {
     throw createNotFoundError('Notification');
   }
@@ -273,7 +273,7 @@ export const updateNotification = catchAsync(async (req: AuthenticatedRequest, r
   const { id } = req.params;
   const { title, message, link } = req.body;
 
-  const notification = await Notification.findById(id);
+  const notification = await (Notification as any).findById(id);
   if (!notification) {
     throw createNotFoundError('Notification');
   }

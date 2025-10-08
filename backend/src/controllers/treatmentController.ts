@@ -28,8 +28,8 @@ export const createTreatmentRecord = catchAsync(async (req: AuthenticatedRequest
 
   // Verify patient and clinic exist
   const [patient, clinic] = await Promise.all([
-    Patient.findById(patientId),
-    Clinic.findById(clinicId)
+    (Patient as any).findById(patientId),
+    (Clinic as any).findById(clinicId)
   ]);
 
   if (!patient) {
@@ -207,7 +207,7 @@ export const deleteTreatmentRecord = catchAsync(async (req: AuthenticatedRequest
   }
 
   // Remove from patient's treatment records
-  await Patient.findByIdAndUpdate(
+  await (Patient as any).findByIdAndUpdate(
     treatmentRecord.patientId,
     { $pull: { treatmentRecords: id } }
   );
@@ -225,7 +225,7 @@ export const getTreatmentRecordsByPatient = catchAsync(async (req: Request, res:
   const { patientId } = req.params;
   const { page, limit, skip } = getPaginationParams(req);
 
-  const patient = await Patient.findById(patientId);
+  const patient = await (Patient as any).findById(patientId);
   if (!patient) {
     throw createNotFoundError('Patient');
   }
@@ -285,7 +285,7 @@ export const getTreatmentRecordsByClinic = catchAsync(async (req: Request, res: 
   const { clinicId } = req.params;
   const { page, limit, skip } = getPaginationParams(req);
 
-  const clinic = await Clinic.findById(clinicId);
+  const clinic = await (Clinic as any).findById(clinicId);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }

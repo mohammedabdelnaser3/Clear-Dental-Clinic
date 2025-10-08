@@ -17,7 +17,14 @@ import {
   getRecentAppointmentsOverall,
   checkAppointmentConflicts,
   autoBookFirstAvailable,
-  getNextSlotAfterLastBooking
+  getNextSlotAfterLastBooking,
+  getBookedSlots,
+  // Unified Dashboard Endpoints
+  getDoctorUnifiedAppointments,
+  getAdminUnifiedAppointments,
+  quickUpdateAppointment,
+  cancelAppointmentWithNotification,
+  rescheduleAppointmentEnhanced
 } from '../controllers/appointmentController';
 import {
   authenticate,
@@ -86,6 +93,20 @@ router.get('/next-slot-after-last', [
     .withMessage('Duration must be between 15 and 240 minutes')
 ], handleValidationErrors, getNextSlotAfterLastBooking);
 
+// Get booked time slots - public endpoint for availability display
+router.get('/booked-slots', [
+  query('date')
+    .isISO8601()
+    .withMessage('Date is required and must be in YYYY-MM-DD format'),
+  query('clinicId')
+    .isMongoId()
+    .withMessage('Valid clinic ID is required'),
+  query('doctorId')
+    .optional()
+    .isMongoId()
+    .withMessage('Doctor ID must be valid if provided')
+], handleValidationErrors, getBookedSlots);
+
 // Check appointment conflicts - public endpoint for booking validation
 router.get('/check-conflict', [
   query('date')
@@ -113,6 +134,134 @@ router.get('/check-conflict', [
 
 // All routes below require authentication
 router.use(authenticate);
+
+// ==================== UNIFIED DASHBOARD ROUTES ====================
+
+// Get unified appointments for doctor across all assigned clinics
+router.get('/unified/doctor', dentistOrAdmin, [
+  ...validatePagination.slice(0, -1),
+  query('startDate')
+    .optional()
+    .isISO8601()
+    .withMessage('Start date must be a valid date'),
+  query('endDate')
+    .optional()
+    .isISO8601()
+    .withMessage('End date must be a valid date'),
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  query('patientName')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Patient name must not exceed 100 characters'),
+  query('status')
+    .optional()
+    .isIn(['scheduled', 'confirmed', 'in-progress', 'completed', 'cancelled', 'no-show'])
+    .withMessage('Invalid appointment status'),
+  query('sortBy')
+    .optional()
+    .isIn(['date', 'createdAt', 'status'])
+    .withMessage('Invalid sort field'),
+  query('sortOrder')
+    .optional()
+    .isIn(['asc', 'desc'])
+    .withMessage('Invalid sort order')
+], handleValidationErrors, getDoctorUnifiedAppointments);
+
+// Get unified appointments for admin (all appointments across all clinics)
+router.get('/unified/admin', dentistOrAdmin, [
+  ...validatePagination.slice(0, -1),
+  query('startDate')
+    .optional()
+    .isISO8601()
+    .withMessage('Start date must be a valid date'),
+  query('endDate')
+    .optional()
+    .isISO8601()
+    .withMessage('End date must be a valid date'),
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  query('dentistId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid dentist ID'),
+  query('patientName')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Patient name must not exceed 100 characters'),
+  query('status')
+    .optional()
+    .isIn(['scheduled', 'confirmed', 'in-progress', 'completed', 'cancelled', 'no-show'])
+    .withMessage('Invalid appointment status'),
+  query('sortBy')
+    .optional()
+    .isIn(['date', 'createdAt', 'status'])
+    .withMessage('Invalid sort field'),
+  query('sortOrder')
+    .optional()
+    .isIn(['asc', 'desc'])
+    .withMessage('Invalid sort order')
+], handleValidationErrors, getAdminUnifiedAppointments);
+
+// Quick update appointment (time/notes only)
+router.patch('/:id/quick-update', dentistOrAdmin, [
+  ...createMongoIdValidation('id'),
+  body('timeSlot')
+    .optional()
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('Time slot must be in HH:MM format'),
+  body('notes')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Notes must not exceed 1000 characters'),
+  body('duration')
+    .optional()
+    .isInt({ min: 15, max: 480 })
+    .withMessage('Duration must be between 15 and 480 minutes')
+], handleValidationErrors, quickUpdateAppointment);
+
+// Cancel appointment with automatic notification
+router.post('/:id/cancel-notify', dentistOrAdmin, [
+  ...createMongoIdValidation('id'),
+  body('cancellationReason')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Cancellation reason must not exceed 500 characters'),
+  body('notifyPatient')
+    .optional()
+    .isBoolean()
+    .withMessage('notifyPatient must be a boolean')
+], handleValidationErrors, cancelAppointmentWithNotification);
+
+// Reschedule appointment with enhanced conflict checking
+router.post('/:id/reschedule-enhanced', dentistOrAdmin, [
+  ...createMongoIdValidation('id'),
+  body('newDate')
+    .isISO8601()
+    .withMessage('New date is required and must be a valid date'),
+  body('newTimeSlot')
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('New time slot is required and must be in HH:MM format'),
+  body('newDuration')
+    .optional()
+    .isInt({ min: 15, max: 480 })
+    .withMessage('Duration must be between 15 and 480 minutes'),
+  body('reason')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Reason must not exceed 500 characters')
+], handleValidationErrors, rescheduleAppointmentEnhanced);
+
+// ==================== END UNIFIED DASHBOARD ROUTES ====================
 
 // Create appointment
 router.post('/', validateAppointmentCreation, handleValidationErrors, createAppointment);

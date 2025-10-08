@@ -15,6 +15,7 @@ export { default as ResetPassword } from './auth/ResetPassword';
 
 // Dashboard Pages
 export { default as Dashboard } from './dashboard/Dashboard';
+export { default as UnifiedAppointmentDashboard } from './dashboard/UnifiedAppointmentDashboard';
 
 // Patient Pages
 export { default as Patients } from './patient/Patients';

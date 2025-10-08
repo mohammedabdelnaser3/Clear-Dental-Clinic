@@ -63,14 +63,14 @@ export const resetDatabase = async (): Promise<void> => {
     // Delete all data
     await Promise.all([
       User.deleteMany({}),
-      Patient.deleteMany({}),
-      Clinic.deleteMany({}),
-      Appointment.deleteMany({}),
+      (Patient as any).deleteMany({}),
+      (Clinic as any).deleteMany({}),
+      (Appointment as any).deleteMany({}),
       TreatmentRecord.deleteMany({}),
-      Notification.deleteMany({}),
+      (Notification as any).deleteMany({}),
       Medication.deleteMany({}),
       Prescription.deleteMany({}),
-      Billing.deleteMany({}),
+      (Billing as any).deleteMany({}),
       StaffSchedule.deleteMany({})
     ]);
     

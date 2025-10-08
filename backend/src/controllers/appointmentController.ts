@@ -102,9 +102,9 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
     });
 
     [patient, dentist, clinic] = await Promise.all([
-      Patient.findById(patientId).exec(),
+      (Patient as any).findById(patientId).exec(),
       dentistId ? User.findById(dentistId).exec() : null,
-      clinicId ? Clinic.findById(clinicId).exec() : null
+      clinicId ? (Clinic as any).findById(clinicId).exec() : null
     ]);
 
     console.log('Entity lookup results:', {
@@ -135,7 +135,7 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
 
     // Check for conflicts only if dentistId is provided
     if (dentistId) {
-    const conflicts = await Appointment.findConflicts(dentistId, appointmentDate, timeSlot, duration);
+    const conflicts = await (Appointment as any).findConflicts(dentistId, appointmentDate, timeSlot, duration);
     if (conflicts.length > 0) {
       throw createConflictError(
         `Time slot ${timeSlot} on ${formatDate(appointmentDate)} is already booked. Please select another time.`
@@ -238,7 +238,7 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
         
         // Check conflicts in parallel for better performance
         const conflictPromises = scheduledDentists.map(dentist => 
-          Appointment.findConflicts(dentist._id.toString(), appointmentDate, timeSlot, duration)
+          (Appointment as any).findConflicts(dentist._id.toString(), appointmentDate, timeSlot, duration)
             .then(conflicts => ({ dentist, conflicts }))
         );
         
@@ -299,7 +299,7 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
     appointmentData.dentistId = dentistId;
   }
 
-  const appointment = await Appointment.create(appointmentData);
+  const appointment = await (Appointment as any).create(appointmentData);
 
   // Populate related data with more comprehensive information
   const populatePaths = [
@@ -384,7 +384,7 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
     
     // Create in-app notification if enabled or if this is an emergency
     if (notificationPreferences.channels.inApp || emergency) {
-      const notificationPromise = Notification.create({
+      const notificationPromise = (Notification as any).create({
       userId: patientId,
       type: emergency ? 'urgent_appointment' : 'appointment_confirmation',
       title: emergency ? 'Urgent Appointment Scheduled' : 'Appointment Confirmed',
@@ -406,7 +406,7 @@ export const createAppointment = catchAsync(async (req: AuthenticatedRequest, re
     
     // If this is an emergency appointment, also notify staff
     if (emergency && dentist && dentistId) {
-      const staffNotificationPromise = Notification.create({
+      const staffNotificationPromise = (Notification as any).create({
         userId: dentistId,
         type: 'urgent_appointment_staff',
         title: 'Urgent Appointment Scheduled',
@@ -460,14 +460,14 @@ export const getAllAppointments = catchAsync(async (req: Request, res: Response)
   });
 
   const [appointments, total] = await Promise.all([
-    Appointment.find(query)
+    (Appointment as any).find(query)
       .populate('patientId', 'firstName lastName email phone')
       .populate('dentistId', 'firstName lastName specialization')
       .populate('clinicId', 'name address phone')
       .sort({ date: -1, 'timeSlot.start': 1 })
       .skip(skip)
       .limit(limit),
-    Appointment.countDocuments(query)
+    (Appointment as any).countDocuments(query)
   ]);
 
   res.json({
@@ -504,7 +504,7 @@ const buildAppointmentQuery = ({ status, date, dentistId, clinicId, patientId }:
 
 // Get appointment by ID
 export const getAppointmentById = catchAsync(async (req: Request, res: Response) => {
-  const appointment = await Appointment.findById(req.params.id)
+  const appointment = await (Appointment as any).findById(req.params.id)
     .populate('patientId', 'firstName lastName email phone dateOfBirth gender address')
     .populate('dentistId', 'firstName lastName email specialization phone')
     .populate('clinicId', 'name address phone email operatingHours');
@@ -526,7 +526,7 @@ export const updateAppointment = catchAsync(async (req: Request, res: Response) 
 
   // console.log('🔍 UpdateAppointment - Request details:', { appointmentId: id, requestBody: req.body });
 
-  const appointment = await Appointment.findById(id)
+  const appointment = await (Appointment as any).findById(id)
     .populate('patientId', 'firstName lastName email')
     .populate('dentistId', 'firstName lastName')
     .populate('clinicId', 'name');
@@ -598,7 +598,7 @@ async function validateAndUpdateDateTime(appointment: any, date: string, timeSlo
     throw createValidationError('date', 'Appointment date cannot be in the past');
   }
 
-  const conflicts = await Appointment.find({
+  const conflicts = await (Appointment as any).find({
     dentistId: appointment.dentistId,
     date: {
       $gte: new Date(newDate.setHours(0, 0, 0, 0)),
@@ -622,7 +622,7 @@ export const cancelAppointment = catchAsync(async (req: Request, res: Response) 
   const { id } = req.params;
   const { reason } = req.body;
 
-  const appointment = await Appointment.findById(id)
+  const appointment = await (Appointment as any).findById(id)
     .populate('patientId', 'firstName lastName email')
     .populate('dentistId', 'firstName lastName')
     .populate('clinicId', 'name address phone');
@@ -656,7 +656,7 @@ export const cancelAppointment = catchAsync(async (req: Request, res: Response) 
           reason: reason || 'No reason provided'
         }
       ),
-      Notification.create({
+      (Notification as any).create({
         userId: appointment.patientId,
         type: 'appointment_cancellation',
         title: 'Appointment Cancelled',
@@ -696,14 +696,14 @@ export const getTodayAppointments = catchAsync(async (req: Request, res: Respons
   if (status) query.status = status;
 
   const [appointments, total] = await Promise.all([
-    Appointment.find(query)
+    (Appointment as any).find(query)
       .populate('patientId', 'firstName lastName email phone')
       .populate('dentistId', 'firstName lastName specialization')
       .populate('clinicId', 'name address phone')
       .sort({ 'timeSlot.start': 1 })
       .skip(skip)
       .limit(limit),
-    Appointment.countDocuments(query)
+    (Appointment as any).countDocuments(query)
   ]);
 
   res.json({
@@ -716,7 +716,7 @@ export const getTodayAppointments = catchAsync(async (req: Request, res: Respons
 export const sendAppointmentReminder = catchAsync(async (req: Request, res: Response) => {
   const { appointmentId } = req.params;
 
-  const appointment = await Appointment.findById(appointmentId)
+  const appointment = await (Appointment as any).findById(appointmentId)
     .populate('patientId', 'name email')
     .populate('dentistId', 'name')
     .populate('clinicId', 'name');
@@ -750,7 +750,7 @@ export const sendAppointmentReminder = catchAsync(async (req: Request, res: Resp
 
   // Create notification
   try {
-    await Notification.create({
+    await (Notification as any).create({
       userId: appointment.patientId,
       type: 'appointment_reminder',
       title: 'Appointment Reminder',
@@ -772,7 +772,7 @@ export const completeAppointment = catchAsync(async (req: Request, res: Response
   const { id } = req.params;
   const { treatmentProvided, followUpRequired, followUpDate, notes } = req.body;
 
-  const appointment = await Appointment.findById(id);
+  const appointment = await (Appointment as any).findById(id);
   if (!appointment) {
     return res.status(404).json({
       status: 'error',
@@ -807,7 +807,7 @@ export const rescheduleAppointment = catchAsync(async (req: Request, res: Respon
   const { id } = req.params;
   const { newDate, newTime, reason } = req.body;
 
-  const appointment = await Appointment.findById(id)
+  const appointment = await (Appointment as any).findById(id)
     .populate('patientId', 'name email')
     .populate('dentistId', 'name')
     .populate('clinicId', 'name');
@@ -841,7 +841,7 @@ export const rescheduleAppointment = catchAsync(async (req: Request, res: Respon
   }
 
   // Check for conflicts
-  const conflicts = await Appointment.findConflicts(
+  const conflicts = await (Appointment as any).findConflicts(
     appointment.dentistId?.toString() || '',
     appointmentDate,
     newTime,
@@ -934,8 +934,8 @@ export const autoBookFirstAvailable = catchAsync(async (req: AuthenticatedReques
 
   // Validate entities exist
   const [patient, clinic] = await Promise.all([
-    Patient.findById(patientId).exec(),
-    Clinic.findById(clinicId).exec()
+    (Patient as any).findById(patientId).exec(),
+    (Clinic as any).findById(clinicId).exec()
   ]);
 
   if (!patient) {
@@ -1070,7 +1070,7 @@ export const autoBookFirstAvailable = catchAsync(async (req: AuthenticatedReques
     createdAt: new Date()
   };
 
-  const appointment = await Appointment.create(appointmentData);
+  const appointment = await (Appointment as any).create(appointmentData);
 
   // Populate related data
   await appointment.populate([
@@ -1121,7 +1121,7 @@ export const getAvailableTimeSlots = catchAsync(async (req: Request, res: Respon
   }
 
   // Validate clinic exists first
-  const clinic = await Clinic.findById(clinicId);
+  const clinic = await (Clinic as any).findById(clinicId);
   if (!clinic) {
     return res.status(404).json({
       status: 'error',
@@ -1349,7 +1349,7 @@ export const getNextSlotAfterLastBooking = catchAsync(async (req: Request, res: 
   }
 
   // Validate clinic exists first
-  const clinic = await Clinic.findById(clinicId);
+  const clinic = await (Clinic as any).findById(clinicId);
   if (!clinic) {
     return res.status(404).json({
       status: 'error',
@@ -1417,14 +1417,14 @@ export const getUpcomingAppointments = catchAsync(async (req: Request, res: Resp
   if (dentistId) query.dentistId = dentistId;
   
   const [appointments, total] = await Promise.all([
-    Appointment.find(query)
+    (Appointment as any).find(query)
       .populate('patientId', 'name email phone')
       .populate('dentistId', 'name specialization')
       .populate('clinicId', 'name address')
       .sort({ date: 1, timeSlot: 1 })
       .skip(skip)
       .limit(limit),
-    Appointment.countDocuments(query)
+    (Appointment as any).countDocuments(query)
   ]);
 
   return res.status(200).json({
@@ -1457,14 +1457,14 @@ export const getAppointmentsByDateRange = catchAsync(async (req: Request, res: R
   if (status) query.status = status;
   
   const [appointments, total] = await Promise.all([
-    Appointment.find(query)
+    (Appointment as any).find(query)
       .populate('patientId', 'name email phone')
       .populate('dentistId', 'name specialization')
       .populate('clinicId', 'name address')
       .sort({ date: 1, timeSlot: 1 })
       .skip(skip)
       .limit(limit),
-    Appointment.countDocuments(query)
+    (Appointment as any).countDocuments(query)
   ]);
 
   return res.status(200).json({
@@ -1490,7 +1490,7 @@ export const getAppointmentStatistics = catchAsync(async (req: Request, res: Res
     matchQuery.clinicId = clinicId;
   }
 
-  const statistics = await Appointment.aggregate([
+  const statistics = await (Appointment as any).aggregate([
     { $match: matchQuery },
     {
       $group: {
@@ -1500,7 +1500,7 @@ export const getAppointmentStatistics = catchAsync(async (req: Request, res: Res
     }
   ]);
 
-  const totalAppointments = await Appointment.countDocuments(matchQuery);
+  const totalAppointments = await (Appointment as any).countDocuments(matchQuery);
   
   const statusCounts = {
     scheduled: 0,
@@ -1537,14 +1537,14 @@ export const getRecentAppointments = catchAsync(async (req: Request, res: Respon
   if (clinicId) query.clinicId = clinicId;
   
   const [appointments, total] = await Promise.all([
-    Appointment.find(query)
+    (Appointment as any).find(query)
       .populate('patientId', 'firstName lastName email phone')
       .populate('dentistId', 'firstName lastName specialization')
       .populate('clinicId', 'name address')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit as string) || pageLimit),
-    Appointment.countDocuments(query)
+    (Appointment as any).countDocuments(query)
   ]);
 
   res.status(200).json({
@@ -1560,14 +1560,14 @@ export const getRecentAppointmentsOverall = catchAsync(async (req: Request, res:
   const { page, limit: pageLimit, skip } = getPaginationParams(req);
   
   const [appointments, total] = await Promise.all([
-    Appointment.find({})
+    (Appointment as any).find({})
       .populate('patientId', 'firstName lastName email phone')
       .populate('dentistId', 'firstName lastName specialization')
       .populate('clinicId', 'name address')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit as string) || pageLimit),
-    Appointment.countDocuments({})
+    (Appointment as any).countDocuments({})
   ]);
 
   res.status(200).json({
@@ -1594,7 +1594,7 @@ export const sendAppointmentReminders = catchAsync(async (req: Request, res: Res
 
   if (clinicId) query.clinicId = clinicId;
 
-  const appointments = await Appointment.find(query)
+  const appointments = await (Appointment as any).find(query)
     .populate('patientId', 'name email')
     .populate('dentistId', 'name')
     .populate('clinicId', 'name');
@@ -1619,7 +1619,7 @@ export const sendAppointmentReminders = catchAsync(async (req: Request, res: Res
         }
       );
 
-      await Notification.create({
+      await (Notification as any).create({
         userId: appointment.patientId,
         type: 'appointment_reminder',
         title: 'Appointment Reminder',
@@ -1646,6 +1646,580 @@ export const sendAppointmentReminders = catchAsync(async (req: Request, res: Res
 });
 
 // Check appointment conflicts (for frontend validation)
+// ==================== UNIFIED APPOINTMENT DASHBOARD ENDPOINTS ====================
+
+// Get unified appointments for doctor across all assigned clinics
+export const getDoctorUnifiedAppointments = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const { startDate, endDate, clinicId, patientName, status, sortBy = 'date', sortOrder = 'asc' } = req.query;
+  const { page: pageNum, limit: limitNum } = getPaginationParams(req);
+  
+  // Build query for doctor's appointments across all assigned clinics
+  const query: any = {
+    dentistId: req.user._id
+  };
+  
+  // Filter by date range
+  if (startDate || endDate) {
+    query.date = {};
+    if (startDate) query.date.$gte = new Date(startDate as string);
+    if (endDate) query.date.$lte = new Date(endDate as string);
+  }
+  
+  // Filter by specific clinic (optional)
+  if (clinicId) {
+    query.clinicId = clinicId;
+  }
+  
+  // Filter by status
+  if (status) {
+    query.status = status;
+  }
+  
+  // Build sort object
+  const sort: any = {};
+  sort[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
+  
+  // Execute query with pagination
+  const [appointments, total] = await Promise.all([
+    (Appointment as any).find(query)
+      .populate('patientId', 'firstName lastName email phone dateOfBirth')
+      .populate('clinicId', 'name address phone')
+      .populate('dentistId', 'firstName lastName email')
+      .sort(sort)
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean(),
+    (Appointment as any).countDocuments(query)
+  ]);
+  
+  // Filter by patient name if provided (post-query filtering for flexibility)
+  let filteredAppointments = appointments;
+  if (patientName) {
+    const searchTerm = (patientName as string).toLowerCase();
+    filteredAppointments = appointments.filter((apt: any) => {
+      const fullName = `${apt.patientId.firstName} ${apt.patientId.lastName}`.toLowerCase();
+      return fullName.includes(searchTerm);
+    });
+  }
+  
+  // Group appointments by clinic for better visualization
+  const appointmentsByClinic = filteredAppointments.reduce((acc: any, apt: any) => {
+    const clinicName = apt.clinicId.name;
+    if (!acc[clinicName]) {
+      acc[clinicName] = {
+        clinic: apt.clinicId,
+        appointments: [],
+        count: 0
+      };
+    }
+    acc[clinicName].appointments.push(apt);
+    acc[clinicName].count++;
+    return acc;
+  }, {});
+  
+  res.json({
+    success: true,
+    message: 'Unified appointments retrieved successfully',
+    data: {
+      appointments: filteredAppointments,
+      appointmentsByClinic,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      },
+      stats: {
+        totalAppointments: filteredAppointments.length,
+        clinicsCount: Object.keys(appointmentsByClinic).length,
+        todayAppointments: filteredAppointments.filter((apt: any) => 
+          new Date(apt.date).toDateString() === new Date().toDateString()
+        ).length
+      }
+    }
+  });
+});
+
+// Get unified appointments for admin (all appointments across all clinics)
+export const getAdminUnifiedAppointments = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const { startDate, endDate, clinicId, dentistId, patientName, status, sortBy = 'date', sortOrder = 'asc' } = req.query;
+  const { page: pageNum, limit: limitNum } = getPaginationParams(req);
+  
+  // Build query
+  const query: any = {};
+  
+  // Filter by date range
+  if (startDate || endDate) {
+    query.date = {};
+    if (startDate) query.date.$gte = new Date(startDate as string);
+    if (endDate) query.date.$lte = new Date(endDate as string);
+  }
+  
+  // Filter by clinic
+  if (clinicId) {
+    query.clinicId = clinicId;
+  }
+  
+  // Filter by dentist
+  if (dentistId) {
+    query.dentistId = dentistId;
+  }
+  
+  // Filter by status
+  if (status) {
+    query.status = status;
+  }
+  
+  // Build sort object
+  const sort: any = {};
+  sort[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
+  
+  // Execute query
+  const [appointments, total] = await Promise.all([
+    (Appointment as any).find(query)
+      .populate('patientId', 'firstName lastName email phone dateOfBirth')
+      .populate('clinicId', 'name address phone')
+      .populate('dentistId', 'firstName lastName email specialization')
+      .populate('createdBy', 'firstName lastName')
+      .sort(sort)
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean(),
+    (Appointment as any).countDocuments(query)
+  ]);
+  
+  // Filter by patient name if provided
+  let filteredAppointments = appointments;
+  if (patientName) {
+    const searchTerm = (patientName as string).toLowerCase();
+    filteredAppointments = appointments.filter((apt: any) => {
+      const fullName = `${apt.patientId.firstName} ${apt.patientId.lastName}`.toLowerCase();
+      return fullName.includes(searchTerm);
+    });
+  }
+  
+  // Analytics data
+  const stats = {
+    totalAppointments: filteredAppointments.length,
+    byStatus: filteredAppointments.reduce((acc: any, apt: any) => {
+      acc[apt.status] = (acc[apt.status] || 0) + 1;
+      return acc;
+    }, {}),
+    byClinic: filteredAppointments.reduce((acc: any, apt: any) => {
+      const clinicName = apt.clinicId.name;
+      acc[clinicName] = (acc[clinicName] || 0) + 1;
+      return acc;
+    }, {}),
+    todayCount: filteredAppointments.filter((apt: any) => 
+      new Date(apt.date).toDateString() === new Date().toDateString()
+    ).length
+  };
+  
+  res.json({
+    success: true,
+    message: 'Admin unified appointments retrieved successfully',
+    data: {
+      appointments: filteredAppointments,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      },
+      stats
+    }
+  });
+});
+
+// Quick update appointment (time/notes only - lightweight operation)
+export const quickUpdateAppointment = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { timeSlot, notes, duration } = req.body;
+  
+  // Validate appointment ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw createValidationError('id', 'Invalid appointment ID');
+  }
+  
+  // Find appointment
+  const appointment = await (Appointment as any).findById(id);
+  if (!appointment) {
+    throw createNotFoundError('Appointment');
+  }
+  
+  // Authorization: Doctors can only update their own appointments, admins can update all
+  if (req.user.role !== 'admin' && appointment.dentistId.toString() !== req.user._id.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: 'You can only update your own appointments'
+    });
+  }
+  
+  // Store original values for audit
+  const originalTimeSlot = appointment.timeSlot;
+  const originalNotes = appointment.notes;
+  
+  // Update fields
+  if (timeSlot) {
+    // Validate time slot format
+    if (!isValidTimeSlot(timeSlot)) {
+      throw createValidationError('timeSlot', 'Invalid time slot format. Use HH:MM format');
+    }
+    appointment.timeSlot = timeSlot;
+  }
+  
+  if (notes !== undefined) {
+    appointment.notes = notes;
+  }
+  
+  if (duration) {
+    appointment.duration = duration;
+  }
+  
+  // Add modification history
+  if (!appointment.modificationHistory) {
+    appointment.modificationHistory = [];
+  }
+  
+  appointment.modificationHistory.push({
+    modifiedBy: req.user._id,
+    modifiedAt: new Date(),
+    changes: {
+      timeSlot: { from: originalTimeSlot, to: timeSlot },
+      notes: { from: originalNotes, to: notes }
+    }
+  });
+  
+  appointment.lastModifiedBy = req.user._id;
+  
+  await appointment.save();
+  
+  // Populate for response
+  const updatedAppointment = await (Appointment as any).findById(id)
+    .populate('patientId', 'firstName lastName email phone')
+    .populate('clinicId', 'name address')
+    .populate('dentistId', 'firstName lastName')
+    .populate('lastModifiedBy', 'firstName lastName');
+  
+  res.json({
+    success: true,
+    message: 'Appointment updated successfully',
+    data: { appointment: updatedAppointment }
+  });
+});
+
+// Cancel appointment with automatic notification
+export const cancelAppointmentWithNotification = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { cancellationReason, notifyPatient = true } = req.body;
+  
+  // Validate appointment ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw createValidationError('id', 'Invalid appointment ID');
+  }
+  
+  // Find appointment
+  const appointment = await (Appointment as any).findById(id)
+    .populate('patientId', 'firstName lastName email phone userId')
+    .populate('clinicId', 'name address phone')
+    .populate('dentistId', 'firstName lastName');
+  
+  if (!appointment) {
+    throw createNotFoundError('Appointment');
+  }
+  
+  // Authorization check
+  if (req.user.role !== 'admin' && appointment.dentistId._id.toString() !== req.user._id.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: 'You can only cancel your own appointments'
+    });
+  }
+  
+  // Check if already cancelled
+  if (appointment.status === 'cancelled') {
+    return res.status(400).json({
+      success: false,
+      message: 'Appointment is already cancelled'
+    });
+  }
+  
+  // Update appointment
+  appointment.status = 'cancelled';
+  appointment.cancellationReason = cancellationReason || 'Cancelled by staff';
+  appointment.lastModifiedBy = req.user._id;
+  
+  // Add to modification history
+  if (!appointment.modificationHistory) {
+    appointment.modificationHistory = [];
+  }
+  
+  appointment.modificationHistory.push({
+    modifiedBy: req.user._id,
+    modifiedAt: new Date(),
+    changes: {
+      status: { from: appointment.status, to: 'cancelled' },
+      cancellationReason: cancellationReason
+    }
+  });
+  
+  await appointment.save();
+  
+  // Send notifications if requested
+  const notifications = {
+    email: false,
+    sms: false,
+    inApp: false
+  };
+  
+  if (notifyPatient) {
+    const patient = appointment.patientId;
+    const clinic = appointment.clinicId;
+    const dentist = appointment.dentistId;
+    
+    // Send email notification
+    if (patient.email) {
+      try {
+        await sendAppointmentCancellationEmail(
+          patient.email,
+          `${patient.firstName} ${patient.lastName}`,
+          {
+            date: new Date(appointment.date).toLocaleDateString(),
+            time: appointment.timeSlot,
+            reason: cancellationReason || 'Cancelled by clinic'
+          }
+        );
+        notifications.email = true;
+      } catch (error) {
+        console.error('Failed to send cancellation email:', error);
+      }
+    }
+    
+    // Send SMS notification
+    if (patient.phone) {
+      try {
+        await sendAppointmentCancellationSMS(
+          patient.phone,
+          `${patient.firstName} ${patient.lastName}`,
+          {
+            date: new Date(appointment.date).toLocaleDateString(),
+            time: appointment.timeSlot,
+            clinic: clinic.name
+          }
+        );
+        notifications.sms = true;
+      } catch (error) {
+        console.error('Failed to send cancellation SMS:', error);
+      }
+    }
+    
+    // Create in-app notification
+    if (patient.userId) {
+      try {
+        await (Notification as any).create({
+          userId: patient.userId,
+          type: 'appointment_cancellation',
+          title: 'Appointment Cancelled',
+          message: `Your appointment on ${new Date(appointment.date).toLocaleDateString()} at ${appointment.timeSlot} has been cancelled. Reason: ${cancellationReason || 'Cancelled by clinic'}`,
+          link: `/appointments/${appointment._id}`,
+          metadata: {
+            appointmentId: appointment._id,
+            clinicId: clinic._id,
+            reason: cancellationReason
+          }
+        });
+        notifications.inApp = true;
+      } catch (error) {
+        console.error('Failed to create in-app notification:', error);
+      }
+    }
+    
+    // Cancel any scheduled reminders
+    try {
+      await cancelAppointmentReminders(appointment);
+    } catch (error) {
+      console.error('Failed to cancel appointment reminders:', error);
+    }
+  }
+  
+  res.json({
+    success: true,
+    message: 'Appointment cancelled successfully',
+    data: {
+      appointment,
+      notificationsSent: notifications
+    }
+  });
+});
+
+// Reschedule appointment with conflict checking
+export const rescheduleAppointmentEnhanced = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { newDate, newTimeSlot, newDuration = 60, reason } = req.body;
+  
+  // Validate appointment ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw createValidationError('id', 'Invalid appointment ID');
+  }
+  
+  // Validate required fields
+  if (!newDate || !newTimeSlot) {
+    throw createValidationError('newDate/newTimeSlot', 'New date and time slot are required');
+  }
+  
+  // Find appointment
+  const appointment = await (Appointment as any).findById(id)
+    .populate('patientId', 'firstName lastName email phone userId')
+    .populate('clinicId', 'name address phone operatingHours')
+    .populate('dentistId', 'firstName lastName');
+  
+  if (!appointment) {
+    throw createNotFoundError('Appointment');
+  }
+  
+  // Authorization check
+  if (req.user.role !== 'admin' && appointment.dentistId._id.toString() !== req.user._id.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: 'You can only reschedule your own appointments'
+    });
+  }
+  
+  // Store original values
+  const originalDate = appointment.date;
+  const originalTimeSlot = appointment.timeSlot;
+  
+  // Validate new date is not in the past
+  const appointmentDate = new Date(newDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  if (appointmentDate < today) {
+    throw createValidationError('newDate', 'Cannot reschedule to a past date');
+  }
+  
+  // Check for conflicts
+  const conflicts = await (Appointment as any).find({
+    _id: { $ne: id },
+    dentistId: appointment.dentistId._id,
+    clinicId: appointment.clinicId._id,
+    date: appointmentDate,
+    status: { $in: ['scheduled', 'confirmed'] }
+  });
+  
+  // Check if new time slot conflicts with existing appointments
+  const hasConflict = conflicts.some((existingApt: any) => {
+    const [existingHour, existingMin] = existingApt.timeSlot.split(':').map(Number);
+    const [newHour, newMin] = newTimeSlot.split(':').map(Number);
+    
+    const existingStart = existingHour * 60 + existingMin;
+    const existingEnd = existingStart + existingApt.duration;
+    const newStart = newHour * 60 + newMin;
+    const newEnd = newStart + newDuration;
+    
+    return (newStart < existingEnd && newEnd > existingStart);
+  });
+  
+  if (hasConflict) {
+    throw createConflictError('The new time slot conflicts with an existing appointment');
+  }
+  
+  // Update appointment
+  appointment.date = appointmentDate;
+  appointment.timeSlot = newTimeSlot;
+  appointment.duration = newDuration;
+  appointment.lastModifiedBy = req.user._id;
+  
+  // Add to modification history
+  if (!appointment.modificationHistory) {
+    appointment.modificationHistory = [];
+  }
+  
+  appointment.modificationHistory.push({
+    modifiedBy: req.user._id,
+    modifiedAt: new Date(),
+    changes: {
+      date: { from: originalDate, to: newDate },
+      timeSlot: { from: originalTimeSlot, to: newTimeSlot },
+      reason: reason || 'Rescheduled'
+    }
+  });
+  
+  await appointment.save();
+  
+  // Send notification to patient
+  const patient = appointment.patientId;
+  const clinic = appointment.clinicId;
+  const dentist = appointment.dentistId;
+  
+  const notifications = {
+    email: false,
+    sms: false,
+    inApp: false
+  };
+  
+  // Email notification
+  if (patient.email) {
+    try {
+      await sendAppointmentConfirmationEmail(
+        patient.email,
+        `${patient.firstName} ${patient.lastName}`,
+        {
+          date: appointmentDate.toLocaleDateString(),
+          time: newTimeSlot,
+          dentist: `Dr. ${dentist.firstName} ${dentist.lastName}`,
+          clinic: clinic.name,
+          service: appointment.serviceType
+        }
+      );
+      notifications.email = true;
+    } catch (error) {
+      console.error('Failed to send rescheduling email:', error);
+    }
+  }
+  
+  // In-app notification
+  if (patient.userId) {
+    try {
+      await (Notification as any).create({
+        userId: patient.userId,
+        type: 'appointment_confirmation',
+        title: 'Appointment Rescheduled',
+        message: `Your appointment has been rescheduled to ${appointmentDate.toLocaleDateString()} at ${newTimeSlot}`,
+        link: `/appointments/${appointment._id}`,
+        metadata: {
+          appointmentId: appointment._id,
+          clinicId: clinic._id,
+          oldDate: originalDate,
+          newDate: appointmentDate
+        }
+      });
+      notifications.inApp = true;
+    } catch (error) {
+      console.error('Failed to create in-app notification:', error);
+    }
+  }
+  
+  // Reschedule reminders
+  try {
+    await cancelAppointmentReminders(appointment);
+    await scheduleAppointmentReminders(appointment, patient, dentist, clinic);
+  } catch (error) {
+    console.error('Failed to reschedule appointment reminders:', error);
+  }
+  
+  res.json({
+    success: true,
+    message: 'Appointment rescheduled successfully',
+    data: {
+      appointment,
+      notificationsSent: notifications
+    }
+  });
+});
+
+// ==================== END UNIFIED DASHBOARD ENDPOINTS ====================
+
 export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Response) => {
   const { date, timeSlot, dentistId, clinicId, excludeAppointmentId, duration = 60 } = req.query;
 
@@ -1664,7 +2238,7 @@ export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Re
     // If no dentistId provided, check for conflicts across all dentists in the clinic
     if (!effectiveDentistId) {
       // First validate the clinic exists
-      const clinic = await Clinic.findById(clinicId);
+      const clinic = await (Clinic as any).findById(clinicId);
       if (!clinic) {
         return res.status(404).json({
           success: false,
@@ -1697,7 +2271,7 @@ export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Re
       // Check conflicts for all dentists and return the most relevant ones
       const allConflicts = await Promise.all(
         dentists.map(dentist =>
-          Appointment.findConflicts(
+          (Appointment as any).findConflicts(
             dentist._id.toString(),
             appointmentDate,
             timeSlot as string,
@@ -1726,7 +2300,7 @@ export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Re
     }
 
     // Check for conflicts with the specific dentist
-    const conflicts = await Appointment.findConflicts(
+    const conflicts = await (Appointment as any).findConflicts(
       effectiveDentistId,
       appointmentDate,
       timeSlot as string,
@@ -1735,7 +2309,7 @@ export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Re
     );
 
     // Populate patient data for conflicts
-    const populatedConflicts = await Appointment.populate(conflicts, [
+    const populatedConflicts = await (Appointment as any).populate(conflicts, [
       { path: 'patientId', select: 'firstName lastName' }
     ]);
 
@@ -1760,4 +2334,64 @@ export const checkAppointmentConflicts = catchAsync(async (req: Request, res: Re
       error: error.message
     });
   }
+});
+
+// @desc    Get booked time slots for a specific date and clinic/doctor
+// @route   GET /api/v1/appointments/booked-slots
+// @access  Public (to allow patients to see availability)
+export const getBookedSlots = catchAsync(async (req: Request, res: Response) => {
+  const { date, clinicId, doctorId } = req.query;
+
+  // Validate required parameters
+  if (!date || !clinicId) {
+    throw createValidationError('date/clinicId', 'Date and clinic ID are required');
+  }
+
+  // Validate date format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date as string)) {
+    throw createValidationError('date', 'Date must be in YYYY-MM-DD format');
+  }
+
+  // Validate clinic ID
+  if (!mongoose.Types.ObjectId.isValid(clinicId as string)) {
+    throw createValidationError('clinicId', 'Invalid clinic ID');
+  }
+
+  // Build query
+  const query: any = {
+    clinicId,
+    date: new Date(date as string),
+    status: { $in: ['scheduled', 'confirmed'] } // Only count scheduled/confirmed appointments
+  };
+
+  // Optionally filter by doctor
+  if (doctorId) {
+    if (!mongoose.Types.ObjectId.isValid(doctorId as string)) {
+      throw createValidationError('doctorId', 'Invalid doctor ID');
+    }
+    query.dentistId = doctorId;
+  }
+
+  // Find all booked appointments for this date/clinic/doctor
+  const bookedAppointments = await Appointment.find(query)
+    .select('timeSlot duration')
+    .lean();
+
+  // Extract booked time slots (just the start times)
+  const bookedSlots = bookedAppointments.map(apt => apt.timeSlot);
+
+  // Return unique booked slots
+  const uniqueBookedSlots = [...new Set(bookedSlots)];
+
+  res.status(200).json({
+    success: true,
+    data: {
+      date: date as string,
+      clinicId: clinicId as string,
+      doctorId: doctorId as string || null,
+      bookedSlots: uniqueBookedSlots,
+      count: uniqueBookedSlots.length
+    }
+  });
 });

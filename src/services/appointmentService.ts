@@ -558,6 +558,63 @@ class AppointmentService {
       throw error;
     }
   }
+
+  /**
+   * Get booked time slots for a specific date and clinic/doctor
+   * @param date - Date in YYYY-MM-DD format
+   * @param clinicId - Clinic ID
+   * @param doctorId - Optional doctor ID for filtering
+   * @returns Array of booked time slots in HH:MM format
+   */
+  async getBookedSlots(date: string, clinicId: string, doctorId?: string): Promise<string[]> {
+    try {
+      // Validate parameters
+      if (!date || !clinicId) {
+        console.error('Missing required parameters for booked slots:', { date, clinicId });
+        return [];
+      }
+
+      // Validate date format
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        console.error('Invalid date format:', date);
+        return [];
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+      try {
+        const params: any = { date, clinicId };
+        if (doctorId) {
+          params.doctorId = doctorId;
+        }
+
+        const response = await api.get('/api/v1/appointments/booked-slots', {
+          params,
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        console.log('Booked slots response:', response.data);
+
+        return response.data.data?.bookedSlots || [];
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          console.warn('Booked slots request timed out');
+          return [];
+        }
+
+        console.error('API request for booked slots failed:', fetchError);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error getting booked slots:', error);
+      return [];
+    }
+  }
 }
 
 export const appointmentService = new AppointmentService();

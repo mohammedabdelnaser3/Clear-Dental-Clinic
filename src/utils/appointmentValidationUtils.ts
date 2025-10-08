@@ -9,6 +9,7 @@ export interface AppointmentFormData {
   notes: string;
   emergency: boolean;
   patientSearch?: string;
+  clinicId?: string;
 }
 
 export interface ValidationResult {
@@ -40,6 +41,10 @@ export const validateAppointmentForm = (
   if (!currentStep || currentStep === 'service') {
     if (!data.service) {
       errors.service = t('appointmentForm.error_selectService');
+    }
+    // Validate clinic selection for multi-branch system
+    if (!data.clinicId) {
+      errors.clinicId = t('appointmentForm.error_clinicRequired') || 'Please select a clinic';
     }
   }
   

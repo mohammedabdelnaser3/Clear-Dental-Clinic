@@ -11,6 +11,7 @@ import { connectDB } from "./config/database";
 import routes from "./routes";
 import { errorHandler, notFound, AppError } from "./middleware/errorHandler";
 import { testEmailConfiguration } from "./utils/email";
+import { Server } from 'socket.io';
 
 // Create Express app
 const app = express();
@@ -205,5 +206,33 @@ if (process.env.NODE_ENV === "development") {
 		console.warn("⚠️  Email configuration test failed:", err.message);
 	});
 }
+
+const server = app.listen(process.env.PORT || 5000, () => {
+	console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
+  path: '/socket.io',
+  transports: ['websocket', 'polling'],
+  pingTimeout: 10000,
+  pingInterval: 5000
+});
+
+io.on('connection', (socket) => {
+  console.info('🔌 Client connected:', socket.id);
+  
+  socket.on('disconnect', (reason) => {
+    console.info('🔌 Client disconnected:', socket.id, reason);
+  });
+
+  socket.on('error', (error) => {
+    console.error('🔌 Socket error:', error);
+  });
+});
 
 export default app;

@@ -1,5 +1,6 @@
 import api from './api';
-import type { User, PaginatedResponse } from '../types';
+import type { User, ApiResponse, PaginatedResponse } from '../types';
+import { createSafeApiParams } from '../utils/clinicUtils';
 
 export interface UpdateProfileData {
   firstName?: string;
@@ -18,11 +19,6 @@ export interface UpdateProfileData {
   bio?: string;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
-}
 
 export interface TokenValidationResult {
   isValid: boolean;
@@ -110,6 +106,9 @@ export const checkUserPermission = (user: User | null, requiredRole?: string, re
 export const updateProfile = async (profileData: UpdateProfileData): Promise<User> => {
   try {
     const response = await api.put<ApiResponse<{ user: User }>>('/auth/profile', profileData);
+    if (!response.data?.data?.user) {
+      throw new Error('Invalid response from server');
+    }
     return response.data.data.user;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to update profile';
@@ -128,6 +127,9 @@ export const uploadProfileImage = async (file: File): Promise<{ profileImage: st
         'Content-Type': 'multipart/form-data',
       },
     });
+    if (!response.data?.data) {
+      throw new Error('Invalid response from server');
+    }
     return response.data.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to upload profile image';
@@ -146,10 +148,9 @@ export const getUsersByRole = async (role: string, params?: {
     
     if (role === 'dentist') {
       // Use dedicated dentists endpoint
+      const safeParams = createSafeApiParams(params?.clinicId);
       const response = await api.get('/api/v1/users/dentists', {
-        params: {
-          clinicId: params?.clinicId
-        }
+        params: safeParams
       });
       
       console.log('Dentist API response:', {
@@ -169,24 +170,20 @@ export const getUsersByRole = async (role: string, params?: {
           success: true,
           data: [],
           message: `No dentists available for this clinic. Please contact administration to assign dentists.`,
-          pagination: {
-            page: 1,
-            limit: 0,
-            total: 0,
-            totalPages: 1
-          }
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 1
         };
       }
       
       return {
         success: true,
         data: dentists,
-        pagination: {
-          page: 1,
-          limit: dentists.length,
-          total: dentists.length,
-          totalPages: 1
-        }
+        page: 1,
+        limit: dentists.length,
+        total: dentists.length,
+        totalPages: 1
       };
     } else {
       // Use general users endpoint for other roles
@@ -216,12 +213,10 @@ export const getUsersByRole = async (role: string, params?: {
           success: false,
           data: [],
           message: `No ${role}s available for this clinic. Please contact administration.`,
-          pagination: {
-            page: 1,
-            limit: 0,
-            total: 0,
-            totalPages: 1
-          }
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 1
         };
       } else {
         throw new Error('Authentication failed. Please log in again.');
@@ -231,12 +226,10 @@ export const getUsersByRole = async (role: string, params?: {
         success: true,
         data: [],
         message: `No ${role}s found.`,
-        pagination: {
-          page: 1,
-          limit: 0,
-          total: 0,
-          totalPages: 1
-        }
+        page: 1,
+        limit: 0,
+        total: 0,
+        totalPages: 1
       };
     }
     

@@ -39,7 +39,7 @@ const dentistData: DentistData[] = [
 export const createDentistUsers = async (): Promise<void> => {
   try {
     // Get the first clinic to assign dentists to
-    const clinic = await Clinic.findOne();
+    const clinic = await (Clinic as any).findOne();
     if (!clinic) {
       console.log('❌ No clinic found. Cannot assign dentists.');
       return;

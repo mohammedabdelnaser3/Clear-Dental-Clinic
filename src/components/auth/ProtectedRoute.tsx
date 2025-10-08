@@ -19,7 +19,7 @@ const ProtectedRoute = memo<ProtectedRouteProps>(({ children, requiredRole }) =>
     const hasRequiredRole = !requiredRole || user?.role === requiredRole || user?.role === 'admin';
     
     // Only log in development mode and for important state changes
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('🛡️ ProtectedRoute auth status:', {
         path: location.pathname,
         isInitialized,

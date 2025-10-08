@@ -52,19 +52,22 @@ export interface Prescription {
 }
 
 export interface CreatePrescriptionData {
-  patient: string;
-  appointment?: string;
+  patientId: string;
+  clinicId: string;
+  appointmentId?: string;
   medications: Array<{
-    medication: string;
+    medicationId: string;
     dosage: string;
     frequency: string;
     duration: string;
     instructions?: string;
+    startDate: string;
+    endDate?: string;
   }>;
-  diagnosis?: string;
+  diagnosis: string;
   notes?: string;
   expiryDate: string;
-  maxRefills: number;
+  refillsAllowed: number;
 }
 
 export interface UpdatePrescriptionData extends Partial<CreatePrescriptionData> {
@@ -172,6 +175,35 @@ class PrescriptionService {
   async deletePrescription(id: string) {
     const response = await api.delete(`${this.baseURL}/${id}`);
     return response;
+  }
+
+  // Get current user's prescriptions (for patients)
+  async getMyPrescriptions(filters: PrescriptionFilters = {}) {
+    const params = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value.toString());
+      }
+    });
+
+    try {
+      const response = await api.get(`${this.baseURL}/my-prescriptions?${params.toString()}`);
+      return response;
+    } catch (error: any) {
+      if (error.response && error.response.status === 403) {
+        return {
+          data: {
+            prescriptions: [],
+            totalRecords: 0,
+            totalPages: 0,
+            currentPage: 1
+          },
+          message: 'Access to prescriptions is restricted. Please contact an administrator for assistance.'
+        };
+      }
+      throw error;
+    }
   }
 
   // Get prescriptions by patient

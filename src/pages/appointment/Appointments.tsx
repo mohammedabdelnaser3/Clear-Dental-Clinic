@@ -89,7 +89,12 @@ const Appointments: React.FC = () => {
         // For patients, use the general endpoint with patientId parameter
         params.patientId = patientId;
         response = await appointmentService.getAppointments(params);
-      } else if (user?.role && ['staff', 'dentist', 'admin', 'super_admin'].includes(user.role)) {
+      } else if (user?.role === 'dentist') {
+        // For dentists, filter by their dentist ID (using user ID as dentist ID)
+        params.dentistId = user.id;
+        console.log('🔍 Filtering appointments for dentist:', user.id, 'with params:', params);
+        response = await appointmentService.getAppointments(params);
+      } else if (user?.role && ['staff', 'admin', 'super_admin'].includes(user.role)) {
         // For staff/admin, use the general appointments endpoint
         response = await appointmentService.getAppointments(params);
       } else {
@@ -104,15 +109,15 @@ const Appointments: React.FC = () => {
         return rawAppointments.map((appointment: any) => ({
           ...appointment,
           id: appointment._id || appointment.id, // Ensure id field exists
-          patientName: typeof appointment.patientId === 'object' 
-            ? `${appointment.patientId.firstName} ${appointment.patientId.lastName}`
-            : appointment.patientName,
-          dentistName: typeof appointment.dentistId === 'object' 
-            ? `${appointment.dentistId.firstName} ${appointment.dentistId.lastName}`
+          patientName: typeof appointment.patientId === 'object' && appointment.patientId
+            ? `${appointment.patientId.firstName || ''} ${appointment.patientId.lastName || ''}`.trim() || 'Unknown Patient'
+            : appointment.patientName || 'Unknown Patient',
+          dentistName: typeof appointment.dentistId === 'object' && appointment.dentistId
+            ? `${appointment.dentistId.firstName || ''} ${appointment.dentistId.lastName || ''}`.trim() || 'Auto-assigned'
             : appointment.dentistName || 'Auto-assigned',
-          clinicName: typeof appointment.clinicId === 'object' 
-            ? appointment.clinicId.name 
-            : appointment.clinicName,
+          clinicName: typeof appointment.clinicId === 'object' && appointment.clinicId
+            ? appointment.clinicId.name || 'Unknown Clinic'
+            : appointment.clinicName || 'Unknown Clinic',
         }));
       };
 
@@ -253,7 +258,7 @@ const Appointments: React.FC = () => {
 
   const formatDate = (date: Date | string) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString(i18n.language, {
+    return dateObj.toLocaleDateString(i18n?.language || 'en', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -438,7 +443,10 @@ const Appointments: React.FC = () => {
                 {t('appointments.title')}
               </h1>
               <p className="text-blue-100 text-lg">
-                {t('appointments.description')}
+                {user?.role === 'dentist' 
+                  ? t('appointments.descriptionDoctor') || 'Your scheduled appointments'
+                  : t('appointments.description')
+                }
               </p>
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
@@ -447,6 +455,14 @@ const Appointments: React.FC = () => {
                   </svg>
                   <span>{totalCount} {t('appointments.total')}</span>
                 </div>
+                {user?.role === 'dentist' && (
+                  <div className="flex items-center space-x-2 bg-green-400/20 text-green-100 rounded-full px-3 py-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                    <span>{t('appointments.myAppointments') || 'My Appointments'}</span>
+                  </div>
+                )}
                 {selectedAppointments.length > 0 && (
                   <div className="flex items-center space-x-2 bg-yellow-400/20 text-yellow-100 rounded-full px-3 py-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

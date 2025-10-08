@@ -2,7 +2,8 @@ import mongoose, { Schema, Model } from 'mongoose';
 import { IAppointment, IAppointmentModel } from '../types';
 import Clinic from './Clinic'; // Import Clinic model to access operating hours
 
-const appointmentSchema = new Schema<IAppointment>({
+// Use a broad schema typing to accommodate extended fields present in the schema
+const appointmentSchema = new Schema<any>({
   patientId: {
     type: Schema.Types.ObjectId,
     ref: 'Patient',
@@ -101,7 +102,57 @@ const appointmentSchema = new Schema<IAppointment>({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  // Enhanced fields for unified dashboard
+  lastModifiedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  modificationHistory: [{
+    modifiedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    modifiedAt: {
+      type: Date,
+      required: true,
+      default: Date.now
+    },
+    changes: {
+      type: Schema.Types.Mixed,
+      required: true
+    }
+  }],
+  cancellationReason: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Cancellation reason cannot exceed 500 characters']
+  },
+  notificationsSent: [{
+    type: {
+      type: String,
+      enum: ['24h', '1h', '15min', 'confirmation', 'cancellation', 'rescheduling'],
+      required: true
+    },
+    sentAt: {
+      type: Date,
+      required: true,
+      default: Date.now
+    },
+    channels: {
+      type: [{
+        type: String,
+        enum: ['email', 'sms', 'inApp']
+      }],
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ['sent', 'failed', 'delivered', 'pending'],
+      default: 'sent'
+    }
+  }]
 }, {
   timestamps: true,
   toJSON: {
@@ -130,6 +181,10 @@ appointmentSchema.index({ createdAt: 1 });
 appointmentSchema.index({ clinicId: 1, date: 1, status: 1 });
 appointmentSchema.index({ patientId: 1, status: 1, date: 1 });
 appointmentSchema.index({ dentistId: 1, status: 1, date: 1 });
+
+// Enhanced indexes for unified dashboard
+appointmentSchema.index({ dentistId: 1, clinicId: 1, date: 1 }); // Compound index for cross-clinic doctor view
+appointmentSchema.index({ lastModifiedBy: 1, createdAt: -1 }); // Index for audit trail
 
 // Virtual for appointment end time
 appointmentSchema.virtual('endTime').get(function(this: any) {
@@ -241,7 +296,8 @@ appointmentSchema.statics.findConflicts = function(dentistId: string, date: Date
 // Static method to get available time slots
 appointmentSchema.statics.getAvailableTimeSlots = async function(dentistId: string, date: Date, duration: number = 30) {
   try {
-    const appointmentModel = this as IAppointmentModel;
+    // Cast through unknown to satisfy TS where static `this` is typed as generic Model
+    const appointmentModel = (this as unknown) as IAppointmentModel;
     
     // Find the dentist to get their assigned clinic
     const dentist = await mongoose.model('User').findById(dentistId).populate('assignedClinics');
@@ -252,7 +308,7 @@ appointmentSchema.statics.getAvailableTimeSlots = async function(dentistId: stri
 
     // For simplicity, we'll use the first assigned clinic's operating hours.
     // A more complex system might check schedules for a specific clinic if a dentist works at multiple.
-    const clinic = await Clinic.findById(dentist.assignedClinics[0]);
+    const clinic = await (Clinic as any).findById(dentist.assignedClinics[0]);
     if (!clinic || !clinic.operatingHours) {
       console.warn(`Clinic or operating hours not found for dentist: ${dentistId}`);
       return []; // No slots if clinic hours aren't defined
@@ -328,7 +384,7 @@ appointmentSchema.statics.getAvailableTimeSlots = async function(dentistId: stri
 appointmentSchema.statics.getNextSlotAfterLastBooking = async function(clinicId: string, date: Date, duration: number = 30) {
   try {
     // Get clinic operating hours
-    const clinic = await Clinic.findById(clinicId);
+    const clinic = await (Clinic as any).findById(clinicId);
     if (!clinic || !clinic.operatingHours) {
       console.warn(`Clinic or operating hours not found: ${clinicId}`);
       return null;

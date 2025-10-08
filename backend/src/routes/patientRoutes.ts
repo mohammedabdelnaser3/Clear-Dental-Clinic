@@ -8,9 +8,18 @@ import {
   searchPatients,
   getPatientMedicalHistory,
   updatePatientMedicalHistory,
-  getPatientsByUserId
+  getPatientsByUserId,
+  getRecentPatients,
+  getPatientStatistics
 } from '../controllers/patientController';
 import { getPatientMedications } from '../controllers/medicationController';
+import { 
+  getPatientReports, 
+  createPatientReport, 
+  updatePatientReport, 
+  deletePatientReport, 
+  getPatientReportById 
+} from '../controllers/patientReportController';
 import {
   authenticate,
   staffOrAdmin,
@@ -83,8 +92,33 @@ router.get('/user/:userId', userOwnerOrStaff('userId'), [
   ...validatePagination.slice(0, -1)
 ], handleValidationErrors, getPatientsByUserId);
 
-// Note: Statistics, recent patients, and clinic-specific routes commented out
-// until corresponding controller methods are implemented
+// Get recent patients
+router.get('/recent', staffOrAdmin, [
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100')
+], handleValidationErrors, getRecentPatients);
+
+// Get patient statistics
+router.get('/statistics', staffOrAdmin, [
+  query('clinicId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid clinic ID'),
+  query('startDate')
+    .optional()
+    .isISO8601()
+    .withMessage('Start date must be a valid date'),
+  query('endDate')
+    .optional()
+    .isISO8601()
+    .withMessage('End date must be a valid date')
+], handleValidationErrors, getPatientStatistics);
 
 // Get patient by ID (staff/admin or patient themselves)
 router.get('/:id', patientOwnerOrStaff('id'), [
@@ -188,6 +222,87 @@ router.put('/:id/medical-history', dentistOrAdmin, [
     .withMessage('Current medications must be an array')
 ], handleValidationErrors, updatePatientMedicalHistory);
 
-// Note: Additional routes commented out until corresponding controller methods are implemented
+// Patient reports routes
+// Get patient reports
+router.get('/:id/reports', patientOwnerOrStaff('id'), [
+  ...createMongoIdValidation('id'),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100'),
+  query('search')
+    .optional()
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage('Search term must be at least 2 characters')
+], handleValidationErrors, getPatientReports);
+
+// Create patient report
+router.post('/:id/reports', dentistOrAdmin, [
+  ...createMongoIdValidation('id'),
+  body('title')
+    .notEmpty()
+    .trim()
+    .isLength({ min: 2, max: 200 })
+    .withMessage('Title must be between 2 and 200 characters'),
+  body('description')
+    .notEmpty()
+    .trim()
+    .isLength({ min: 10, max: 2000 })
+    .withMessage('Description must be between 10 and 2000 characters'),
+  body('date')
+    .optional()
+    .isISO8601()
+    .withMessage('Date must be a valid date'),
+  body('attachments')
+    .optional()
+    .isArray()
+    .withMessage('Attachments must be an array'),
+  body('isShared')
+    .optional()
+    .isBoolean()
+    .withMessage('isShared must be a boolean')
+], handleValidationErrors, createPatientReport);
+
+// Get specific report by ID
+router.get('/reports/:reportId', [
+  ...createMongoIdValidation('reportId')
+], handleValidationErrors, getPatientReportById);
+
+// Update patient report
+router.put('/reports/:reportId', [
+  ...createMongoIdValidation('reportId'),
+  body('title')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 200 })
+    .withMessage('Title must be between 2 and 200 characters'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ min: 10, max: 2000 })
+    .withMessage('Description must be between 10 and 2000 characters'),
+  body('date')
+    .optional()
+    .isISO8601()
+    .withMessage('Date must be a valid date'),
+  body('attachments')
+    .optional()
+    .isArray()
+    .withMessage('Attachments must be an array'),
+  body('isShared')
+    .optional()
+    .isBoolean()
+    .withMessage('isShared must be a boolean')
+], handleValidationErrors, updatePatientReport);
+
+// Delete patient report
+router.delete('/reports/:reportId', [
+  ...createMongoIdValidation('reportId')
+], handleValidationErrors, deletePatientReport);
 
 export default router;

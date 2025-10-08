@@ -1,48 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, Card, Table, Pagination, Badge } from '../../components/ui';
+import { Button, Card, Table, Pagination, Badge } from '../../components/ui';
+import { AnalyticsWidget } from '../../components/dashboard';
+import PatientSearch, { type PatientSearchFilters } from '../../components/patient/PatientSearch';
 import { patientService } from '../../services';
 import { useAuth } from '../../hooks/useAuth';
 import { formatLocalizedDate } from '../../utils/dateUtils';
 import type { PaginatedResponse, Patient } from '../../types';
+import {
+  Users,
+  UserPlus,
+  UserCheck,
+  UserX,
+  Download,
+  Filter,
+  Grid,
+  List,
+  Plus,
+  Trash2,
+  RefreshCw,
+  CheckCircle,
+  Clock
+} from 'lucide-react';
 
 const Patients: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchFilters, setSearchFilters] = useState<PatientSearchFilters>({
+    search: '',
+    ageRange: 'all',
+    gender: 'all',
+    status: 'all',
+    hasAllergies: 'all',
+    sortBy: 'lastName',
+    sortOrder: 'asc'
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [patientsData, setPatientsData] = useState<PaginatedResponse<Patient>>({ data: [], total: 0, page: 1, limit: 10, totalPages: 0, success: true });
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [showFilters, setShowFilters] = useState(false);
 
   const isPatient = user?.role === 'patient';
   const isStaffOrAdmin = user?.role === 'staff' || user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'dentist';
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      setLoading(true);
-      try {
-        const params: any = { search: searchTerm, page: currentPage, limit: patientsPerPage };
-        
-        // If user is a patient, only fetch their own data
-        if (isPatient && user?.id) {
-          params.patientId = user.id;
-        }
-        
-        const response = await patientService.getPatients(params);
-        setPatientsData(response);
-      } catch (err: any) {
-          console.error('Failed to fetch patients:', err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPatients();
-  }, [searchTerm, currentPage, user?.id, isPatient]);
+  // Patient statistics
+  const patientStats = useMemo(() => {
+    const patients = patientsData.data;
+    const totalPatients = patientsData.total;
+    const activePatients = patients.filter(p => p.isActive).length;
+    const inactivePatients = patients.filter(p => !p.isActive).length;
+    const newThisMonth = patients.filter(p => {
+      const createdDate = new Date(p.createdAt);
+      const now = new Date();
+      return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
+    }).length;
 
-  const patientsPerPage = 10;
+    return {
+      total: totalPatients,
+      active: activePatients,
+      inactive: inactivePatients,
+      newThisMonth,
+      activePercentage: totalPatients > 0 ? Math.round((activePatients / totalPatients) * 100) : 0
+    };
+  }, [patientsData]);
+
+  // Fetch patients with advanced filtering
+  const fetchPatients = useCallback(async (refresh = false) => {
+    if (refresh) setRefreshing(true);
+    else setLoading(true);
+    
+    try {
+      const params: any = { 
+        search: searchFilters.search, 
+        page: currentPage, 
+        limit: 10,
+        sortBy: searchFilters.sortBy,
+        sortOrder: searchFilters.sortOrder
+      };
+      
+      // Add advanced filters
+      if (searchFilters.status !== 'all') {
+        params.status = searchFilters.status;
+      }
+      if (searchFilters.gender !== 'all') {
+        params.gender = searchFilters.gender;
+      }
+      if (searchFilters.ageRange !== 'all') {
+        params.ageRange = searchFilters.ageRange;
+      }
+      if (searchFilters.hasAllergies !== 'all') {
+        params.hasAllergies = searchFilters.hasAllergies === 'yes';
+      }
+      
+      // If user is a patient, only fetch their own data
+      if (isPatient && user?.id) {
+        params.patientId = user.id;
+      }
+      
+      const response = await patientService.getPatients(params);
+      setPatientsData(response);
+    } catch (err: any) {
+      console.error('Failed to fetch patients:', err.message || 'Unknown error');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [searchFilters, currentPage, user?.id, isPatient]);
+
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
+
   const filteredPatients = patientsData.data; // Already filtered by API
   const totalPages = patientsData.totalPages;
   const paginatedPatients = filteredPatients;
@@ -143,91 +216,207 @@ const Patients: React.FC = () => {
   ];
 
   return (
-    <div className="py-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            {isPatient ? t('patients.my_profile') : t('patients.patients')}
-          </h1>
-          <p className="mt-1 text-sm text-gray-600">
-            {isPatient ? t('patients.view_and_manage_personal_information') : t('patients.manage_patient_records')}
-          </p>
-        </div>
-        {isStaffOrAdmin && (
-          <div className="mt-4 md:mt-0">
-            <Link to="/patients/new">
-              <Button variant="primary">
-                <svg className="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {t('patients.add_patient')}
-              </Button>
-            </Link>
-          </div>
-        )}
-      </div>
-
-      <Card>
-        {isStaffOrAdmin && (
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:w-64">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl border-b border-blue-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+            {/* Left Section */}
+            <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+                <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                  <Users className="w-8 h-8 text-white" />
                 </div>
-                <Input
-                  placeholder={t('patients.search_patients')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                  {isPatient ? t('patients.my_profile') : t('patients.patients')}
+                </h1>
+                <p className="text-blue-100/80 text-sm lg:text-base">
+                  {isPatient ? t('patients.view_and_manage_personal_information') : t('patients.manage_patient_records')}
+                </p>
+                <div className="flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
+                  <span className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>System Online</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>Last updated: {new Date().toLocaleTimeString()}</span>
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="mt-4 sm:mt-0 flex items-center space-x-2">
-              {selectedPatients.length > 0 && (
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm">
-                    <svg className="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    {t('patients.export')}
+
+            {/* Right Section */}
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => fetchPatients(true)}
+                disabled={refreshing}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : t('common.refresh')}
+              </Button>
+              
+              {isStaffOrAdmin && (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                  >
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filters
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                    <svg className="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    {t('patients.delete')}
-                  </Button>
-                </div>
+                  
+                  <div className="flex items-center bg-white/10 rounded-lg p-1">
+                    <Button
+                      variant={viewMode === 'table' ? 'primary' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('table')}
+                      className="px-2 py-1"
+                    >
+                      <List className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'grid' ? 'primary' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('grid')}
+                      className="px-2 py-1"
+                    >
+                      <Grid className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <Link to="/patients/new">
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      {t('patients.add_patient')}
+                    </Button>
+                  </Link>
+                </>
               )}
             </div>
           </div>
-        )}
+        </div>
+      </div>
 
-        <Table
-          columns={columns}
-          data={paginatedPatients}
-          keyExtractor={(patient) => patient.id}
-          isLoading={loading}
-          emptyMessage={isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
-          onRowClick={handleRowClick}
-          isSelectable={isStaffOrAdmin}
-          selectedIds={selectedPatients}
-          onSelectionChange={handleSelectionChange}
-        />
-
-        {totalPages > 1 && (
-          <div className="mt-6 flex justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Statistics Cards - Only for staff/admin */}
+        {isStaffOrAdmin && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <AnalyticsWidget
+              title="Total Patients"
+              type="metric"
+              data={[{ label: 'Total', value: patientStats.total }]}
+              icon={<Users className="w-5 h-5" />}
+              gradient="from-blue-500 to-blue-600"
+              height="h-32"
+              showLegend={false}
+            />
+            <AnalyticsWidget
+              title="Active Patients"
+              type="metric"
+              data={[{ label: 'Active', value: patientStats.active }]}
+              trend={{ value: patientStats.activePercentage, isPositive: true, period: 'of total' }}
+              icon={<UserCheck className="w-5 h-5" />}
+              gradient="from-green-500 to-green-600"
+              height="h-32"
+              showLegend={false}
+            />
+            <AnalyticsWidget
+              title="Inactive Patients"
+              type="metric"
+              data={[{ label: 'Inactive', value: patientStats.inactive }]}
+              icon={<UserX className="w-5 h-5" />}
+              gradient="from-orange-500 to-orange-600"
+              height="h-32"
+              showLegend={false}
+            />
+            <AnalyticsWidget
+              title="New This Month"
+              type="metric"
+              data={[{ label: 'New', value: patientStats.newThisMonth }]}
+              trend={{ value: 15, isPositive: true, period: 'vs last month' }}
+              icon={<UserPlus className="w-5 h-5" />}
+              gradient="from-purple-500 to-purple-600"
+              height="h-32"
+              showLegend={false}
             />
           </div>
         )}
-      </Card>
+
+        {/* Advanced Search - Only for staff/admin */}
+        {isStaffOrAdmin && showFilters && (
+          <div className="mb-6">
+            <PatientSearch
+              onSearch={setSearchFilters}
+              loading={loading}
+              totalResults={patientsData.total}
+            />
+          </div>
+        )}
+
+        {/* Main Content */}
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50">
+          {/* Bulk Actions Bar */}
+          {isStaffOrAdmin && selectedPatients.length > 0 && (
+            <div className="p-4 bg-blue-50 border-b border-blue-100 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-900">
+                    {selectedPatients.length} patient{selectedPatients.length !== 1 ? 's' : ''} selected
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-100">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="p-6">
+            <Table
+              columns={columns}
+              data={paginatedPatients}
+              keyExtractor={(patient) => patient.id}
+              isLoading={loading}
+              emptyMessage={isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
+              onRowClick={handleRowClick}
+              isSelectable={isStaffOrAdmin}
+              selectedIds={selectedPatients}
+              onSelectionChange={handleSelectionChange}
+            />
+
+            {totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };

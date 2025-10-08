@@ -68,7 +68,7 @@ const patientData: PatientData[] = [
 export const createPatientRecords = async (): Promise<void> => {
   try {
     // Get the first clinic to assign patients to
-    const clinic = await Clinic.findOne();
+    const clinic = await (Clinic as any).findOne();
     if (!clinic) {
       console.log('❌ No clinic found. Cannot assign patients.');
       return;
@@ -76,7 +76,7 @@ export const createPatientRecords = async (): Promise<void> => {
 
     for (const patientInfo of patientData) {
       // Check if patient already exists
-      const existingPatient = await Patient.findOne({ email: patientInfo.email });
+      const existingPatient = await (Patient as any).findOne({ email: patientInfo.email });
       
       if (existingPatient) {
         console.log(`✅ Patient already exists: ${patientInfo.firstName} ${patientInfo.lastName}`);

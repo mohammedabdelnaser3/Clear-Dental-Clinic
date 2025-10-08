@@ -91,7 +91,7 @@ const clinicsData: ClinicData[] = [
 export const seedClinics = async (): Promise<void> => {
   try {
     // Check if clinics already exist
-    const existingCount = await Clinic.countDocuments();
+    const existingCount = await (Clinic as any).countDocuments();
     
     if (existingCount > 0) {
       console.log(`✅ Clinics already seeded (${existingCount} clinics found)`);

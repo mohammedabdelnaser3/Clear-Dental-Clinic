@@ -1,10 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Card, Button, Input, Select, Badge } from '../../components/ui';
+import { AnalyticsWidget } from '../../components/dashboard';
 import { useAuth } from '../../hooks/useAuth';
 import { prescriptionService } from '../../services/prescriptionService';
-import { patientService } from '../../services/patientService';
+import {
+  FileText,
+  Clock,
+  RefreshCw,
+  Search,
+  Filter,
+  CheckCircle,
+  XCircle,
+  Plus,
+  Activity
+} from 'lucide-react';
 
 // Patient Prescriptions Interfaces
 interface PatientPrescription {
@@ -62,6 +73,7 @@ const Prescriptions: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PatientPrescription[]>([]);
   const [filteredPrescriptions, setFilteredPrescriptions] = useState<PatientPrescription[]>([]);
   const [prescriptionStats, setPrescriptionStats] = useState<PrescriptionStats>({
@@ -76,7 +88,7 @@ const Prescriptions: React.FC = () => {
   const [selectedPrescription, setSelectedPrescription] = useState<PatientPrescription | null>(null);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [patientId, setPatientId] = useState<string | null>(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Fetch patient's prescriptions
   const fetchPatientPrescriptions = useCallback(async () => {
@@ -86,68 +98,48 @@ const Prescriptions: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      // Get patient record linked to user
-      try {
-        const patientsResponse = await patientService.getPatientsByUserId(user.id, { page: 1, limit: 1 });
-        if (patientsResponse.data && patientsResponse.data.length > 0) {
-          const currentPatientId = patientsResponse.data[0].id;
-          setPatientId(currentPatientId);
+      // Use the new endpoint for patients to get their own prescriptions
+      const prescriptionsResponse = await prescriptionService.getMyPrescriptions({
+        limit: 100
+      });
 
-          // Fetch prescriptions for this patient
-          const prescriptionsResponse = await prescriptionService.getPrescriptionsByPatient(currentPatientId, {
-            limit: 100
-          });
-
-          let prescriptionsData = [];
-          if (prescriptionsResponse?.data?.prescriptions) {
-            prescriptionsData = prescriptionsResponse.data.prescriptions;
-          } else if (prescriptionsResponse?.data?.data) {
-            prescriptionsData = prescriptionsResponse.data.data;
-          } else if (Array.isArray(prescriptionsResponse?.data)) {
-            prescriptionsData = prescriptionsResponse.data;
-          }
-
-          setPrescriptions(prescriptionsData);
-
-          // Calculate stats
-          const stats = {
-            totalPrescriptions: prescriptionsData.length,
-            activePrescriptions: prescriptionsData.filter((p: PatientPrescription) => 
-              p.status === 'active' && new Date(p.expiryDate) > new Date()
-            ).length,
-            expiredPrescriptions: prescriptionsData.filter((p: PatientPrescription) => 
-              p.status === 'expired' || new Date(p.expiryDate) <= new Date()
-            ).length,
-            pendingRefills: prescriptionsData.filter((p: PatientPrescription) => 
-              p.status === 'active' && p.currentRefills < p.maxRefills
-            ).length
-          };
-          setPrescriptionStats(stats);
-        } else {
-          // If no patient record found, set empty state but don't show error
-          setPrescriptions([]);
-          setPrescriptionStats({
-            totalPrescriptions: 0,
-            activePrescriptions: 0,
-            expiredPrescriptions: 0,
-            pendingRefills: 0
-          });
-        }
-      } catch (patientError) {
-        console.warn('No patient record found for user');
-        // Set empty state for no patient record
-        setPrescriptions([]);
-        setPrescriptionStats({
-          totalPrescriptions: 0,
-          activePrescriptions: 0,
-          expiredPrescriptions: 0,
-          pendingRefills: 0
-        });
+      let prescriptionsData = [];
+      if (prescriptionsResponse?.data?.prescriptions) {
+        prescriptionsData = prescriptionsResponse.data.prescriptions;
+      } else if (prescriptionsResponse?.data?.data?.prescriptions) {
+        prescriptionsData = prescriptionsResponse.data.data.prescriptions;
+      } else if (prescriptionsResponse?.data?.data) {
+        prescriptionsData = prescriptionsResponse.data.data;
+      } else if (Array.isArray(prescriptionsResponse?.data)) {
+        prescriptionsData = prescriptionsResponse.data;
       }
+
+      // Ensure prescriptionsData is always an array
+      if (!Array.isArray(prescriptionsData)) {
+        prescriptionsData = [];
+      }
+
+      setPrescriptions(prescriptionsData);
+
+      // Calculate stats - ensure prescriptionsData is an array
+      const prescriptionsArray = Array.isArray(prescriptionsData) ? prescriptionsData : [];
+      const stats = {
+        totalPrescriptions: prescriptionsArray.length || 0,
+        activePrescriptions: prescriptionsArray.filter((p: PatientPrescription) => 
+          p?.status === 'active' && p?.expiryDate && new Date(p.expiryDate) > new Date()
+        ).length || 0,
+        expiredPrescriptions: prescriptionsArray.filter((p: PatientPrescription) => 
+          p?.status === 'expired' || (p?.expiryDate && new Date(p.expiryDate) <= new Date())
+        ).length || 0,
+        pendingRefills: prescriptionsArray.filter((p: PatientPrescription) => 
+          p?.status === 'active' && typeof p?.currentRefills === 'number' && typeof p?.maxRefills === 'number' && p.currentRefills < p.maxRefills
+        ).length || 0
+      };
+      setPrescriptionStats(stats);
 
     } catch (err) {
       console.error('Error fetching prescriptions:', err);
-      setError(t('prescriptions.errorLoading') || 'Failed to load prescriptions');
+      setError(t('prescriptions.errors.loading'));
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +151,7 @@ const Prescriptions: React.FC = () => {
 
   // Filter and sort prescriptions
   useEffect(() => {
-    let filtered = [...prescriptions];
+    let filtered = Array.isArray(prescriptions) ? [...prescriptions] : [];
 
     // Apply search filter
     if (searchTerm) {
@@ -226,26 +218,59 @@ const Prescriptions: React.FC = () => {
     const isExpired = new Date(prescription.expiryDate) <= new Date();
     
     if (isExpired || prescription.status === 'expired') {
-      return <Badge variant="gray" size="sm">{t('prescriptions.expired')}</Badge>;
+      return <Badge variant="gray" size="sm">{t('prescriptions.status.expired')}</Badge>;
     }
     
     switch (prescription.status) {
       case 'active':
-        return <Badge variant="success" size="sm">{t('prescriptions.active')}</Badge>;
+        return <Badge variant="success" size="sm">{t('prescriptions.status.active')}</Badge>;
       case 'completed':
-        return <Badge variant="primary" size="sm">{t('prescriptions.completed')}</Badge>;
+        return <Badge variant="primary" size="sm">{t('prescriptions.status.completed')}</Badge>;
       case 'cancelled':
-        return <Badge variant="danger" size="sm">{t('prescriptions.cancelled')}</Badge>;
+        return <Badge variant="danger" size="sm">{t('prescriptions.status.cancelled')}</Badge>;
       default:
         return <Badge variant="gray" size="sm">{prescription.status}</Badge>;
     }
   }, [t]);
 
+  // Add refresh functionality - moved before any conditional returns
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchPatientPrescriptions();
+    setRefreshing(false);
+  }, [fetchPatientPrescriptions]);
+
+  // Calculate enhanced statistics - moved before any conditional returns
+  const enhancedStats = useMemo(() => {
+    // Ensure all stats are numbers
+    const totalPrescriptions = Number(prescriptionStats.totalPrescriptions) || 0;
+    const activePrescriptions = Number(prescriptionStats.activePrescriptions) || 0;
+    const expiredPrescriptions = Number(prescriptionStats.expiredPrescriptions) || 0;
+    const pendingRefills = Number(prescriptionStats.pendingRefills) || 0;
+    
+    const activePercentage = totalPrescriptions > 0 
+      ? Math.round((activePrescriptions / totalPrescriptions) * 100) 
+      : 0;
+    
+    const expiredPercentage = totalPrescriptions > 0 
+      ? Math.round((expiredPrescriptions / totalPrescriptions) * 100) 
+      : 0;
+
+    return {
+      activePercentage,
+      expiredPercentage,
+      refillsAvailable: pendingRefills,
+      totalPrescriptions,
+      activePrescriptions,
+      expiredPrescriptions
+    };
+  }, [prescriptionStats]);
+
   const getMedicationSummary = (medications: PatientPrescription['medications']) => {
     if (medications.length === 1) {
       return medications[0].medication.name;
     }
-    return `${medications[0].medication.name} + ${medications.length - 1} ${t('prescriptions.moreMedications')}`;
+    return `${medications[0].medication.name} + ${medications.length - 1} ${t('prescriptions.card.moreMedications')}`;
   };
 
   const handleViewPrescription = (prescription: PatientPrescription) => {
@@ -260,7 +285,7 @@ const Prescriptions: React.FC = () => {
       const printContent = `
         <html>
           <head>
-            <title>${t('prescriptions.prescription')} - ${prescription._id}</title>
+            <title>${t('prescriptions.print.title')} - ${prescription._id}</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
@@ -272,49 +297,49 @@ const Prescriptions: React.FC = () => {
           </head>
           <body>
             <div class="header">
-              <h1>${t('prescriptions.prescription')}</h1>
+              <h1>${t('prescriptions.print.title')}</h1>
               <p>ID: ${prescription._id}</p>
             </div>
             
             <div class="info-section">
-              <h3>${t('prescriptions.patientInfo')}</h3>
-              <p><strong>${t('prescriptions.patient')}:</strong> ${user?.firstName} ${user?.lastName}</p>
-              <p><strong>${t('prescriptions.prescribedBy')}:</strong> Dr. ${prescription.dentist.firstName} ${prescription.dentist.lastName}</p>
-              <p><strong>${t('prescriptions.clinic')}:</strong> ${prescription.clinic.name}</p>
-              <p><strong>${t('prescriptions.prescribedDate')}:</strong> ${formatDate(prescription.prescribedDate)}</p>
-              <p><strong>${t('prescriptions.expiryDate')}:</strong> ${formatDate(prescription.expiryDate)}</p>
+              <h3>${t('prescriptions.print.patientInfo')}</h3>
+              <p><strong>${t('prescriptions.print.patient')}:</strong> ${user?.firstName} ${user?.lastName}</p>
+              <p><strong>${t('prescriptions.print.prescribedBy')}:</strong> Dr. ${prescription.dentist.firstName} ${prescription.dentist.lastName}</p>
+              <p><strong>${t('prescriptions.print.clinic')}:</strong> ${prescription.clinic.name}</p>
+              <p><strong>${t('prescriptions.print.prescribedDate')}:</strong> ${formatDate(prescription.prescribedDate)}</p>
+              <p><strong>${t('prescriptions.print.expiryDate')}:</strong> ${formatDate(prescription.expiryDate)}</p>
             </div>
 
             ${prescription.diagnosis ? `
               <div class="info-section">
-                <h3>${t('prescriptions.diagnosis')}</h3>
+                <h3>${t('prescriptions.print.diagnosis')}</h3>
                 <p>${prescription.diagnosis}</p>
               </div>
             ` : ''}
 
             <div class="medications">
-              <h3>${t('prescriptions.medications')}</h3>
+              <h3>${t('prescriptions.print.medications')}</h3>
               ${prescription.medications.map(med => `
                 <div class="medication-item">
                   <h4>${med.medication.name}</h4>
-                  <p><strong>${t('prescriptions.dosage')}:</strong> ${med.dosage}</p>
-                  <p><strong>${t('prescriptions.frequency')}:</strong> ${med.frequency}</p>
-                  <p><strong>${t('prescriptions.duration')}:</strong> ${med.duration}</p>
-                  ${med.instructions ? `<p><strong>${t('prescriptions.instructions')}:</strong> ${med.instructions}</p>` : ''}
+                  <p><strong>${t('prescriptions.print.dosage')}:</strong> ${med.dosage}</p>
+                  <p><strong>${t('prescriptions.print.frequency')}:</strong> ${med.frequency}</p>
+                  <p><strong>${t('prescriptions.print.duration')}:</strong> ${med.duration}</p>
+                  ${med.instructions ? `<p><strong>${t('prescriptions.print.instructions')}:</strong> ${med.instructions}</p>` : ''}
                 </div>
               `).join('')}
             </div>
 
             ${prescription.notes ? `
               <div class="info-section">
-                <h3>${t('prescriptions.notes')}</h3>
+                <h3>${t('prescriptions.print.notes')}</h3>
                 <p>${prescription.notes}</p>
               </div>
             ` : ''}
 
             <div class="footer">
-              <p>${t('prescriptions.printDisclaimer')}</p>
-              <p>${t('prescriptions.printDate')}: ${new Date().toLocaleDateString()}</p>
+              <p>${t('prescriptions.print.disclaimer')}</p>
+              <p>${t('prescriptions.print.printDate')}: ${new Date().toLocaleDateString()}</p>
             </div>
           </body>
         </html>
@@ -413,17 +438,78 @@ const Prescriptions: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('prescriptions.title')}
-          </h1>
-          <p className="text-gray-600 text-lg">
-            {t('prescriptions.patientSubtitle')}
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl border-b border-blue-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+            {/* Left Section */}
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="p-3 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-600 rounded-xl shadow-lg">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                  {t('prescriptions.header.title')}
+                </h1>
+                <p className="text-blue-100/80 text-sm lg:text-base">
+                  {t('prescriptions.header.subtitle')}
+                </p>
+                <div className="flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
+                  <span className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>{t('prescriptions.header.systemOnline')}</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{t('prescriptions.header.lastUpdated', { time: new Date().toLocaleTimeString() })}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? t('prescriptions.header.refreshing') : t('prescriptions.header.refresh')}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                {t('prescriptions.header.filters')}
+              </Button>
+              
+              <Link to="/appointments/create">
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t('prescriptions.header.newAppointment')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
         {error && (
           <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700">
@@ -440,125 +526,126 @@ const Prescriptions: React.FC = () => {
           </div>
         )}
 
-        {/* Stats Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-shadow duration-200 border-0">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-blue-100">{t('prescriptions.totalPrescriptions')}</p>
-                  <p className="text-2xl font-bold">{prescriptionStats.totalPrescriptions}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-shadow duration-200 border-0">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-green-100">{t('prescriptions.activePrescriptions')}</p>
-                  <p className="text-2xl font-bold">{prescriptionStats.activePrescriptions}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg hover:shadow-xl transition-shadow duration-200 border-0">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-red-100">{t('prescriptions.expiredPrescriptions')}</p>
-                  <p className="text-2xl font-bold">{prescriptionStats.expiredPrescriptions}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow duration-200 border-0">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-purple-100">{t('prescriptions.pendingRefills')}</p>
-                  <p className="text-2xl font-bold">{prescriptionStats.pendingRefills}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
+        {/* Enhanced Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <AnalyticsWidget
+            title={t('prescriptions.stats.totalPrescriptions')}
+            type="metric"
+            data={[{ label: t('prescriptions.stats.total'), value: enhancedStats.totalPrescriptions }]}
+            icon={<FileText className="w-5 h-5" />}
+            gradient="from-blue-500 to-blue-600"
+            height="h-32"
+            showLegend={false}
+          />
+          <AnalyticsWidget
+            title={t('prescriptions.stats.activePrescriptions')}
+            type="metric"
+            data={[{ label: t('prescriptions.stats.active'), value: enhancedStats.activePrescriptions }]}
+            trend={{ value: enhancedStats.activePercentage, isPositive: true, period: t('prescriptions.stats.ofTotal') }}
+            icon={<CheckCircle className="w-5 h-5" />}
+            gradient="from-green-500 to-green-600"
+            height="h-32"
+            showLegend={false}
+          />
+          <AnalyticsWidget
+            title={t('prescriptions.stats.expiredPrescriptions')}
+            type="metric"
+            data={[{ label: t('prescriptions.stats.expired'), value: enhancedStats.expiredPrescriptions }]}
+            trend={{ value: enhancedStats.expiredPercentage, isPositive: false, period: t('prescriptions.stats.ofTotal') }}
+            icon={<XCircle className="w-5 h-5" />}
+            gradient="from-red-500 to-red-600"
+            height="h-32"
+            showLegend={false}
+          />
+          <AnalyticsWidget
+            title={t('prescriptions.stats.pendingRefills')}
+            type="metric"
+            data={[{ label: t('prescriptions.stats.refills'), value: enhancedStats.refillsAvailable }]}
+            icon={<Activity className="w-5 h-5" />}
+            gradient="from-purple-500 to-purple-600"
+            height="h-32"
+            showLegend={false}
+          />
         </div>
 
-        {/* Filters and Search */}
-        <Card className="mb-8 shadow-lg border-0 bg-gradient-to-r from-gray-50 to-blue-50">
+        {/* Enhanced Search and Filters */}
+        <Card className="mb-8 shadow-lg border-0 bg-gradient-to-br from-white to-gray-50/50">
           <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-4 md:items-center">
-              <div className="flex-1">
-                <Input
-                  type="text"
-                  placeholder={t('prescriptions.searchPlaceholder') || 'Search medications, diagnosis, or doctor...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                  leftIcon={
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  }
-                />
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+              <div className="flex items-center space-x-4">
+                <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg">
+                  <Search className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('prescriptions.searchAndFilter.title')}</h3>
+                  <p className="text-sm text-gray-600">{t('prescriptions.searchAndFilter.subtitle')}</p>
+                </div>
               </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className="flex items-center space-x-2"
+                >
+                  <Filter className="w-4 h-4" />
+                  <span>{t('prescriptions.searchAndFilter.advancedFilters')}</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder={t('prescriptions.searchAndFilter.searchPlaceholder')}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex gap-3">
-                <Select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-32"
-                  options={[
-                    { value: 'all', label: t('prescriptions.allStatuses') || 'All Statuses' },
-                    { value: 'active', label: t('prescriptions.active') || 'Active' },
-                    { value: 'completed', label: t('prescriptions.completed') || 'Completed' },
-                    { value: 'expired', label: t('prescriptions.expired') || 'Expired' },
-                    { value: 'cancelled', label: t('prescriptions.cancelled') || 'Cancelled' }
-                  ]}
-                />
+                <div className="flex gap-3">
+                  <Select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-40 bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    options={[
+                      { value: 'all', label: t('prescriptions.status.all') },
+                      { value: 'active', label: t('prescriptions.status.active') },
+                      { value: 'completed', label: t('prescriptions.status.completed') },
+                      { value: 'expired', label: t('prescriptions.status.expired') },
+                      { value: 'cancelled', label: t('prescriptions.status.cancelled') }
+                    ]}
+                  />
 
-                <Select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-36"
-                  options={[
-                    { value: 'date_desc', label: t('prescriptions.sortByNewest') || 'Newest First' },
-                    { value: 'date_asc', label: t('prescriptions.sortByOldest') || 'Oldest First' },
-                    { value: 'medication_name', label: t('prescriptions.sortByMedication') || 'By Medication' },
-                    { value: 'dentist_name', label: t('prescriptions.sortByDoctor') || 'By Doctor' }
-                  ]}
-                />
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-40 bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    options={[
+                      { value: 'date_desc', label: t('prescriptions.sort.newest') },
+                      { value: 'date_asc', label: t('prescriptions.sort.oldest') },
+                      { value: 'medication_name', label: t('prescriptions.sort.byMedication') },
+                      { value: 'dentist_name', label: t('prescriptions.sort.byDoctor') }
+                    ]}
+                  />
+                </div>
+              </div>
+              
+              {/* Results Summary */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="text-sm text-gray-600">
+                  {t('prescriptions.searchAndFilter.resultsCount', { count: filteredPrescriptions.length })}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {t('prescriptions.searchAndFilter.lastUpdated', { time: new Date().toLocaleTimeString() })}
+                </div>
               </div>
             </div>
           </div>
@@ -576,20 +663,20 @@ const Prescriptions: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {searchTerm || statusFilter !== 'all' 
-                    ? t('prescriptions.noMatchingPrescriptions')
-                    : t('prescriptions.noPrescriptions')
+                    ? t('prescriptions.emptyState.noMatchingPrescriptions')
+                    : t('prescriptions.emptyState.noPrescriptions')
                   }
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {searchTerm || statusFilter !== 'all'
-                    ? t('prescriptions.adjustFilters')
-                    : t('prescriptions.noPrescriptionsDescription')
+                    ? t('prescriptions.emptyState.adjustFilters')
+                    : t('prescriptions.emptyState.noPrescriptionsDescription')
                   }
                 </p>
                 {(!searchTerm && statusFilter === 'all') && (
                   <Link to="/appointments/create">
                     <Button variant="primary">
-                      {t('prescriptions.bookAppointment')}
+                      {t('prescriptions.emptyState.bookAppointment')}
                     </Button>
                   </Link>
                 )}
@@ -607,10 +694,13 @@ const Prescriptions: React.FC = () => {
                               {getMedicationSummary(prescription.medications)}
                             </h3>
                             <p className="text-sm text-gray-600">
-                              {t('prescriptions.prescribedBy')} Dr. {prescription.dentist.firstName} {prescription.dentist.lastName}
+                              {t('prescriptions.card.prescribedBy', { 
+                                firstName: prescription.dentist.firstName, 
+                                lastName: prescription.dentist.lastName 
+                              })}
                             </p>
                             <p className="text-sm text-gray-600">
-                              📍 {prescription.clinic.name}
+                              📍 {t('prescriptions.card.clinic', { name: prescription.clinic.name })}
                             </p>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -620,27 +710,30 @@ const Prescriptions: React.FC = () => {
 
                         <div className="grid md:grid-cols-3 gap-4 text-sm">
                           <div>
-                            <span className="font-medium text-gray-700">{t('prescriptions.prescribedDate')}:</span>
+                            <span className="font-medium text-gray-700">{t('prescriptions.card.prescribedDate')}:</span>
                             <br />
                             <span className="text-gray-600">{formatDate(prescription.prescribedDate)}</span>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">{t('prescriptions.expiryDate')}:</span>
+                            <span className="font-medium text-gray-700">{t('prescriptions.card.expiryDate')}:</span>
                             <br />
                             <span className="text-gray-600">{formatDate(prescription.expiryDate)}</span>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">{t('prescriptions.refills')}:</span>
+                            <span className="font-medium text-gray-700">{t('prescriptions.card.refills')}:</span>
                             <br />
                             <span className="text-gray-600">
-                              {prescription.currentRefills} / {prescription.maxRefills}
+                              {t('prescriptions.card.refillsCount', { 
+                                current: prescription.currentRefills, 
+                                max: prescription.maxRefills 
+                              })}
                             </span>
                           </div>
                         </div>
 
                         {prescription.diagnosis && (
                           <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                            <span className="font-medium text-gray-700">{t('prescriptions.diagnosis')}:</span>
+                            <span className="font-medium text-gray-700">{t('prescriptions.card.diagnosis')}:</span>
                             <p className="text-gray-600 mt-1">{prescription.diagnosis}</p>
                           </div>
                         )}
@@ -648,6 +741,7 @@ const Prescriptions: React.FC = () => {
 
                       <div className="flex flex-col sm:flex-row gap-2 lg:ml-6">
                         <Button
+                          key={`view-${prescription._id}`}
                           variant="outline"
                           size="sm"
                           onClick={() => handleViewPrescription(prescription)}
@@ -657,10 +751,11 @@ const Prescriptions: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
-                          {t('prescriptions.view')}
+                          {t('prescriptions.actions.view')}
                         </Button>
 
                         <Button
+                          key={`print-${prescription._id}`}
                           variant="outline"
                           size="sm"
                           onClick={() => handlePrintPrescription(prescription)}
@@ -669,10 +764,11 @@ const Prescriptions: React.FC = () => {
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                           </svg>
-                          {t('prescriptions.print')}
+                          {t('prescriptions.actions.print')}
                         </Button>
 
                         <Button
+                          key={`download-${prescription._id}`}
                           variant="outline"
                           size="sm"
                           onClick={() => handleDownloadPrescription(prescription)}
@@ -681,7 +777,7 @@ const Prescriptions: React.FC = () => {
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
-                          {t('prescriptions.download')}
+                          {t('prescriptions.actions.download')}
                         </Button>
                       </div>
                     </div>
@@ -699,7 +795,7 @@ const Prescriptions: React.FC = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">
-                    {t('prescriptions.prescriptionDetails')}
+                    {t('prescriptions.modal.title')}
                   </h2>
                   <button
                     onClick={() => setShowPrescriptionModal(false)}
@@ -712,30 +808,33 @@ const Prescriptions: React.FC = () => {
                 <div className="space-y-6">
                   {/* Prescription Info */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.prescriptionInfo')}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.prescriptionInfo')}</h3>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.prescriptionId')}:</span>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.prescriptionId')}:</span>
                         <p className="text-gray-900 font-mono">{selectedPrescription._id}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.status')}:</span>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.status')}:</span>
                         <div className="mt-1">{getStatusBadge(selectedPrescription)}</div>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.prescribedDate')}:</span>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.prescribedDate')}:</span>
                         <p className="text-gray-900">{formatDate(selectedPrescription.prescribedDate)}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.expiryDate')}:</span>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.expiryDate')}:</span>
                         <p className="text-gray-900">{formatDate(selectedPrescription.expiryDate)}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.prescribedBy')}:</span>
-                        <p className="text-gray-900">Dr. {selectedPrescription.dentist.firstName} {selectedPrescription.dentist.lastName}</p>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.prescribedBy')}:</span>
+                        <p className="text-gray-900">{t('prescriptions.modal.doctorName', { 
+                          firstName: selectedPrescription.dentist.firstName, 
+                          lastName: selectedPrescription.dentist.lastName 
+                        })}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">{t('prescriptions.clinic')}:</span>
+                        <span className="font-medium text-gray-700">{t('prescriptions.modal.clinic')}:</span>
                         <p className="text-gray-900">{selectedPrescription.clinic.name}</p>
                       </div>
                     </div>
@@ -744,7 +843,7 @@ const Prescriptions: React.FC = () => {
                   {/* Diagnosis */}
                   {selectedPrescription.diagnosis && (
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.diagnosis')}</h3>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.diagnosis')}</h3>
                       <div className="bg-gray-50 rounded-lg p-4">
                         <p className="text-gray-700">{selectedPrescription.diagnosis}</p>
                       </div>
@@ -753,32 +852,32 @@ const Prescriptions: React.FC = () => {
 
                   {/* Medications */}
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.medications')}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.medications')}</h3>
                     <div className="space-y-4">
                       {selectedPrescription.medications.map((med, index) => (
                         <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <h4 className="font-semibold text-gray-900 mb-2">{med.medication.name}</h4>
                           <div className="grid md:grid-cols-2 gap-3 text-sm">
                             <div>
-                              <span className="font-medium text-gray-700">{t('prescriptions.dosage')}:</span>
+                              <span className="font-medium text-gray-700">{t('prescriptions.modal.dosage')}:</span>
                               <p className="text-gray-900">{med.dosage}</p>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-700">{t('prescriptions.frequency')}:</span>
+                              <span className="font-medium text-gray-700">{t('prescriptions.modal.frequency')}:</span>
                               <p className="text-gray-900">{med.frequency}</p>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-700">{t('prescriptions.duration')}:</span>
+                              <span className="font-medium text-gray-700">{t('prescriptions.modal.duration')}:</span>
                               <p className="text-gray-900">{med.duration}</p>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-700">{t('prescriptions.category')}:</span>
+                              <span className="font-medium text-gray-700">{t('prescriptions.modal.category')}:</span>
                               <p className="text-gray-900">{med.medication.category}</p>
                             </div>
                           </div>
                           {med.instructions && (
                             <div className="mt-3">
-                              <span className="font-medium text-gray-700">{t('prescriptions.instructions')}:</span>
+                              <span className="font-medium text-gray-700">{t('prescriptions.modal.instructions')}:</span>
                               <p className="text-gray-900 mt-1">{med.instructions}</p>
                             </div>
                           )}
@@ -789,19 +888,19 @@ const Prescriptions: React.FC = () => {
 
                   {/* Refill Information */}
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.refillInformation')}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.refillInformation')}</h3>
                     <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                       <div className="grid md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="font-medium text-gray-700">{t('prescriptions.maxRefills')}:</span>
+                          <span className="font-medium text-gray-700">{t('prescriptions.modal.maxRefills')}:</span>
                           <p className="text-gray-900">{selectedPrescription.maxRefills}</p>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-700">{t('prescriptions.currentRefills')}:</span>
+                          <span className="font-medium text-gray-700">{t('prescriptions.modal.currentRefills')}:</span>
                           <p className="text-gray-900">{selectedPrescription.currentRefills}</p>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-700">{t('prescriptions.refillsRemaining')}:</span>
+                          <span className="font-medium text-gray-700">{t('prescriptions.modal.refillsRemaining')}:</span>
                           <p className="text-gray-900">{selectedPrescription.maxRefills - selectedPrescription.currentRefills}</p>
                         </div>
                       </div>
@@ -811,7 +910,7 @@ const Prescriptions: React.FC = () => {
                   {/* Notes */}
                   {selectedPrescription.notes && (
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.notes')}</h3>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.notes')}</h3>
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <p className="text-gray-700">{selectedPrescription.notes}</p>
                       </div>
@@ -824,19 +923,19 @@ const Prescriptions: React.FC = () => {
                       variant="outline"
                       onClick={() => handlePrintPrescription(selectedPrescription)}
                     >
-                      {t('prescriptions.print')}
+                      {t('prescriptions.modal.print')}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => handleDownloadPrescription(selectedPrescription)}
                     >
-                      {t('prescriptions.download')}
+                      {t('prescriptions.modal.download')}
                     </Button>
                     <Button
                       variant="primary"
                       onClick={() => setShowPrescriptionModal(false)}
                     >
-                      {t('prescriptions.close')}
+                      {t('prescriptions.modal.close')}
                     </Button>
                   </div>
                 </div>

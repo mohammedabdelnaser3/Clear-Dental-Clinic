@@ -34,7 +34,7 @@ const medicationSchema = (t: (key: string) => string) => z.object({
 type MedicationFormData = z.infer<ReturnType<typeof medicationSchema>>;
 
 interface Medication {
-  _id: string;
+  id: string;
   name: string;
   genericName?: string;
   dosage: string;
@@ -154,16 +154,11 @@ export const MedicationForm: React.FC<MedicationFormProps> = ({
       };
 
       if (medication) {
-        await medicationService.updateMedication(medication._id, {
-          ...medicationData,
-          category: medicationData.category === 'anti-inflammatory' ? 'anti_inflammatory' : medicationData.category
-        });
+        console.log('medication',medication,medication.id);
+        await medicationService.updateMedication(medication.id, medicationData);
         toast.success(t('medicationForm.successUpdate'));
       } else {
-        await medicationService.createMedication({
-          ...medicationData,
-          category: medicationData.category === 'anti-inflammatory' ? 'anti_inflammatory' : medicationData.category
-        });
+        await medicationService.createMedication(medicationData);
         toast.success(t('medicationForm.successCreate'));
       }
       

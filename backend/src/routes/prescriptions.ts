@@ -8,7 +8,11 @@ import {
   getPrescriptionsByPatient,
   getActivePrescriptions,
   getExpiringPrescriptions,
-  addRefill
+  addRefill,
+  performSafetyCheck,
+  getPatientMedicationSummary,
+  getCrossClinicPrescriptions,
+  getMyPrescriptions
 } from '../controllers/prescriptionController';
 import { protect, authorize, patientOwnerOrStaff } from '../middleware/auth';
 import { handleValidationErrors } from '../middleware/validation';
@@ -18,6 +22,47 @@ const router = express.Router();
 
 // Protect all routes
 router.use(protect);
+
+// Medication Safety Check (must come before /:id routes)
+router.post('/safety-check',
+  [
+    body('patientId').isMongoId().withMessage('Valid patient ID is required'),
+    body('medications').isArray({ min: 1 }).withMessage('At least one medication is required'),
+    body('medications.*.medicationId').isMongoId().withMessage('Valid medication ID is required'),
+    body('medications.*.name').notEmpty().withMessage('Medication name is required'),
+    body('medications.*.genericName').optional().isString(),
+    body('medications.*.dosage').notEmpty().withMessage('Dosage is required'),
+    body('medications.*.frequency').notEmpty().withMessage('Frequency is required'),
+    body('medications.*.duration').notEmpty().withMessage('Duration is required')
+  ],
+  handleValidationErrors,
+  authorize('dentist', 'admin'),
+  performSafetyCheck
+);
+
+// Get patient medication summary (allergies, current meds, conditions)
+router.get('/patient/:patientId/summary',
+  [
+    param('patientId').isMongoId().withMessage('Invalid patient ID')
+  ],
+  handleValidationErrors,
+  authorize('dentist', 'staff', 'admin'),
+  getPatientMedicationSummary
+);
+
+// Get cross-clinic prescriptions for a patient
+router.get('/cross-clinic/patient/:patientId',
+  [
+    param('patientId').isMongoId().withMessage('Invalid patient ID'),
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('status').optional().isIn(['active', 'completed', 'cancelled', 'expired'])
+      .withMessage('Invalid prescription status')
+  ],
+  handleValidationErrors,
+  authorize('dentist', 'admin'),
+  getCrossClinicPrescriptions
+);
 
 // Get active prescriptions
 router.get('/active',
@@ -37,6 +82,19 @@ router.get('/expiring',
   handleValidationErrors,
   authorize('dentist', 'staff', 'admin'),
   getExpiringPrescriptions
+);
+
+// Get current user's prescriptions (for patients, dentists, staff, admin)
+router.get('/my-prescriptions',
+  [
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('status').optional().isIn(['active', 'completed', 'cancelled', 'expired'])
+      .withMessage('Invalid prescription status')
+  ],
+  handleValidationErrors,
+  authorize('patient', 'dentist', 'staff', 'admin'),
+  getMyPrescriptions
 );
 
 // Get prescriptions by patient (staff/admin or patient themselves)
@@ -63,7 +121,7 @@ router.get('/',
     query('patientId').optional().isMongoId().withMessage('Invalid patient ID')
   ],
   handleValidationErrors,
-  authorize('dentist', 'staff', 'admin'),
+  authorize('dentist', 'staff', 'admin', 'patient'),
   getAllPrescriptions
 );
 

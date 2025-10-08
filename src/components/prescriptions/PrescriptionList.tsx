@@ -80,10 +80,10 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
 
   const statusOptions = [
-    { value: 'all', label: t('prescriptions.allStatus') },
-    { value: 'active', label: t('prescriptions.active') },
-    { value: 'completed', label: t('prescriptions.completed') },
-    { value: 'cancelled', label: t('prescriptions.cancelled') }
+    { value: 'all', label: t('prescriptionList.filters.allStatus') },
+    { value: 'active', label: t('prescriptionList.filters.active') },
+    { value: 'completed', label: t('prescriptionList.filters.completed') },
+    { value: 'cancelled', label: t('prescriptionList.filters.cancelled') }
   ];
 
   const fetchPrescriptions = async () => {
@@ -98,9 +98,16 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
       };
       
       let response;
-      if (patientId) {
+      
+      // Use role-based endpoint selection
+      if (user?.role === 'patient') {
+        // Patients use the my-prescriptions endpoint
+        response = await prescriptionService.getMyPrescriptions(params);
+      } else if (patientId) {
+        // Staff/dentists can view specific patient prescriptions
         response = await prescriptionService.getPrescriptionsByPatient(patientId, params);
       } else {
+        // Staff/dentists view all prescriptions (filtered by their role)
         response = await prescriptionService.getPrescriptions(params);
       }
       
@@ -111,7 +118,7 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
       setPrescriptions(Array.isArray(prescriptionsData) ? prescriptionsData : []);
       setTotalPages(typeof totalPagesData === 'number' ? totalPagesData : 1);
     } catch (_error) {
-      toast.error(t('prescriptions.fetchError'));
+      toast.error(t('prescriptionList.messages.fetchError'));
       console.error('Error fetching prescriptions:', _error);
       // Set empty array on error to prevent undefined access
       setPrescriptions([]);
@@ -151,16 +158,16 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
   };
 
   const handleDeletePrescription = async (prescriptionId: string) => {
-    if (!window.confirm(t('prescriptions.deleteConfirmation'))) {
+    if (!window.confirm(t('prescriptionList.messages.deleteConfirmation'))) {
       return;
     }
 
     try {
       await prescriptionService.deletePrescription(prescriptionId);
-      toast.success(t('prescriptions.deleteSuccess'));
+      toast.success(t('prescriptionList.messages.deleteSuccess'));
       fetchPrescriptions();
     } catch (_error) {
-      toast.error(t('prescriptions.deleteError'));
+      toast.error(t('prescriptionList.messages.deleteError'));
       console.error('Error deleting prescription:', _error);
     }
   };
@@ -200,12 +207,12 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">
-          {patientId ? t('prescriptions.patientPrescriptions') : t('prescriptions.title')}
+          {patientId ? t('prescriptionList.header.patientPrescriptions') : t('prescriptionList.header.title')}
         </h2>
         {canManagePrescriptions && (
           <Button onClick={handleAddPrescription} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            {t('prescriptions.newPrescription')}
+            {t('prescriptionList.actions.newPrescription')}
           </Button>
         )}
       </div>
@@ -217,7 +224,7 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder={t('prescriptions.searchPlaceholder')}
+              placeholder={t('prescriptionList.search.placeholder')}
               value={searchTerm}
               onChange={handleSearch}
               className="pl-10"
@@ -243,14 +250,14 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {t('prescriptions.prescriptionNumber', { id: prescription._id.slice(-8) })}
+                      {t('prescriptionList.card.prescriptionNumber', { id: prescription._id.slice(-8) })}
                     </h3>
                     <Badge className={getStatusColor(prescription.status)}>
-                      {t(`prescriptions.${prescription.status}`)}
+                      {t(`prescriptionList.status.${prescription.status}`)}
                     </Badge>
                     {isExpired(prescription.expiryDate) && (
                       <Badge className="bg-red-100 text-red-800">
-                        {t('prescriptions.expired')}
+                        {t('prescriptionList.status.expired')}
                       </Badge>
                     )}
                   </div>
@@ -297,13 +304,13 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
 
               {/* Diagnosis */}
               <div>
-                <p className="text-sm text-gray-600 mb-1">{t('prescriptions.diagnosis')}</p>
+                <p className="text-sm text-gray-600 mb-1">{t('prescriptionList.card.diagnosis')}</p>
                 <p className="text-sm text-gray-800">{prescription.diagnosis}</p>
               </div>
 
               {/* Medications */}
               <div>
-                <p className="text-sm text-gray-600 mb-2">{t('prescriptions.medications')}</p>
+                <p className="text-sm text-gray-600 mb-2">{t('prescriptionList.card.medications')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {prescription.medications.map((med, index) => (
                     <div key={index} className="bg-gray-50 p-3 rounded-lg">
@@ -324,14 +331,14 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
               {/* Additional Info */}
               <div className="flex justify-between items-center text-sm text-gray-600">
                 <div className="flex items-center gap-4">
-                  <span>{t('prescriptions.doctor', { firstName: prescription.dentist.firstName, lastName: prescription.dentist.lastName })}</span>
+                  <span>{t('prescriptionList.card.doctor', { firstName: prescription.dentist.firstName, lastName: prescription.dentist.lastName })}</span>
                   <span>{t('common.separator')}</span>
                   <span>{prescription.clinic.name}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span>{t('prescriptions.refills', { current: prescription.refills.length, max: prescription.maxRefills })}</span>
+                  <span>{t('prescriptionList.card.refills', { current: prescription.refills.length, max: prescription.maxRefills })}</span>
                   <span>{t('common.separator')}</span>
-                  <span>{t('prescriptions.expires', { date: format(new Date(prescription.expiryDate), 'MMM dd, yyyy', { locale: i18n.language === 'ar' ? require('date-fns/locale/ar') : undefined }) })}</span>
+                  <span>{t('prescriptionList.card.expires', { date: format(new Date(prescription.expiryDate), 'MMM dd, yyyy', { locale: i18n.language === 'ar' ? require('date-fns/locale/ar') : undefined }) })}</span>
                 </div>
               </div>
             </div>
@@ -343,15 +350,15 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
       {prescriptions.length === 0 && (
         <div className="text-center py-12">
           <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('prescriptions.noPrescriptionsFound')}</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('prescriptionList.emptyState.noPrescriptionsFound')}</h3>
           <p className="text-gray-600 mb-4">
             {patientId 
-              ? t('prescriptions.noPatientPrescriptions')
-              : t('prescriptions.noFilteredPrescriptions')}
+              ? t('prescriptionList.emptyState.noPatientPrescriptions')
+              : t('prescriptionList.emptyState.noFilteredPrescriptions')}
           </p>
           {canManagePrescriptions && (
             <Button onClick={handleAddPrescription}>
-              {t('prescriptions.createFirstPrescription')}
+              {t('prescriptionList.emptyState.createFirstPrescription')}
             </Button>
           )}
         </div>
@@ -365,17 +372,17 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            {t('prescriptions.previous')}
+            {t('prescriptionList.pagination.previous')}
           </Button>
           <span className="text-sm text-gray-600">
-            {t('prescriptions.pageOf', { currentPage, totalPages })}
+            {t('prescriptionList.pagination.pageOf', { currentPage, totalPages })}
           </span>
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            {t('prescriptions.next')}
+            {t('prescriptionList.pagination.next')}
           </Button>
         </div>
       )}
@@ -387,12 +394,12 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
           setIsFormModalOpen(false);
           setEditingPrescription(null);
         }}
-        title={editingPrescription ? t('prescriptions.editPrescription') : t('prescriptions.newPrescription')}
+        title={editingPrescription ? t('prescriptionList.modal.editPrescription') : t('prescriptionList.modal.newPrescription')}
         size="lg"
       >
         <PrescriptionForm
           prescription={editingPrescription}
-          patientId={patientId}
+          patientId={patientId || ''}
           onSave={handlePrescriptionSaved}
           onCancel={() => {
             setIsFormModalOpen(false);
@@ -408,7 +415,7 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
           setIsDetailsModalOpen(false);
           setViewingPrescription(null);
         }}
-        title={t('prescriptions.prescriptionDetails')}
+        title={t('prescriptionList.modal.prescriptionDetails')}
         size="lg"
       >
         {viewingPrescription && (

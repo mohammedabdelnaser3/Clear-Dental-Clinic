@@ -41,12 +41,12 @@ export const getPatients = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const [patients, total] = await Promise.all([
-    Patient.find(query)
+    (Patient as any).find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNum)
       .select('-password'),
-    Patient.countDocuments(query)
+    (Patient as any).countDocuments(query)
   ]);
 
   res.status(200).json({
@@ -65,7 +65,7 @@ export const getPatients = asyncHandler(async (req: Request, res: Response) => {
 export const getPatientById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const patient = await Patient.findById(id).select('-password');
+  const patient = await (Patient as any).findById(id).select('-password');
   
   if (!patient) {
     throw new AppError('Patient not found', 404);
@@ -95,7 +95,7 @@ export const createPatient = asyncHandler(async (req: Request, res: Response) =>
   } = req.body;
 
   // Check if patient already exists
-  const existingPatient = await Patient.findOne({ 
+  const existingPatient = await (Patient as any).findOne({ 
     $or: [{ email }, { phone }] 
   });
 
@@ -103,7 +103,7 @@ export const createPatient = asyncHandler(async (req: Request, res: Response) =>
     throw new AppError('Patient with this email or phone already exists', 400);
   }
 
-  const patient = await Patient.create({
+  const patient = await (Patient as any).create({
     firstName,
     lastName,
     email,
@@ -135,7 +135,7 @@ export const updatePatient = asyncHandler(async (req: Request, res: Response) =>
   delete updateData.password;
   delete updateData.role;
 
-  const patient = await Patient.findByIdAndUpdate(
+  const patient = await (Patient as any).findByIdAndUpdate(
     id,
     { ...updateData, updatedAt: new Date() },
     { new: true, runValidators: true }
@@ -156,14 +156,14 @@ export const updatePatient = asyncHandler(async (req: Request, res: Response) =>
 export const deletePatient = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const patient = await Patient.findById(id);
+  const patient = await (Patient as any).findById(id);
   
   if (!patient) {
     throw new AppError('Patient not found', 404);
   }
 
   // Soft delete - mark as inactive instead of removing
-  await Patient.findByIdAndUpdate(id, { status: 'inactive' });
+  await (Patient as any).findByIdAndUpdate(id, { status: 'inactive' });
 
   res.status(200).json({
     success: true,
@@ -182,7 +182,7 @@ export const searchPatients = asyncHandler(async (req: Request, res: Response) =
     });
   }
 
-  const patients = await Patient.find({
+  const patients = await (Patient as any).find({
     $or: [
       { firstName: { $regex: q, $options: 'i' } },
       { lastName: { $regex: q, $options: 'i' } },
@@ -205,7 +205,7 @@ export const searchPatients = asyncHandler(async (req: Request, res: Response) =
 export const getPatientMedicalHistory = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const patient = await Patient.findById(id)
+  const patient = await (Patient as any).findById(id)
     .select('medicalHistory allergies currentMedications')
     .populate('appointments')
     .populate('treatments');
@@ -225,7 +225,7 @@ export const updatePatientMedicalHistory = asyncHandler(async (req: Request, res
   const { id } = req.params;
   const { medicalHistory, allergies, currentMedications } = req.body;
 
-  const patient = await Patient.findByIdAndUpdate(
+  const patient = await (Patient as any).findByIdAndUpdate(
     id,
     {
       medicalHistory,
@@ -262,12 +262,12 @@ export const getPatientsByUserId = asyncHandler(async (req: Request, res: Respon
   try {
     console.log(`Fetching patients for userId: ${userId}, page: ${pageNum}, limit: ${limitNum}`);
     const [patients, total] = await Promise.all([
-      Patient.find({ userId })
+      (Patient as any).find({ userId })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
         .populate('preferredClinicId', 'name'),
-      Patient.countDocuments({ userId })
+      (Patient as any).countDocuments({ userId })
     ]);
     console.log(`Found ${patients.length} patients for userId: ${userId}`);
 
@@ -280,7 +280,124 @@ export const getPatientsByUserId = asyncHandler(async (req: Request, res: Respon
       message: `Found ${patients.length} patient(s) for user`
     });
   } catch (error) {
-    console.error(`Error in getPatientsByUserId for userId: ${userId}`, error);
-    throw new AppError('Internal server error while fetching patient data', 500);
+    console.error('Error fetching patients:', error);
+    throw new AppError('Failed to fetch patients', 500);
   }
+});
+
+// Get recent patients
+export const getRecentPatients = asyncHandler(async (req: Request, res: Response) => {
+  const { clinicId, limit = 10 } = req.query;
+  const limitNum = parseInt(limit as string);
+
+  const query: any = { isActive: true };
+  if (clinicId) {
+    query.preferredClinicId = clinicId;
+  }
+
+  const patients = await (Patient as any).find(query)
+    .sort({ createdAt: -1 })
+    .limit(limitNum)
+    .select('firstName lastName email phone createdAt preferredClinicId')
+    .populate('preferredClinicId', 'name');
+
+  res.json({
+    success: true,
+    data: patients
+  });
+});
+
+// Get patient statistics
+export const getPatientStatistics = asyncHandler(async (req: Request, res: Response) => {
+  const { clinicId, startDate, endDate } = req.query;
+
+  const query: any = { isActive: true };
+  if (clinicId) {
+    query.preferredClinicId = clinicId;
+  }
+
+  // Date range filter
+  if (startDate || endDate) {
+    query.createdAt = {};
+    if (startDate) query.createdAt.$gte = new Date(startDate as string);
+    if (endDate) query.createdAt.$lte = new Date(endDate as string);
+  }
+
+  const [
+    totalPatients,
+    patientsByGender,
+    patientsByAgeGroup,
+    newThisMonth
+  ] = await Promise.all([
+    (Patient as any).countDocuments(query),
+    (Patient as any).aggregate([
+      { $match: query },
+      { $group: { _id: '$gender', count: { $sum: 1 } } }
+    ]),
+    (Patient as any).aggregate([
+      { $match: query },
+      {
+        $addFields: {
+          age: {
+            $divide: [
+              { $subtract: [new Date(), '$dateOfBirth'] },
+              365.25 * 24 * 60 * 60 * 1000
+            ]
+          }
+        }
+      },
+      {
+        $bucket: {
+          groupBy: '$age',
+          boundaries: [0, 18, 35, 50, 65, 100],
+          default: '65+',
+          output: { count: { $sum: 1 } }
+        }
+      }
+    ]),
+    (Patient as any).countDocuments({
+      ...query,
+      createdAt: {
+        $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      }
+    })
+  ]);
+
+  // Format gender statistics
+  const genderStats = {
+    male: 0,
+    female: 0,
+    other: 0
+  };
+  patientsByGender.forEach((stat: any) => {
+    if (stat._id === 'male') genderStats.male = stat.count;
+    else if (stat._id === 'female') genderStats.female = stat.count;
+    else if (stat._id === 'other') genderStats.other = stat.count;
+  });
+
+  // Format age group statistics
+  const ageGroupStats = {
+    '0-18': 0,
+    '19-35': 0,
+    '36-50': 0,
+    '51-65': 0,
+    '65+': 0
+  };
+  patientsByAgeGroup.forEach((stat: any) => {
+    if (stat._id === 0) ageGroupStats['0-18'] = stat.count;
+    else if (stat._id === 18) ageGroupStats['19-35'] = stat.count;
+    else if (stat._id === 35) ageGroupStats['36-50'] = stat.count;
+    else if (stat._id === 50) ageGroupStats['51-65'] = stat.count;
+    else if (stat._id === '65+') ageGroupStats['65+'] = stat.count;
+  });
+
+  res.json({
+    success: true,
+    data: {
+      total: totalPatients,
+      newThisMonth,
+      byGender: genderStats,
+      byAgeGroup: ageGroupStats
+    }
+  });
 });

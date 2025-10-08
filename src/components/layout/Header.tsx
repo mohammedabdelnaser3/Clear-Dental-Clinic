@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useClinic } from '../../hooks/useClinic';
 import LanguageSwitcher from '../common/LanguageSwitcher';
+import { NotificationDropdown } from '../notifications';
 import { 
   Bell, 
   Menu, 
@@ -32,8 +33,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [hasNotifications, setHasNotifications] = useState(false);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -41,7 +41,7 @@ const Header = () => {
   const location = useLocation();
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
-  const notificationRef = useRef<HTMLDivElement>(null);
+
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   
@@ -55,10 +55,7 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  // Simulate notifications - in a real app, this would come from a notification service
-  useEffect(() => {
-    setHasNotifications(true);
-  }, []);
+
 
   // Click outside handlers
   useEffect(() => {
@@ -66,9 +63,7 @@ const Header = () => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setIsNotificationOpen(false);
-      }
+
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
@@ -85,7 +80,6 @@ const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsProfileOpen(false);
-    setIsNotificationOpen(false);
     setIsMoreMenuOpen(false);
   }, [location.pathname]);
 
@@ -94,7 +88,6 @@ const Header = () => {
     // Close other dropdowns when opening mobile menu
     if (!isMenuOpen) {
       setIsProfileOpen(false);
-      setIsNotificationOpen(false);
     }
   };
 
@@ -102,27 +95,17 @@ const Header = () => {
     setIsProfileOpen(!isProfileOpen);
     // Close other dropdowns
     if (!isProfileOpen) {
-      setIsNotificationOpen(false);
       setIsMenuOpen(false);
     }
   };
 
-  const toggleNotifications = () => {
-    setIsNotificationOpen(!isNotificationOpen);
-    // Close other dropdowns
-    if (!isNotificationOpen) {
-      setIsProfileOpen(false);
-      setIsMenuOpen(false);
-      setIsMoreMenuOpen(false);
-    }
-  };
+
 
   const toggleMoreMenu = () => {
     setIsMoreMenuOpen(!isMoreMenuOpen);
     // Close other dropdowns
     if (!isMoreMenuOpen) {
       setIsProfileOpen(false);
-      setIsNotificationOpen(false);
       setIsMenuOpen(false);
     }
   };
@@ -160,7 +143,6 @@ const Header = () => {
       // Escape to close dropdowns
       if (e.key === 'Escape') {
         setIsProfileOpen(false);
-        setIsNotificationOpen(false);
         setIsMenuOpen(false);
         setIsMoreMenuOpen(false);
         setIsSearchFocused(false);
@@ -173,9 +155,9 @@ const Header = () => {
   }, []);
 
   // Keyboard navigation for dropdowns
-  const handleDropdownKeyDown = (e: React.KeyboardEvent, type: 'profile' | 'notifications') => {
+  const handleDropdownKeyDown = (e: React.KeyboardEvent, type: 'profile') => {
     const isProfile = type === 'profile';
-    const isOpen = isProfile ? isProfileOpen : isNotificationOpen;
+    const isOpen = isProfile ? isProfileOpen : false;
     
     if (!isOpen) return;
 
@@ -184,8 +166,6 @@ const Header = () => {
         e.preventDefault();
         if (isProfile) {
           setIsProfileOpen(false);
-        } else {
-          setIsNotificationOpen(false);
         }
         break;
       case 'Tab':
@@ -424,91 +404,7 @@ const Header = () => {
             {/* Right side controls */}
             <div className="flex items-center space-x-3">
               {/* Notifications */}
-              {user && (
-                <div className="relative" ref={notificationRef}>
-                  <button 
-                    onClick={toggleNotifications}
-                    onKeyDown={(e) => handleDropdownKeyDown(e, 'notifications')}
-                    className="relative p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-                    aria-label="Notifications"
-                    aria-expanded={isNotificationOpen}
-                    aria-haspopup="true"
-                  >
-                    <Bell className="h-5 w-5" />
-                    {hasNotifications && (
-                      <span className="absolute -top-1 -right-1 flex h-5 w-5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 items-center justify-center">
-                          <span className="text-xs font-medium text-white">3</span>
-                        </span>
-                      </span>
-                    )}
-                  </button>
-                  
-                  {/* Notification dropdown */}
-                  {isNotificationOpen && (
-                    <div 
-                      className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transform transition-all duration-200 ease-out"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="notifications-menu"
-                    >
-                      <div className="p-4 border-b border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-                      </div>
-                      <div className="max-h-96 overflow-y-auto">
-                        <div className="p-4 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors duration-150">
-                          <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0">
-                              <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Calendar className="h-4 w-4 text-blue-600" />
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900">New appointment scheduled</p>
-                              <p className="text-sm text-gray-500">John Doe - Tomorrow at 2:00 PM</p>
-                              <p className="text-xs text-gray-400 mt-1">5 minutes ago</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors duration-150">
-                          <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0">
-                              <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                                <FileText className="h-4 w-4 text-green-600" />
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900">Prescription ready</p>
-                              <p className="text-sm text-gray-500">Patient: Sarah Wilson</p>
-                              <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-150">
-                          <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0">
-                              <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <Clock className="h-4 w-4 text-yellow-600" />
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900">Appointment reminder</p>
-                              <p className="text-sm text-gray-500">Mike Johnson - Today at 4:00 PM</p>
-                              <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-4 border-t border-gray-100">
-                        <button className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-                          View all notifications
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+              {user && <NotificationDropdown />}
               
               {/* Language Switcher */}
               <div className="hidden sm:block">

@@ -11,6 +11,7 @@ import prescriptionRoutes from './prescriptions';
 import billingRoutes from './billing';
 import adminRoutes from './adminRoutes';
 import staffScheduleRoutes from './staffScheduleRoutes';
+import scheduleRoutes from './schedules';
 
 const router = Router();
 
@@ -30,6 +31,7 @@ router.use(`${API_VERSION}/prescriptions`, prescriptionRoutes);
 router.use(`${API_VERSION}/billing`, billingRoutes);
 router.use(`${API_VERSION}/admin`, adminRoutes);
 router.use(`${API_VERSION}/staff-schedules`, staffScheduleRoutes);
+router.use(`${API_VERSION}/schedules`, scheduleRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -59,7 +61,8 @@ router.get(`${API_VERSION}`, (req, res) => {
       prescriptions: `${API_VERSION}/prescriptions`,
       billing: `${API_VERSION}/billing`,
       admin: `${API_VERSION}/admin`,
-      staffSchedules: `${API_VERSION}/staff-schedules`
+      staffSchedules: `${API_VERSION}/staff-schedules`,
+      schedules: `${API_VERSION}/schedules`
     },
     documentation: {
       health: '/health',

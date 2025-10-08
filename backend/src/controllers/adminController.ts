@@ -33,12 +33,12 @@ export const getAdminClinicOverview = catchAsync(async (req: AuthenticatedReques
 
   // Get clinics with basic info
   const [clinics, totalClinics] = await Promise.all([
-    Clinic.find(query)
+    (Clinic as any).find(query)
       .populate('staff', 'firstName lastName role')
       .sort({ [sortBy as string]: 1 })
       .skip(skip)
       .limit(limit),
-    Clinic.countDocuments(query)
+    (Clinic as any).countDocuments(query)
   ]);
 
   // Get comprehensive data for each clinic
@@ -46,7 +46,7 @@ export const getAdminClinicOverview = catchAsync(async (req: AuthenticatedReques
     clinics.map(async (clinic) => {
       const [patientStats, appointmentStats, billingStats, staffCount] = await Promise.all([
         // Patient statistics
-        Patient.aggregate([
+        (Patient as any).aggregate([
           { $match: { preferredClinicId: clinic._id } },
           {
             $group: {
@@ -66,7 +66,7 @@ export const getAdminClinicOverview = catchAsync(async (req: AuthenticatedReques
         ]),
         
         // Appointment statistics
-        Appointment.aggregate([
+        (Appointment as any).aggregate([
           { $match: { clinicId: clinic._id } },
           {
             $group: {
@@ -77,7 +77,7 @@ export const getAdminClinicOverview = catchAsync(async (req: AuthenticatedReques
         ]),
         
         // Billing statistics
-        Billing.aggregate([
+        (Billing as any).aggregate([
           { $match: { clinicId: clinic._id } },
           {
             $group: {
@@ -188,7 +188,7 @@ export const getClinicDetailedData = catchAsync(async (req: AuthenticatedRequest
   const { clinicId } = req.params;
   const { startDate, endDate } = req.query;
 
-  const clinic = await Clinic.findById(clinicId).populate('staff', 'firstName lastName role email phone');
+  const clinic = await (Clinic as any).findById(clinicId).populate('staff', 'firstName lastName role email phone');
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -199,7 +199,7 @@ export const getClinicDetailedData = catchAsync(async (req: AuthenticatedRequest
 
   const [patientData, appointmentData, billingData, recentActivity] = await Promise.all([
     // Detailed patient analytics
-    Patient.aggregate([
+    (Patient as any).aggregate([
       { $match: { preferredClinicId: clinic._id } },
       {
         $facet: {
@@ -264,7 +264,7 @@ export const getClinicDetailedData = catchAsync(async (req: AuthenticatedRequest
     ]),
 
     // Detailed appointment analytics
-    Appointment.aggregate([
+    (Appointment as any).aggregate([
       { $match: { clinicId: clinic._id, date: { $gte: start, $lte: end } } },
       {
         $facet: {
@@ -303,7 +303,7 @@ export const getClinicDetailedData = catchAsync(async (req: AuthenticatedRequest
     ]),
 
     // Detailed billing analytics
-    Billing.aggregate([
+    (Billing as any).aggregate([
       { $match: { clinicId: clinic._id, createdAt: { $gte: start, $lte: end } } },
       {
         $facet: {
@@ -345,17 +345,17 @@ export const getClinicDetailedData = catchAsync(async (req: AuthenticatedRequest
 
     // Recent activity
     Promise.all([
-      Patient.find({ preferredClinicId: clinic._id })
+      (Patient as any).find({ preferredClinicId: clinic._id })
         .sort({ createdAt: -1 })
         .limit(5)
         .select('firstName lastName email createdAt'),
-      Appointment.find({ clinicId: clinic._id })
+      (Appointment as any).find({ clinicId: clinic._id })
         .sort({ createdAt: -1 })
         .limit(5)
         .populate('patientId', 'firstName lastName')
         .populate('dentistId', 'firstName lastName')
         .select('date time status patientId dentistId createdAt'),
-      Billing.find({ clinicId: clinic._id })
+      (Billing as any).find({ clinicId: clinic._id })
         .sort({ createdAt: -1 })
         .limit(5)
         .populate('patientId', 'firstName lastName')
@@ -426,7 +426,7 @@ export const getClinicComparison = catchAsync(async (req: AuthenticatedRequest, 
       start.setDate(start.getDate() - 30);
   }
 
-  const clinics = await Clinic.find({ _id: { $in: ids } }).select('name');
+  const clinics = await (Clinic as any).find({ _id: { $in: ids } }).select('name');
   
   const comparisonData = await Promise.all(
     clinics.map(async (clinic) => {
@@ -434,7 +434,7 @@ export const getClinicComparison = catchAsync(async (req: AuthenticatedRequest, 
       
       switch (metric) {
         case 'revenue':
-          data = await Billing.aggregate([
+          data = await (Billing as any).aggregate([
             {
               $match: {
                 clinicId: clinic._id,
@@ -456,7 +456,7 @@ export const getClinicComparison = catchAsync(async (req: AuthenticatedRequest, 
           break;
           
         case 'patients':
-          data = await Patient.aggregate([
+          data = await (Patient as any).aggregate([
             {
               $match: {
                 preferredClinicId: clinic._id,
@@ -478,7 +478,7 @@ export const getClinicComparison = catchAsync(async (req: AuthenticatedRequest, 
           break;
           
         case 'appointments':
-          data = await Appointment.aggregate([
+          data = await (Appointment as any).aggregate([
             {
               $match: {
                 clinicId: clinic._id,
@@ -553,13 +553,13 @@ export const getSystemStatistics = catchAsync(async (req: AuthenticatedRequest, 
   const [systemStats, growthStats] = await Promise.all([
     // Current system statistics
     Promise.all([
-      Clinic.countDocuments({ isActive: true }),
-      Clinic.countDocuments({ isActive: false }),
+      (Clinic as any).countDocuments({ isActive: true }),
+      (Clinic as any).countDocuments({ isActive: false }),
       User.countDocuments({ role: 'patient', isActive: true }),
       User.countDocuments({ role: { $in: ['dentist', 'staff'] }, isActive: true }),
       User.countDocuments({ role: 'admin', isActive: true }),
-      Appointment.countDocuments({ date: { $gte: start, $lte: end } }),
-      Billing.aggregate([
+      (Appointment as any).countDocuments({ date: { $gte: start, $lte: end } }),
+      (Billing as any).aggregate([
         { $match: { createdAt: { $gte: start, $lte: end } } },
         { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
       ])
@@ -567,7 +567,7 @@ export const getSystemStatistics = catchAsync(async (req: AuthenticatedRequest, 
     
     // Growth statistics
     Promise.all([
-      Clinic.countDocuments({ createdAt: { $gte: start, $lte: end } }),
+      (Clinic as any).countDocuments({ createdAt: { $gte: start, $lte: end } }),
       User.countDocuments({ role: 'patient', createdAt: { $gte: start, $lte: end } }),
       User.countDocuments({ role: { $in: ['dentist', 'staff'] }, createdAt: { $gte: start, $lte: end } })
     ])
@@ -645,13 +645,13 @@ export const getMultiClinicDashboard = catchAsync(async (req: AuthenticatedReque
     { _id: { $in: Array.isArray(clinicIds) ? clinicIds : [clinicIds] } } : 
     {};
 
-  const clinics = await Clinic.find(clinicFilter).populate('staff', 'firstName lastName role specialization');
+  const clinics = await (Clinic as any).find(clinicFilter).populate('staff', 'firstName lastName role specialization');
 
   const dashboardData = await Promise.all(
     clinics.map(async (clinic) => {
       const [patientStats, appointmentStats, billingStats, staffScheduleStats] = await Promise.all([
         // Patient statistics
-        Patient.aggregate([
+        (Patient as any).aggregate([
           { $match: { preferredClinicId: clinic._id } },
           {
             $facet: {
@@ -673,7 +673,7 @@ export const getMultiClinicDashboard = catchAsync(async (req: AuthenticatedReque
         ]),
 
         // Appointment statistics
-        Appointment.aggregate([
+        (Appointment as any).aggregate([
           { $match: { clinicId: clinic._id, date: { $gte: start, $lte: end } } },
           {
             $facet: {
@@ -704,7 +704,7 @@ export const getMultiClinicDashboard = catchAsync(async (req: AuthenticatedReque
         ]),
 
         // Billing statistics
-        Billing.aggregate([
+        (Billing as any).aggregate([
           { $match: { clinicId: clinic._id, createdAt: { $gte: start, $lte: end } } },
           {
             $facet: {
@@ -901,13 +901,13 @@ export const getClinicPerformanceMetrics = catchAsync(async (req: AuthenticatedR
       start.setDate(start.getDate() - 30);
   }
 
-  const clinics = await Clinic.find({ isActive: true }).select('name');
+  const clinics = await (Clinic as any).find({ isActive: true }).select('name');
 
   const performanceData = await Promise.all(
     clinics.map(async (clinic) => {
       const [efficiency, patientSatisfaction, revenue, staffProductivity] = await Promise.all([
         // Efficiency metrics (appointment completion rate)
-        Appointment.aggregate([
+        (Appointment as any).aggregate([
           { $match: { clinicId: clinic._id, date: { $gte: start, $lte: end } } },
           {
             $group: {
@@ -933,7 +933,7 @@ export const getClinicPerformanceMetrics = catchAsync(async (req: AuthenticatedR
         ]),
 
         // Patient satisfaction (based on completed appointments vs cancellations)
-        Patient.aggregate([
+        (Patient as any).aggregate([
           { $match: { preferredClinicId: clinic._id, createdAt: { $gte: start, $lte: end } } },
           {
             $lookup: {
@@ -973,7 +973,7 @@ export const getClinicPerformanceMetrics = catchAsync(async (req: AuthenticatedR
         ]),
 
         // Revenue metrics
-        Billing.aggregate([
+        (Billing as any).aggregate([
           { $match: { clinicId: clinic._id, createdAt: { $gte: start, $lte: end } } },
           {
             $group: {

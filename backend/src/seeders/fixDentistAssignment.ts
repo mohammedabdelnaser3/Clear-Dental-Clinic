@@ -14,12 +14,12 @@ async function fixDentistAssignment() {
 
     // Step 1: Verify clinic exists
     console.log('📋 Step 1: Verifying clinic...');
-    const clinic = await Clinic.findById(CLINIC_ID_STRING);
+    const clinic = await (Clinic as any).findById(CLINIC_ID_STRING);
     
     if (!clinic) {
       console.log('❌ ERROR: Clinic not found!');
       console.log('Available clinics:');
-      const allClinics = await Clinic.find({}, 'name _id');
+      const allClinics = await (Clinic as any).find({}, 'name _id');
       allClinics.forEach(c => {
         console.log(`   - ${c.name} (${c._id})`);
       });

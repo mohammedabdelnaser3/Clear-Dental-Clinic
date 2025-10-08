@@ -31,7 +31,7 @@ export const createClinic = catchAsync(async (req: AuthenticatedRequest, res: Re
   } = req.body;
 
   // Check if clinic with same name or email already exists
-  const existingClinic = await Clinic.findOne({
+  const existingClinic = await (Clinic as any).findOne({
     $or: [
       { name: { $regex: new RegExp(`^${name}$`, 'i') } },
       { email: email.toLowerCase() }
@@ -102,12 +102,12 @@ export const getAllClinics = catchAsync(async (req: Request, res: Response) => {
 
   // Get clinics with pagination
   const [clinics, total] = await Promise.all([
-    Clinic.find(query)
+    (Clinic as any).find(query)
       .populate('staff', 'firstName lastName role specialization')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit),
-    Clinic.countDocuments(query)
+    (Clinic as any).countDocuments(query)
   ]);
 
   const paginatedResponse = createPaginatedResponse(clinics, total, page, limit);
@@ -122,7 +122,7 @@ export const getAllClinics = catchAsync(async (req: Request, res: Response) => {
 export const getClinicById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id)
+  const clinic = await (Clinic as any).findById(id)
     .populate('staff', 'firstName lastName role specialization phone email profileImage');
 
   if (!clinic) {
@@ -150,14 +150,14 @@ export const updateClinic = catchAsync(async (req: Request, res: Response) => {
     services
   } = req.body;
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
 
   // Check if name or email is being changed and if it's already taken
   if (name && name !== clinic.name) {
-    const existingClinic = await Clinic.findOne({
+    const existingClinic = await (Clinic as any).findOne({
       name: { $regex: new RegExp(`^${name}$`, 'i') },
       _id: { $ne: id }
     });
@@ -168,7 +168,7 @@ export const updateClinic = catchAsync(async (req: Request, res: Response) => {
   }
 
   if (email && email !== clinic.email) {
-    const existingClinic = await Clinic.findOne({
+    const existingClinic = await (Clinic as any).findOne({
       email: email.toLowerCase(),
       _id: { $ne: id }
     });
@@ -203,15 +203,15 @@ export const updateClinic = catchAsync(async (req: Request, res: Response) => {
 export const deleteClinic = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
 
   // Check if clinic has any appointments or patients
   const [appointmentCount, patientCount, staffCount] = await Promise.all([
-    Appointment.countDocuments({ clinicId: id }),
-    Patient.countDocuments({ preferredClinicId: id }),
+    (Appointment as any).countDocuments({ clinicId: id }),
+    (Patient as any).countDocuments({ preferredClinicId: id }),
     User.countDocuments({ assignedClinics: id })
   ]);
 
@@ -222,7 +222,7 @@ export const deleteClinic = catchAsync(async (req: Request, res: Response) => {
     );
   }
 
-  await Clinic.findByIdAndDelete(id);
+  await (Clinic as any).findByIdAndDelete(id);
 
   res.json({
     success: true,
@@ -256,8 +256,8 @@ export const getClinicsByCity = catchAsync(async (req: Request, res: Response) =
   const { page, limit, skip } = getPaginationParams(req);
 
   const [clinics, total] = await Promise.all([
-    Clinic.findByCity(city, { skip, limit }),
-    Clinic.countDocuments({ 'address.city': { $regex: new RegExp(city, 'i') } })
+    (Clinic as any).findByCity(city, { skip, limit }),
+    (Clinic as any).countDocuments({ 'address.city': { $regex: new RegExp(city, 'i') } })
   ]);
 
   const paginatedResponse = createPaginatedResponse(clinics, total, page, limit);
@@ -274,8 +274,8 @@ export const getClinicsByService = catchAsync(async (req: Request, res: Response
   const { page, limit, skip } = getPaginationParams(req);
 
   const [clinics, total] = await Promise.all([
-    Clinic.findByService(service, { skip, limit }),
-    Clinic.countDocuments({ services: { $in: [service] } })
+    (Clinic as any).findByService(service, { skip, limit }),
+    (Clinic as any).countDocuments({ services: { $in: [service] } })
   ]);
 
   const paginatedResponse = createPaginatedResponse(clinics, total, page, limit);
@@ -298,7 +298,7 @@ export const getNearbyClinic = catchAsync(async (req: Request, res: Response) =>
   const lng = parseFloat(longitude as string);
   const radiusInKm = parseFloat(radius as string);
 
-  const clinics = await Clinic.findNearby(lat, lng, radiusInKm);
+  const clinics = await (Clinic as any).findNearby(lat, lng, radiusInKm);
 
   res.json({
     success: true,
@@ -312,7 +312,7 @@ export const addStaffToClinic = catchAsync(async (req: Request, res: Response) =
   const { userId } = req.body;
 
   const [clinic, user] = await Promise.all([
-    Clinic.findById(clinicId),
+    (Clinic as any).findById(clinicId),
     User.findById(userId)
   ]);
 
@@ -348,7 +348,7 @@ export const removeStaffFromClinic = catchAsync(async (req: Request, res: Respon
   const { clinicId, userId } = req.params;
 
   const [clinic, user] = await Promise.all([
-    Clinic.findById(clinicId),
+    (Clinic as any).findById(clinicId),
     User.findById(userId)
   ]);
 
@@ -387,7 +387,7 @@ export const getClinicStaff = catchAsync(async (req: Request, res: Response) => 
   const { clinicId } = req.params;
   const { role } = req.query;
 
-  const clinic = await Clinic.findById(clinicId);
+  const clinic = await (Clinic as any).findById(clinicId);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -415,7 +415,7 @@ export const uploadClinicImage = catchAsync(async (req: Request, res: Response) 
     throw createValidationError('file', 'Clinic image is required');
   }
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -438,16 +438,16 @@ export const uploadClinicImage = catchAsync(async (req: Request, res: Response) 
 export const getClinicStatistics = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
 
   const [appointmentCount, patientCount, staffCount, todayAppointments] = await Promise.all([
-    Appointment.countDocuments({ clinicId: id }),
-    Patient.countDocuments({ preferredClinicId: id }),
+    (Appointment as any).countDocuments({ clinicId: id }),
+    (Patient as any).countDocuments({ preferredClinicId: id }),
     User.countDocuments({ assignedClinics: id }),
-    Appointment.countDocuments({
+    (Appointment as any).countDocuments({
       clinicId: id,
       date: {
         $gte: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -490,20 +490,20 @@ export const getOverallStatistics = catchAsync(async (req: Request, res: Respons
     thisMonthRevenue,
     lastMonthRevenue
   ] = await Promise.all([
-    Clinic.countDocuments(),
-    Clinic.countDocuments({ isActive: true }),
-    Appointment.countDocuments(),
-    Appointment.countDocuments({
+    (Clinic as any).countDocuments(),
+    (Clinic as any).countDocuments({ isActive: true }),
+    (Appointment as any).countDocuments(),
+    (Appointment as any).countDocuments({
       date: { $gte: startOfDay, $lte: endOfDay }
     }),
-    Appointment.countDocuments({
+    (Appointment as any).countDocuments({
       date: { $gt: endOfDay },
       status: 'scheduled'
     }),
-    Appointment.countDocuments({ status: 'completed' }),
-    Appointment.countDocuments({ status: 'cancelled' }),
-    Patient.countDocuments(),
-    Patient.countDocuments({
+    (Appointment as any).countDocuments({ status: 'completed' }),
+    (Appointment as any).countDocuments({ status: 'cancelled' }),
+    (Patient as any).countDocuments(),
+    (Patient as any).countDocuments({
       createdAt: { $gte: startOfMonth }
     }),
     User.countDocuments({ role: { $in: ['dentist', 'staff'] } }),
@@ -514,7 +514,7 @@ export const getOverallStatistics = catchAsync(async (req: Request, res: Respons
   ]);
 
   // Get clinic distribution by city
-  const clinicsByCity = await Clinic.aggregate([
+  const clinicsByCity = await (Clinic as any).aggregate([
     {
       $group: {
         _id: '$address.city',
@@ -526,7 +526,7 @@ export const getOverallStatistics = catchAsync(async (req: Request, res: Respons
   ]);
 
   // Get appointment trends for the last 7 days
-  const appointmentTrends = await Appointment.aggregate([
+  const appointmentTrends = await (Appointment as any).aggregate([
     {
       $match: {
         date: {
@@ -582,7 +582,7 @@ export const getOverallStatistics = catchAsync(async (req: Request, res: Respons
 export const getClinicOperatingHours = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id).select('name operatingHours');
+  const clinic = await (Clinic as any).findById(id).select('name operatingHours');
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -603,7 +603,7 @@ export const getClinicOperatingHours = catchAsync(async (req: Request, res: Resp
 export const checkClinicStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -628,7 +628,7 @@ export const checkClinicStatus = catchAsync(async (req: Request, res: Response) 
 
 // Get all available services
 export const getAllServices = catchAsync(async (req: Request, res: Response) => {
-  const services = await Clinic.distinct('services');
+  const services = await (Clinic as any).distinct('services');
 
   res.json({
     success: true,
@@ -640,7 +640,7 @@ export const getAllServices = catchAsync(async (req: Request, res: Response) => 
 export const getClinicDashboard = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const clinic = await Clinic.findById(id);
+  const clinic = await (Clinic as any).findById(id);
   if (!clinic) {
     throw createNotFoundError('Clinic');
   }
@@ -650,7 +650,7 @@ export const getClinicDashboard = catchAsync(async (req: Request, res: Response)
   const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
   const [todayAppointments, upcomingAppointments, recentPatients, staffCount] = await Promise.all([
-    Appointment.find({
+    (Appointment as any).find({
       clinicId: id,
       date: { $gte: startOfDay, $lte: endOfDay }
     })
@@ -658,7 +658,7 @@ export const getClinicDashboard = catchAsync(async (req: Request, res: Response)
       .populate('dentistId', 'firstName lastName')
       .sort({ 'timeSlot.start': 1 }),
     
-    Appointment.find({
+    (Appointment as any).find({
       clinicId: id,
       date: { $gt: endOfDay },
       status: 'scheduled'
@@ -668,7 +668,7 @@ export const getClinicDashboard = catchAsync(async (req: Request, res: Response)
       .sort({ date: 1 })
       .limit(5),
     
-    Patient.find({ preferredClinicId: id })
+    (Patient as any).find({ preferredClinicId: id })
       .sort({ createdAt: -1 })
       .limit(5)
       .select('firstName lastName email createdAt'),

@@ -238,7 +238,7 @@ export const appointmentAccessControl = async (
       }
 
       // Check if the patient record belongs to this user
-      const patient = await Patient.findById(patientId);
+      const patient = await (Patient as any).findById(patientId);
       if (!patient) {
         res.status(404).json({
           success: false,
@@ -311,7 +311,7 @@ export const appointmentDetailAccessControl = async (
       const { default: Appointment } = await import('../models/Appointment');
       
       // Find the appointment and check if it belongs to this patient
-      const appointment = await Appointment.findById(appointmentId).populate('patientId', '_id userId');
+      const appointment = await (Appointment as any).findById(appointmentId).populate('patientId', '_id userId');
       
       if (!appointment) {
         res.status(404).json({

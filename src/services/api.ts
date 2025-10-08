@@ -19,13 +19,34 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor for adding auth token
+// Request interceptor for adding auth token and debugging
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Debug logging for clinic-related requests (only in development)
+    if (import.meta.env.DEV && config.params && config.params.clinicId) {
+      console.log('🔍 API Request:', {
+        url: config.url,
+        method: config.method?.toUpperCase(),
+        clinicId: config.params.clinicId,
+        clinicIdType: typeof config.params.clinicId
+      });
+      
+      // Check if clinicId is an object (which would cause the 400 error)
+      if (typeof config.params.clinicId === 'object') {
+        console.error('❌ FOUND OBJECT CLINIC ID - FIXING:', config.params.clinicId);
+        // Try to extract the ID if it's an object
+        if (config.params.clinicId && config.params.clinicId.id) {
+          config.params.clinicId = config.params.clinicId.id;
+          console.log('✅ Fixed clinic ID:', config.params.clinicId);
+        }
+      }
+    }
+    
     return config;
   },
   (error) => {
@@ -407,6 +428,9 @@ export const endpoints = {
     patientStats: '/api/v1/dashboard/patient-stats',
     revenueStats: '/api/v1/dashboard/revenue-stats',
   },
+
+  // Search endpoint
+  search: '/api/v1/search',
 };
 
 export default api;

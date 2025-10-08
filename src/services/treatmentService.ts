@@ -215,6 +215,96 @@ class TreatmentService {
       throw new Error(errorMessage);
     }
   }
+
+  // Export treatment records
+  async exportTreatmentRecords(params: {
+    search?: string;
+    status?: string;
+    treatmentType?: string;
+    patient?: string;
+    dentist?: string;
+    startDate?: string;
+    endDate?: string;
+    format: 'csv' | 'pdf';
+  }): Promise<Blob> {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+
+      const response = await api.get(`${this.baseURL}/export?${queryParams.toString()}`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to export treatment records';
+      throw new Error(errorMessage);
+    }
+  }
+
+  // Get treatment analytics for reports
+  async getTreatmentAnalytics(params: {
+    startDate?: string;
+    endDate?: string;
+    dentist?: string;
+    clinic?: string;
+    groupBy?: 'day' | 'week' | 'month';
+  } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+
+      const response = await api.get(`${this.baseURL}/analytics?${queryParams.toString()}`);
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch treatment analytics';
+      throw new Error(errorMessage);
+    }
+  }
+
+  // Upload treatment attachment
+  async uploadAttachment(treatmentId: string, file: File): Promise<ApiResponse<{ url: string; fileName: string }>> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await api.post(`${this.baseURL}/${treatmentId}/attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: 'Attachment uploaded successfully'
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload attachment';
+      throw new Error(errorMessage);
+    }
+  }
+
+  // Delete treatment attachment
+  async deleteAttachment(treatmentId: string, attachmentId: string): Promise<ApiResponse<void>> {
+    try {
+      const response = await api.delete(`${this.baseURL}/${treatmentId}/attachments/${attachmentId}`);
+      return {
+        success: true,
+        data: response.data,
+        message: 'Attachment deleted successfully'
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete attachment';
+      throw new Error(errorMessage);
+    }
+  }
 }
 
 // Create and export service instance
@@ -227,6 +317,10 @@ export const createTreatmentRecord = treatmentService.createTreatmentRecord.bind
 export const updateTreatmentRecord = treatmentService.updateTreatmentRecord.bind(treatmentService);
 export const deleteTreatmentRecord = treatmentService.deleteTreatmentRecord.bind(treatmentService);
 export const getTreatmentStats = treatmentService.getTreatmentStats.bind(treatmentService);
+export const exportTreatmentRecords = treatmentService.exportTreatmentRecords.bind(treatmentService);
+export const getTreatmentAnalytics = treatmentService.getTreatmentAnalytics.bind(treatmentService);
+export const uploadAttachment = treatmentService.uploadAttachment.bind(treatmentService);
+export const deleteAttachment = treatmentService.deleteAttachment.bind(treatmentService);
 
 // Export service instance as both named and default export
 export { treatmentService };

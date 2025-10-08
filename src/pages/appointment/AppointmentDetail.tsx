@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button, Card, Badge } from '../../components/ui';
+import { Button, Card, Badge, Modal } from '../../components/ui';
 import { appointmentService } from '../../services/appointmentService';
+import { PrescriptionForm } from '../../components/prescriptions/PrescriptionForm';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../hooks/useAuth';
 
 interface Appointment {
   _id: string;
@@ -53,9 +55,11 @@ const AppointmentDetail: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({});
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState<{
     show: boolean;
     action: 'cancel' | 'complete' | 'no-show' | null;
@@ -75,7 +79,14 @@ const AppointmentDetail: React.FC = () => {
   // Fetch appointment data on component mount
   useEffect(() => {
     const fetchAppointment = async () => {
-      if (!id) return;
+      // Don't try to fetch data if the ID is a route keyword
+      if (!id || ['new', 'create', 'edit'].includes(id.toLowerCase())) {
+        if (id && ['new', 'create', 'edit'].includes(id.toLowerCase())) {
+          // Redirect to the correct route if someone manually enters an invalid URL
+          navigate('/appointments/create', { replace: true });
+        }
+        return;
+      }
       
       try {
         setIsLoading(true);
@@ -150,7 +161,7 @@ const AppointmentDetail: React.FC = () => {
     };
 
     fetchAppointment();
-  }, [id, t]);
+  }, [id, t, navigate]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -320,6 +331,22 @@ const AppointmentDetail: React.FC = () => {
     }
   }, [showConfirmModal.action, handleCancelAppointment, handleCompleteAppointment, handleNoShow]);
 
+  const handleCreatePrescription = useCallback(() => {
+    setShowPrescriptionModal(true);
+  }, []);
+
+  const handlePrescriptionSaved = useCallback(() => {
+    setShowPrescriptionModal(false);
+    toast.success(t('appointmentDetail.prescriptionCreated') || 'Prescription created successfully');
+  }, [t]);
+
+  const handlePrescriptionCancel = useCallback(() => {
+    setShowPrescriptionModal(false);
+  }, []);
+
+  // Check if user is a dentist
+  const canCreatePrescription = user?.role === 'dentist' || user?.role === 'admin' || user?.role === 'super_admin';
+
   // Loading state
   if (isLoading) {
     return (
@@ -455,6 +482,20 @@ const AppointmentDetail: React.FC = () => {
             
             {/* Action Buttons */}
             <div className="mt-6 md:mt-0 flex flex-wrap gap-3">
+              {/* Create Prescription Button - Available for dentists */}
+              {canCreatePrescription && (appointment.status === 'scheduled' || appointment.status === 'confirmed' || appointment.status === 'in-progress' || appointment.status === 'completed') && (
+                <Button 
+                  variant="primary"
+                  onClick={handleCreatePrescription}
+                  className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 border-0 text-white font-bold shadow-lg transition-all duration-200 transform hover:scale-105"
+                >
+                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  </svg>
+                  <span className="font-bold">{t('appointmentDetail.createPrescription') || 'Create Prescription'}</span>
+                </Button>
+              )}
+              
               {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
             <>
               <Link to={`/appointments/${id}/edit`}>
@@ -838,6 +879,23 @@ const AppointmentDetail: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Prescription Creation Modal */}
+      {showPrescriptionModal && appointment && typeof appointment.patientId === 'object' && (
+        <Modal
+          isOpen={showPrescriptionModal}
+          onClose={handlePrescriptionCancel}
+          title={t('appointmentDetail.createPrescriptionTitle') || 'Create Prescription'}
+          size="xl"
+        >
+          <PrescriptionForm
+            patientId={appointment.patientId._id}
+            appointmentId={appointment._id || appointment.id}
+            onSave={handlePrescriptionSaved}
+            onCancel={handlePrescriptionCancel}
+          />
+        </Modal>
+      )}
       </div>
     </div>
   );

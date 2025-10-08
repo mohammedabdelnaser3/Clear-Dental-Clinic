@@ -8,6 +8,12 @@ const clinicSchema = new Schema<IClinic>({
     trim: true,
     maxlength: [100, 'Clinic name cannot exceed 100 characters']
   },
+  branchName: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Branch name cannot exceed 100 characters'],
+    index: true
+  },
   description: {
     type: String,
     trim: true,
@@ -129,6 +135,8 @@ const clinicSchema = new Schema<IClinic>({
 
 // Indexes
 clinicSchema.index({ name: 1 });
+clinicSchema.index({ branchName: 1 });
+clinicSchema.index({ name: 1, branchName: 1 });
 clinicSchema.index({ 'address.city': 1 });
 clinicSchema.index({ 'address.state': 1 });
 clinicSchema.index({ 'address.zipCode': 1 });

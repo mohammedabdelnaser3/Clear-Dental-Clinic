@@ -3,7 +3,25 @@ import { Link } from 'react-router-dom';
 import { Card, Button, Input, Alert, Select } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
 import adminService from '../../services/adminService';
-import { BarChart3, Users, DollarSign, Calendar, Search, Filter, Eye, RefreshCw } from 'lucide-react';
+import { 
+  BarChart3, 
+  Users, 
+  DollarSign, 
+  Calendar, 
+  Search, 
+  Filter, 
+  Eye, 
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  CheckCircle,
+  Clock,
+  Building2,
+  Plus,
+  Settings,
+  Download,
+} from 'lucide-react';
 import type { Clinic } from '../../types';
 import { useTranslation } from 'react-i18next';
 
@@ -286,29 +304,73 @@ const AdminClinicDashboard: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <BarChart3 /> {t('admin_dashboard.title')}
-        </h1>
-        <div className="flex space-x-2">
-          <Link to="/admin/multi-clinic">
-            <Button variant="secondary">{t('admin_dashboard.multi_clinic_dashboard')}</Button>
-          </Link>
-          <Link to="/clinics">
-            <Button variant="outline">{t('admin_dashboard.manage_clinics')}</Button>
-          </Link>
-          <Button 
-            onClick={handleRefresh} 
-            variant="primary"
-            disabled={refreshing}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={refreshing ? 'animate-spin' : ''} />
-            {refreshing ? t('admin_dashboard.refreshing') : t('admin_dashboard.refresh_data')}
-          </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl border-b border-blue-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+            {/* Left Section */}
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white">{t('admin_dashboard.title')}</h1>
+                <p className="text-blue-100/80 text-sm lg:text-base">Comprehensive clinic management and analytics</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
+                  <span className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>System Online</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>Last updated: {new Date().toLocaleTimeString()}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? t('admin_dashboard.refreshing') : t('admin_dashboard.refresh_data')}
+              </Button>
+              <Link to="/admin/multi-clinic">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                >
+                  <Activity className="w-4 h-4 mr-2" />
+                  {t('admin_dashboard.multi_clinic_dashboard')}
+                </Button>
+              </Link>
+              <Link to="/clinics">
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  {t('admin_dashboard.manage_clinics')}
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       {error && (
         <Alert variant="error" className="mb-4">
@@ -316,154 +378,225 @@ const AdminClinicDashboard: React.FC = () => {
         </Alert>
       )}
 
-      {/* Overall Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="p-6 hover:shadow-lg transition-shadow">
-          <div className="text-center">
-            <div className="flex justify-center mb-2">
-              <div className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg">
-                <Users className="text-2xl text-blue-600" />
+        {/* Overall Statistics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-blue-50/50 backdrop-blur-sm group">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Building2 className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('admin_dashboard.total_clinics')}</h3>
+              <p className="text-3xl font-bold text-blue-600 mb-2">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mx-auto"></div>
+                ) : (
+                  totalStats.totalClinics.toLocaleString()
+                )}
+              </p>
+              <div className="flex items-center justify-center space-x-1 text-sm text-green-600">
+                <TrendingUp className="w-4 h-4" />
+                <span>+12% this month</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-600">{t('admin_dashboard.total_clinics')}</h3>
-            <p className="text-3xl font-bold text-blue-600">
-              {loading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mx-auto"></div>
-              ) : (
-                totalStats.totalClinics.toLocaleString()
-              )}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-6 hover:shadow-lg transition-shadow">
-          <div className="text-center">
-            <div className="flex justify-center mb-2">
-              <div className="p-3 bg-gradient-to-r from-green-100 to-green-200 rounded-lg">
-                <Users className="text-2xl text-green-600" />
+          </Card>
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-green-50/50 backdrop-blur-sm group">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('admin_dashboard.total_patients')}</h3>
+              <p className="text-3xl font-bold text-green-600 mb-2">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-20 rounded mx-auto"></div>
+                ) : (
+                  totalStats.totalPatients.toLocaleString()
+                )}
+              </p>
+              <div className="flex items-center justify-center space-x-1 text-sm text-green-600">
+                <TrendingUp className="w-4 h-4" />
+                <span>+8% this month</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-600">{t('admin_dashboard.total_patients')}</h3>
-            <p className="text-3xl font-bold text-green-600">
-              {loading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded mx-auto"></div>
-              ) : (
-                totalStats.totalPatients.toLocaleString()
-              )}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-6 hover:shadow-lg transition-shadow">
-          <div className="text-center">
-            <div className="flex justify-center mb-2">
-              <div className="p-3 bg-gradient-to-r from-purple-100 to-purple-200 rounded-lg">
-                <DollarSign className="text-2xl text-purple-600" />
+          </Card>
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-purple-50/50 backdrop-blur-sm group">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <DollarSign className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('admin_dashboard.total_revenue')}</h3>
+              <p className="text-3xl font-bold text-purple-600 mb-2">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-24 rounded mx-auto"></div>
+                ) : (
+                  `$${totalStats.totalRevenue.toLocaleString()}`
+                )}
+              </p>
+              <div className="flex items-center justify-center space-x-1 text-sm text-green-600">
+                <TrendingUp className="w-4 h-4" />
+                <span>+15% this month</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-600">{t('admin_dashboard.total_revenue')}</h3>
-            <p className="text-3xl font-bold text-purple-600">
-              {loading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-24 rounded mx-auto"></div>
-              ) : (
-                `$${totalStats.totalRevenue.toLocaleString()}`
-              )}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-6 hover:shadow-lg transition-shadow">
-          <div className="text-center">
-            <div className="flex justify-center mb-2">
-              <div className="p-3 bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg">
-                <Calendar className="text-2xl text-orange-600" />
+          </Card>
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-orange-50/50 backdrop-blur-sm group">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('admin_dashboard.total_appointments')}</h3>
+              <p className="text-3xl font-bold text-orange-600 mb-2">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-20 rounded mx-auto"></div>
+                ) : (
+                  totalStats.totalAppointments.toLocaleString()
+                )}
+              </p>
+              <div className="flex items-center justify-center space-x-1 text-sm text-red-600">
+                <TrendingDown className="w-4 h-4" />
+                <span>-3% this month</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-600">{t('admin_dashboard.total_appointments')}</h3>
-            <p className="text-3xl font-bold text-orange-600">
-              {loading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded mx-auto"></div>
-              ) : (
-                totalStats.totalAppointments.toLocaleString()
-              )}
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="relative flex-1 min-w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="text"
-            placeholder={t('admin_dashboard.search_placeholder')}
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10"
-          />
+          </Card>
         </div>
-        <div className="flex items-center gap-2">
-          <Filter className="text-gray-500" />
-          <Select
-            options={[
-              { value: 'name', label: t('admin_dashboard.sort_by_name') },
-              { value: 'patients', label: t('admin_dashboard.sort_by_patients') },
-              { value: 'revenue', label: t('admin_dashboard.sort_by_revenue') }, 
-              { value: 'appointments', label: t('admin_dashboard.sort_by_appointments') }
-            ]}
-            value={sortBy}
-            onChange={(e) => handleSortChange(e.target.value as SortOption)}
-            className="min-w-40"
-          >
-            <option value="name">{t('admin_dashboard.sort_by_name')}</option>
-            <option value="patients">{t('admin_dashboard.sort_by_patients')}</option>
-            <option value="revenue">{t('admin_dashboard.sort_by_revenue')}</option>
-            <option value="appointments">{t('admin_dashboard.sort_by_appointments')}</option>
-          </Select>
-        </div>
-        <Select
-          options={[
-            { value: 'all', label: t('admin_dashboard.all_clinics') },
-            { value: 'active', label: t('admin_dashboard.active_only') },
-            { value: 'inactive', label: t('admin_dashboard.inactive_only') }
-          ]}
-          value={filterBy}
-          onChange={(e) => handleFilterChange(e.target.value as FilterOption)}
-          className="min-w-32"
-        >
-          <option value="all">{t('admin_dashboard.all_clinics')}</option>
-          <option value="active">{t('admin_dashboard.active_only')}</option>
-          <option value="inactive">{t('admin_dashboard.inactive_only')}</option>
-        </Select>
-      </div>
 
-      {/* Clinics Table */}
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.clinic')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.location')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.patients')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.appointments')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.revenue')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.status')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('admin_dashboard.actions')}
-                </th>
-              </tr>
-            </thead>
+        {/* Enhanced Filters and Search */}
+        <Card className="p-6 mb-8 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Search className="w-5 h-5 text-blue-600" />
+              Search & Filter Clinics
+            </h2>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span>Total: {filteredAndSortedClinics.length} clinics</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder={t('admin_dashboard.search_placeholder')}
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+              />
+            </div>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Select
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
+                className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl appearance-none"
+                options={[
+                  { value: 'name', label: t('admin_dashboard.sort_by_name') },
+                  { value: 'patients', label: t('admin_dashboard.sort_by_patients') },
+                  { value: 'revenue', label: t('admin_dashboard.sort_by_revenue') },
+                  { value: 'appointments', label: t('admin_dashboard.sort_by_appointments') }
+                ]}
+              />
+            </div>
+            <div className="relative">
+              <Activity className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Select
+                value={filterBy}
+                onChange={(e) => handleFilterChange(e.target.value as FilterOption)}
+                className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl appearance-none"
+                options={[
+                  { value: 'all', label: t('admin_dashboard.all_clinics') },
+                  { value: 'active', label: t('admin_dashboard.active_only') },
+                  { value: 'inactive', label: t('admin_dashboard.inactive_only') }
+                ]}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Enhanced Clinics Table */}
+        <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50">
+          <div className="p-6 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-blue-600" />
+                Clinic Management
+              </h2>
+              <div className="flex items-center space-x-3">
+                <Link to="/clinics/create">
+                  <Button 
+                    variant="primary" 
+                    size="sm"
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Clinic
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => console.log('Export clicked')}
+                  className="border-gray-200 hover:border-blue-500 hover:text-blue-600"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-gray-50 to-blue-50/50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <Building2 className="w-4 h-4" />
+                      <span>{t('admin_dashboard.clinic')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <Activity className="w-4 h-4" />
+                      <span>{t('admin_dashboard.location')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-4 h-4" />
+                      <span>{t('admin_dashboard.patients')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="w-4 h-4" />
+                      <span>{t('admin_dashboard.appointments')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <DollarSign className="w-4 h-4" />
+                      <span>{t('admin_dashboard.revenue')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{t('admin_dashboard.status')}</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <div className="flex items-center space-x-1">
+                      <Settings className="w-4 h-4" />
+                      <span>{t('admin_dashboard.actions')}</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredAndSortedClinics.length === 0 ? (
                 <tr>
@@ -775,6 +908,7 @@ const AdminClinicDashboard: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

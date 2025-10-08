@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './AuthContext';
 import { ClinicProvider } from './ClinicContext';
+import { NotificationProvider } from './NotificationContext';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -23,7 +24,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ClinicProvider>
-          {children}
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </ClinicProvider>
       </AuthProvider>
     </QueryClientProvider>

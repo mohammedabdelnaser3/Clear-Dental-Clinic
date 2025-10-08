@@ -128,7 +128,7 @@ const medicationsData: MedicationData[] = [
 export const seedMedications = async (): Promise<void> => {
   try {
     // Check if medications already exist
-    const existingCount = await Medication.countDocuments();
+    const existingCount = await (Medication as any).countDocuments();
     
     if (existingCount > 0) {
       console.log(`✅ Medications already seeded (${existingCount} medications found)`);
@@ -136,7 +136,7 @@ export const seedMedications = async (): Promise<void> => {
     }
 
     // Insert medications
-    await Medication.insertMany(medicationsData);
+    await (Medication as any).insertMany(medicationsData);
     
     console.log(`✅ Successfully seeded ${medicationsData.length} medications`);
     

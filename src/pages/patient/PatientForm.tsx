@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Input, Textarea, Select, Card, Alert } from '../../components/ui';
 import { patientService } from '../../services';
-import type { Patient as PatientType } from '../../types';
+import * as clinicService from '../../services/clinicService';
+import { useAuth } from '../../hooks/useAuth';
+import type { Patient as PatientType, Clinic } from '../../types';
 
 const PatientForm: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +18,7 @@ const PatientForm: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [newAllergy, setNewAllergy] = useState('');
   const [newCondition, setNewCondition] = useState('');
+  const [availableClinics, setAvailableClinics] = useState<Clinic[]>([]);
   
   // Form state
   const [formData, setFormData] = useState<PatientType>({
@@ -50,23 +54,41 @@ const PatientForm: React.FC = () => {
     updatedAt: new Date()
   });
 
-  // Fetch patient data if in edit mode
+  // Fetch clinics and patient data
   useEffect(() => {
-    if (isEditMode) {
-      setIsLoading(true);
-      const fetchPatient = async () => {
-        try {
+    const fetchInitialData = async () => {
+      try {
+        // Load available clinics
+        const clinicsResponse = await clinicService.getAllClinics();
+        if (clinicsResponse.success && clinicsResponse.data) {
+          setAvailableClinics(clinicsResponse.data);
+          
+          // Set default clinic if no clinic selected and clinics available
+          if (!formData.preferredClinicId && clinicsResponse.data && clinicsResponse.data.length > 0) {
+            setFormData(prev => ({
+              ...prev,
+              preferredClinicId: clinicsResponse.data![0].id
+            }));
+          }
+        }
+
+        // Fetch patient data if in edit mode
+        if (isEditMode) {
+          setIsLoading(true);
           const data = await patientService.getPatientById(id!);
           setFormData(data);
-        } catch (err: any) {
-          setError(err.message || 'Failed to fetch patient data');
-        } finally {
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch initial data');
+      } finally {
+        if (isEditMode) {
           setIsLoading(false);
         }
-      };
-      fetchPatient();
-    }
-  }, [id, isEditMode]);
+      }
+    };
+
+    fetchInitialData();
+  }, [id, isEditMode]); // Remove formData dependency to prevent infinite loops
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -171,6 +193,26 @@ const PatientForm: React.FC = () => {
       setError(t('patient_form.date_of_birth_required'));
       return false;
     }
+    if (!formData.preferredClinicId) {
+      setError(t('patient_form.clinic_required'));
+      return false;
+    }
+    if (!formData.address.street.trim()) {
+      setError(t('patient_form.street_address_required'));
+      return false;
+    }
+    if (!formData.address.city.trim()) {
+      setError(t('patient_form.city_required'));
+      return false;
+    }
+    if (!formData.address.state.trim()) {
+      setError(t('patient_form.state_required'));
+      return false;
+    }
+    if (!formData.address.zipCode.trim()) {
+      setError(t('patient_form.zip_code_required'));
+      return false;
+    }
     return true;
   };
 
@@ -185,10 +227,28 @@ const PatientForm: React.FC = () => {
     setIsLoading(true);
     
     try {
+      // Prepare data for backend with proper structure
+      const patientData = {
+        ...formData,
+        // Backend expects Date object, not string
+        dateOfBirth: formData.dateOfBirth instanceof Date 
+          ? formData.dateOfBirth 
+          : new Date(formData.dateOfBirth),
+        // Ensure medical history has proper structure
+        medicalHistory: {
+          allergies: formData.medicalHistory.allergies || [],
+          medications: formData.medicalHistory.medications || [],
+          conditions: formData.medicalHistory.conditions || [],
+          notes: formData.medicalHistory.notes || ''
+        },
+        // Add created by information for new patients
+        ...(isEditMode ? {} : { createdBy: user?.id })
+      };
+
       if (isEditMode) {
-        await patientService.updatePatient(id!, formData);
+        await patientService.updatePatient(id!, patientData);
       } else {
-        await patientService.createPatient(formData);
+        await patientService.createPatient(patientData);
       }
       
       setSuccess(isEditMode ? t('patient_form.patient_updated_successfully') : t('patient_form.patient_created_successfully'));
@@ -298,36 +358,61 @@ const PatientForm: React.FC = () => {
               ]}
             />
           </div>
+          
+          <div className="mt-4">
+            <Select
+              label={t('patient_form.preferred_clinic')}
+              name="preferredClinicId"
+              value={formData.preferredClinicId}
+              onChange={handleInputChange}
+              options={availableClinics.map(clinic => ({
+                value: clinic.id,
+                label: clinic.name
+              }))}
+              required
+            />
+          </div>
         </Card>
 
         <Card>
           <h2 className="text-lg font-medium text-gray-900 mb-4">{t('patient_form.address_information')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-               <Input
-                 label={t('patient_form.street_address')}
-                 name="address.street"
-                 value={formData.address.street}
-                 onChange={handleInputChange}
-               />
+             <Input
+               label={t('patient_form.street_address')}
+               name="address.street"
+               value={formData.address.street}
+               onChange={handleInputChange}
+               required
+             />
              </div>
              <Input
                label={t('patient_form.city')}
                name="address.city"
                value={formData.address.city}
                onChange={handleInputChange}
+               required
              />
              <Input
                label={t('patient_form.state')}
                name="address.state"
                value={formData.address.state}
                onChange={handleInputChange}
+               required
              />
              <Input
                label={t('patient_form.zip_code')}
                name="address.zipCode"
                value={formData.address.zipCode}
                onChange={handleInputChange}
+               required
+             />
+             <Input
+               label={t('patient_form.country')}
+               name="address.country"
+               value={formData.address.country}
+               onChange={handleInputChange}
+               required
              />
           </div>
         </Card>

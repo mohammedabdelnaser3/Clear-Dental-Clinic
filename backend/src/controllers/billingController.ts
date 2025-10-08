@@ -29,7 +29,7 @@ export const getAllBillingRecords = asyncHandler(async (req: AuthenticatedReques
     query.clinicId = clinicId;
   }
   
-  const billingRecords = await Billing.find(query)
+  const billingRecords = await (Billing as any).find(query)
     .populate('patientId', 'firstName lastName email phone')
     .populate('dentistId', 'firstName lastName')
     .populate('clinicId', 'name address')
@@ -38,7 +38,7 @@ export const getAllBillingRecords = asyncHandler(async (req: AuthenticatedReques
     .limit(Number(limit) * 1)
     .skip((Number(page) - 1) * Number(limit));
     
-  const total = await Billing.countDocuments(query);
+  const total = await (Billing as any).countDocuments(query);
   
   return res.status(200).json({
     success: true,
@@ -55,7 +55,7 @@ export const getAllBillingRecords = asyncHandler(async (req: AuthenticatedReques
 // @route   GET /api/billing/:id
 // @access  Private (Dentist, Staff, Admin, Patient - own only)
 export const getBillingRecordById = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const billingRecord = await Billing.findById(req.params.id)
+  const billingRecord = await (Billing as any).findById(req.params.id)
     .populate('patientId', 'firstName lastName email phone address')
     .populate('dentistId', 'firstName lastName specialization licenseNumber')
     .populate('clinicId', 'name address phone email')
@@ -87,21 +87,21 @@ export const getBillingRecordById = asyncHandler(async (req: AuthenticatedReques
 // @access  Private (Dentist, Staff)
 export const createBillingRecord = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   // Verify patient exists
-  const patient = await Patient.findById(req.body.patientId);
+  const patient = await (Patient as any).findById(req.body.patientId);
   if (!patient) {
     return next(new AppError('Patient not found', 404));
   }
   
   // Verify appointment exists if provided
   if (req.body.appointmentId) {
-    const appointment = await Appointment.findById(req.body.appointmentId);
+    const appointment = await (Appointment as any).findById(req.body.appointmentId);
     if (!appointment) {
       return next(new AppError('Appointment not found', 404));
     }
   }
   
   // Generate invoice number
-  const invoiceCount = await Billing.countDocuments();
+  const invoiceCount = await (Billing as any).countDocuments();
   const invoiceNumber = `INV-${Date.now()}-${(invoiceCount + 1).toString().padStart(4, '0')}`;
   
   const billingData = {
@@ -111,9 +111,9 @@ export const createBillingRecord = asyncHandler(async (req: AuthenticatedRequest
     dueDate: req.body.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
   };
   
-  const billingRecord = await Billing.create(billingData);
+  const billingRecord = await (Billing as any).create(billingData);
   
-  const populatedBillingRecord = await Billing.findById(billingRecord._id)
+  const populatedBillingRecord = await (Billing as any).findById(billingRecord._id)
     .populate('patientId', 'firstName lastName email')
     .populate('dentistId', 'firstName lastName')
     .populate('clinicId', 'name')
@@ -130,7 +130,7 @@ export const createBillingRecord = asyncHandler(async (req: AuthenticatedRequest
 // @route   PUT /api/billing/:id
 // @access  Private (Dentist - own only, Staff, Admin)
 export const updateBillingRecord = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const billingRecord = await Billing.findById(req.params.id);
+  const billingRecord = await (Billing as any).findById(req.params.id);
   
   if (!billingRecord) {
     return next(new AppError('Billing record not found', 404));
@@ -141,7 +141,7 @@ export const updateBillingRecord = asyncHandler(async (req: AuthenticatedRequest
     return next(new AppError('Access denied', 403));
   }
   
-  const updatedBillingRecord = await Billing.findByIdAndUpdate(
+  const updatedBillingRecord = await (Billing as any).findByIdAndUpdate(
     req.params.id,
     req.body,
     { new: true, runValidators: true }
@@ -161,7 +161,7 @@ export const updateBillingRecord = asyncHandler(async (req: AuthenticatedRequest
 // @route   DELETE /api/billing/:id
 // @access  Private (Admin)
 export const deleteBillingRecord = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const billingRecord = await Billing.findByIdAndUpdate(
+  const billingRecord = await (Billing as any).findByIdAndUpdate(
     req.params.id,
     { isActive: false },
     { new: true }
@@ -192,12 +192,12 @@ export const getBillingRecordsByPatient = asyncHandler(async (req: Authenticated
   const skip = (Number(page) - 1) * Number(limit);
   
   const [billingRecords, total] = await Promise.all([
-    Billing.findByPatient(patientId, {
+    (Billing as any).findByPatient(patientId, {
       status,
       limit: Number(limit),
       skip
     }),
-    Billing.countDocuments({
+    (Billing as any).countDocuments({
       patientId,
       isActive: true,
       ...(status && { paymentStatus: status })
@@ -228,7 +228,7 @@ export const getOverdueBillingRecords = asyncHandler(async (req: AuthenticatedRe
     filterClinicId = req.user.assignedClinics[0].toString();
   }
   
-  const overdueBillingRecords = await Billing.findOverdue(filterClinicId);
+  const overdueBillingRecords = await (Billing as any).findOverdue(filterClinicId);
   
   return res.status(200).json({
     success: true,
@@ -246,7 +246,7 @@ export const addPayment = asyncHandler(async (req: AuthenticatedRequest, res: Re
     return next(new AppError('Valid payment amount is required', 400));
   }
   
-  const billingRecord = await Billing.findById(req.params.id);
+  const billingRecord = await (Billing as any).findById(req.params.id);
   
   if (!billingRecord) {
     return next(new AppError('Billing record not found', 404));
@@ -299,10 +299,10 @@ export const getBillingSummary = asyncHandler(async (req: AuthenticatedRequest, 
   }
   
   const [totalRecords, pendingPayments, overduePayments, totalRevenue] = await Promise.all([
-    Billing.countDocuments(query),
-    Billing.countDocuments({ ...query, paymentStatus: 'pending' }),
-    Billing.countDocuments({ ...query, paymentStatus: 'overdue' }),
-    Billing.aggregate([
+    (Billing as any).countDocuments(query),
+    (Billing as any).countDocuments({ ...query, paymentStatus: 'pending' }),
+    (Billing as any).countDocuments({ ...query, paymentStatus: 'overdue' }),
+    (Billing as any).aggregate([
       { $match: { ...query, paymentStatus: 'paid' } },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } }
     ])

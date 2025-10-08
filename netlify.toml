@@ -1,0 +1,51 @@
+[build]
+  # Build command for Vite + React + TypeScript
+  command = "npm run build"
+  
+  # Directory to publish (Vite default output)
+  publish = "dist"
+  
+  # Node.js version
+  environment = { NODE_VERSION = "18" }
+
+[build.environment]
+  # Build environment variables
+  NODE_ENV = "production"
+  CI = "true"
+
+# SPA (Single Page Application) routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache service worker
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Functions configuration (if needed for future API integration)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Form handling (for contact forms if any)
+[forms]
+  settings = { spam_protection = true }
