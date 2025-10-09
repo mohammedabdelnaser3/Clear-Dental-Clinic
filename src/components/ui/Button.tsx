@@ -26,29 +26,30 @@ const Button: React.FC<ButtonProps> = ({
   ...rest
 }) => {
   const getVariantClasses = (): string => {
+    const disabledStyles = disabled || isLoading ? '' : '';
     switch (variant) {
       case 'primary':
-        return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+        return `bg-blue-600 ${!disabled && !isLoading ? 'hover:bg-blue-700 active:bg-blue-800' : ''} text-white focus:ring-blue-500 ${disabledStyles}`;
       case 'secondary':
-        return 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500';
+        return `bg-gray-600 ${!disabled && !isLoading ? 'hover:bg-gray-700 active:bg-gray-800' : ''} text-white focus:ring-gray-500 ${disabledStyles}`;
       case 'success':
-        return 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500';
+        return `bg-green-600 ${!disabled && !isLoading ? 'hover:bg-green-700 active:bg-green-800' : ''} text-white focus:ring-green-500 ${disabledStyles}`;
       case 'danger':
-        return 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500';
+        return `bg-red-600 ${!disabled && !isLoading ? 'hover:bg-red-700 active:bg-red-800' : ''} text-white focus:ring-red-500 ${disabledStyles}`;
       case 'warning':
-        return 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500';
+        return `bg-yellow-500 ${!disabled && !isLoading ? 'hover:bg-yellow-600 active:bg-yellow-700' : ''} text-white focus:ring-yellow-500 ${disabledStyles}`;
       case 'info':
-        return 'bg-blue-400 hover:bg-blue-500 text-white focus:ring-blue-400';
+        return `bg-blue-400 ${!disabled && !isLoading ? 'hover:bg-blue-500 active:bg-blue-600' : ''} text-white focus:ring-blue-400 ${disabledStyles}`;
       case 'light':
-        return 'bg-gray-100 hover:bg-gray-200 text-gray-800 focus:ring-gray-200';
+        return `bg-gray-100 ${!disabled && !isLoading ? 'hover:bg-gray-200 active:bg-gray-300' : ''} text-gray-800 focus:ring-gray-200 ${disabledStyles}`;
       case 'dark':
-        return 'bg-gray-800 hover:bg-gray-900 text-white focus:ring-gray-800';
+        return `bg-gray-800 ${!disabled && !isLoading ? 'hover:bg-gray-900 active:bg-black' : ''} text-white focus:ring-gray-800 ${disabledStyles}`;
       case 'link':
-        return 'bg-transparent text-blue-600 hover:text-blue-800 hover:underline focus:ring-blue-500';
+        return `bg-transparent text-blue-600 ${!disabled && !isLoading ? 'hover:text-blue-800 hover:underline active:text-blue-900' : ''} focus:ring-blue-500 ${disabledStyles}`;
       case 'outline':
-        return 'bg-transparent text-gray-700 hover:bg-gray-50 focus:ring-blue-500';
+        return `bg-transparent text-gray-700 ${!disabled && !isLoading ? 'hover:bg-gray-50 active:bg-gray-100' : ''} focus:ring-blue-500 ${disabledStyles}`;
       default:
-        return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+        return `bg-blue-600 ${!disabled && !isLoading ? 'hover:bg-blue-700 active:bg-blue-800' : ''} text-white focus:ring-blue-500 ${disabledStyles}`;
     }
   };
 
@@ -69,9 +70,9 @@ const Button: React.FC<ButtonProps> = ({
     return variant === 'outline' ? 'border border-gray-300' : 'border border-transparent';
   };
 
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform';
   const widthClass = isFullWidth ? 'w-full' : '';
-  const disabledClass = disabled || isLoading ? 'opacity-60 cursor-not-allowed' : '';
+  const disabledClass = disabled || isLoading ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-md active:scale-95';
   
   return (
     <button

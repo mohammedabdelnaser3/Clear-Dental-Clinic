@@ -86,9 +86,12 @@ export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt
 // Update an existing patient
 export const updatePatient = async (id: string, patientData: Partial<Patient>): Promise<Patient> => {
   try {
+    console.log("DONE", patientData);
     const response = await api.put<ApiResponse<any>>(`/api/v1/patients/${id}`, patientData);
+    console.log(response);
     return transformPatientData(response.data.data);
   } catch (error: any) {
+    console.log('Here we go');
     const errorMessage = error.response?.data?.message || error.message || 'Failed to update patient';
     throw new Error(errorMessage);
   }

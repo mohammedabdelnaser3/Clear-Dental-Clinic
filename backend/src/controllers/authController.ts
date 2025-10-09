@@ -255,6 +255,7 @@ export const updateProfile = catchAsync(async (req: AuthenticatedRequest, res: R
     gender,
     address,
     specialization,
+    licenseNumber,
     bio
   } = req.body;
 
@@ -271,6 +272,7 @@ export const updateProfile = catchAsync(async (req: AuthenticatedRequest, res: R
   if (gender) user.gender = gender;
   if (address) user.address = address;
   if (specialization && user.role === 'dentist') user.specialization = specialization;
+  if (licenseNumber && user.role === 'dentist') user.licenseNumber = licenseNumber;
   if (bio) user.bio = bio;
 
   await user.save();

@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "Auto Build on Source Change",
+  "description": "Monitors TypeScript source files, configuration files, and package files in both frontend and backend. When changes are detected, automatically builds the appropriate part of the application and fixes any errors found.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "backend/src/**/*.ts",
+      "*.config.ts",
+      "*.config.js",
+      "tsconfig*.json",
+      "package.json",
+      "backend/package.json",
+      "backend/tsconfig.json",
+      "vite.config.ts",
+      "tailwind.config.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source files have been modified. Please analyze which files changed and determine if they are frontend or backend files. Then build the appropriate part of the application (run 'npm run build' for frontend changes in the root directory, or 'cd backend && npm run build' for backend changes). After building, check for any compilation errors, type errors, or linting issues. If errors are found, analyze them and fix them automatically. Provide a summary of what was built and any fixes that were applied."
+  }
+}

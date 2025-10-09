@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, AlertCircle, Mail, MessageSquare, Bell } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface Appointment {
   _id: string;
@@ -29,6 +30,7 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
   onClose,
   onConfirm
 }) => {
+  const { t } = useTranslation();
   const [cancellationReason, setCancellationReason] = useState('');
   const [notifyPatient, setNotifyPatient] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
 
   const handleConfirm = async () => {
     if (!cancellationReason.trim()) {
-      setError('Please provide a cancellation reason');
+      setError(t('cancelDialog.reasonRequired'));
       return;
     }
 
@@ -46,7 +48,7 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
     try {
       await onConfirm(appointment._id, cancellationReason, notifyPatient);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to cancel appointment');
+      setError(err.response?.data?.message || t('appointments.errorCancelling'));
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
               <Trash2 className="w-5 h-5 text-red-600" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">Cancel Appointment</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t('cancelDialog.title')}</h2>
           </div>
           <button
             onClick={onClose}
@@ -76,12 +78,12 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
         <div className="p-6 space-y-4">
           {/* Appointment Info */}
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-2">Appointment Details</p>
+            <p className="text-sm font-medium text-gray-900 mb-2">{t('cancelDialog.appointmentDetails')}</p>
             <div className="space-y-1 text-sm text-gray-700">
-              <p><strong>Patient:</strong> {appointment.patientId.firstName} {appointment.patientId.lastName}</p>
-              <p><strong>Date:</strong> {format(parseISO(appointment.date), 'MMM dd, yyyy')} at {appointment.timeSlot}</p>
-              <p><strong>Service:</strong> {appointment.serviceType}</p>
-              <p><strong>Clinic:</strong> {appointment.clinicId.name}</p>
+              <p><strong>{t('cancelDialog.patient')}:</strong> {appointment.patientId.firstName} {appointment.patientId.lastName}</p>
+              <p><strong>{t('cancelDialog.date')}:</strong> {format(parseISO(appointment.date), 'MMM dd, yyyy')} at {appointment.timeSlot}</p>
+              <p><strong>{t('cancelDialog.service')}:</strong> {appointment.serviceType}</p>
+              <p><strong>{t('cancelDialog.clinic')}:</strong> {appointment.clinicId.name}</p>
             </div>
           </div>
 
@@ -89,9 +91,9 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start">
             <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-900">Warning</p>
+              <p className="text-sm font-medium text-red-900">{t('cancelDialog.warning')}</p>
               <p className="text-sm text-red-700 mt-1">
-                This action cannot be undone. The appointment will be permanently cancelled.
+                {t('cancelDialog.warningMessage')}
               </p>
             </div>
           </div>
@@ -105,13 +107,13 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
           {/* Cancellation Reason */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cancellation Reason *
+              {t('cancelDialog.cancellationReason')} *
             </label>
             <textarea
               value={cancellationReason}
               onChange={(e) => setCancellationReason(e.target.value)}
               rows={3}
-              placeholder="e.g., Doctor emergency, equipment malfunction, patient no-show..."
+              placeholder={t('cancelDialog.reasonPlaceholder')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
               disabled={loading}
               required
@@ -130,23 +132,23 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
             />
             <label htmlFor="notifyPatient" className="ml-3">
               <p className="text-sm font-medium text-gray-900">
-                Notify patient about cancellation
+                {t('cancelDialog.notifyPatient')}
               </p>
               <p className="text-sm text-gray-600 mt-1">
-                Patient will receive notifications via:
+                {t('cancelDialog.notificationInfo')}
               </p>
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-600">
                 <span className="flex items-center">
                   <Mail className="w-3 h-3 mr-1" />
-                  Email to {appointment.patientId.email}
+                  {t('cancelDialog.emailTo')} {appointment.patientId.email}
                 </span>
                 <span className="flex items-center">
                   <MessageSquare className="w-3 h-3 mr-1" />
-                  SMS to {appointment.patientId.phone}
+                  {t('cancelDialog.smsTo')} {appointment.patientId.phone}
                 </span>
                 <span className="flex items-center">
                   <Bell className="w-3 h-3 mr-1" />
-                  In-app notification
+                  {t('cancelDialog.inAppNotification')}
                 </span>
               </div>
             </label>
@@ -160,7 +162,7 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
             className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={loading}
           >
-            Keep Appointment
+            {t('cancelDialog.keepAppointment')}
           </button>
           <button
             onClick={handleConfirm}
@@ -170,12 +172,12 @@ const CancelConfirmDialog: React.FC<CancelConfirmDialogProps> = ({
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline mr-2"></div>
-                Cancelling...
+                {t('cancelDialog.cancelling')}
               </>
             ) : (
               <>
                 <Trash2 className="w-4 h-4 inline mr-2" />
-                Cancel Appointment
+                {t('cancelDialog.cancelAppointment')}
               </>
             )}
           </button>

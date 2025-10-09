@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Card, Button, Badge, Avatar, Alert } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
 import { patientService } from '../../services/patientService';
@@ -21,7 +23,6 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
-  Bell,
   Settings,
   Camera
 } from 'lucide-react';
@@ -29,30 +30,94 @@ import {
 const PatientProfile: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [patient, setPatient] = useState<Patient>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Navigation handlers
+  const handleEditProfile = () => {
+    navigate('/settings');
+  };
+
+  const handleBookAppointment = () => {
+    navigate('/appointments/create');
+  };
+
+  const handleViewAppointment = (appointmentId: string) => {
+    navigate(`/appointments/${appointmentId}`);
+  };
+
+  const handleAccountSettings = () => {
+    navigate('/settings');
+  };
+
+  const handleDownloadReports = () => {
+    toast('Report download feature coming soon', {
+      icon: '📄',
+    });
+  };
+
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         // Fetch patient data based on current user
         const patientData = await patientService.getPatientsByUserId(user?.id!);
         const patientRecord = patientData.data[0];
+        
+        if (!patientRecord) {
+          console.warn('No patient record found for user:', user?.id);
+          setError('Patient profile not found. Please contact support.');
+          return;
+        }
+        
         setPatient(patientRecord);
 
         // Fetch appointments for this patient using the fetched patient data
         if (patientRecord?.id) {
-          const appointmentsData = await appointmentService.getAppointments({
-            patientId: patientRecord.id
-          }) as { data: Appointment[] };
-          setAppointments(appointmentsData.data || []);
+          try {
+            const appointmentsData = await appointmentService.getAppointments({
+              patientId: patientRecord.id
+            }) as { data: Appointment[] };
+            setAppointments(appointmentsData.data || []);
+          } catch (appointmentErr: any) {
+            // Log appointment fetch error but don't block profile display
+            console.error('Failed to fetch appointments:', appointmentErr);
+            // Set empty appointments array to allow profile to display
+            setAppointments([]);
+            // Show a toast notification instead of blocking the entire page
+            toast.error('Unable to load appointments. Please try refreshing the page.');
+          }
         }
       } catch (err: any) {
-        setError(err.message || 'Failed to load patient data');
+        console.error('Error fetching patient data:', {
+          error: err,
+          message: err.message,
+          status: err.response?.status,
+          userId: user?.id
+        });
+        
+        // Handle specific error cases
+        if (err.response?.status === 401) {
+          setError('Your session has expired. Please log in again.');
+          // Redirect to login after a short delay
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else if (err.response?.status === 403) {
+          setError('You do not have permission to view this profile.');
+        } else if (err.response?.status === 404) {
+          setError('Patient profile not found. Please contact support.');
+        } else if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+          setError('Network error. Please check your internet connection and try again.');
+        } else {
+          setError(err.message || 'Failed to load patient data. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }
@@ -160,7 +225,7 @@ const PatientProfile: React.FC = () => {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button size="sm">
+                <Button size="sm" onClick={handleEditProfile} disabled={loading}>
                   <Edit3 className="w-4 h-4 mr-2" />
                   {t('patientProfile.editProfile')}
                 </Button>
@@ -181,7 +246,11 @@ const PatientProfile: React.FC = () => {
                     fallback={`${patient.firstName[0]}${patient.lastName[0]}`}
                     className="ring-4 ring-white shadow-2xl w-32 h-32"
                   />
-                  <button className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  <button 
+                    onClick={handleEditProfile}
+                    className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loading}
+                  >
                     <Camera className="w-4 h-4" />
                   </button>
                 </div>
@@ -264,7 +333,8 @@ const PatientProfile: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                    disabled={loading}
+                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
@@ -290,7 +360,7 @@ const PatientProfile: React.FC = () => {
                         <Calendar className="w-5 h-5 text-blue-600" />
                         Upcoming Appointments
                       </h3>
-                      <Button size="sm">
+                      <Button size="sm" onClick={handleBookAppointment} disabled={loading}>
                         <Calendar className="w-4 h-4 mr-2" />
                         Book New
                       </Button>
@@ -326,7 +396,7 @@ const PatientProfile: React.FC = () => {
                                 {getAppointmentStatusIcon(appointment.status)}
                                 <span className="ml-1 capitalize">{appointment.status}</span>
                               </Badge>
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" onClick={() => handleViewAppointment(appointment.id)} disabled={loading}>
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
                               </Button>
@@ -338,7 +408,7 @@ const PatientProfile: React.FC = () => {
                       <div className="text-center py-8">
                         <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-600 mb-4">No upcoming appointments</p>
-                        <Button>
+                        <Button onClick={handleBookAppointment} disabled={loading}>
                           <Calendar className="w-4 h-4 mr-2" />
                           Schedule Your Next Visit
                         </Button>
@@ -386,19 +456,19 @@ const PatientProfile: React.FC = () => {
                   <Card className="p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                     <div className="space-y-3">
-                      <Button className="w-full justify-start" variant="outline">
+                      <Button className="w-full justify-start" variant="outline" onClick={handleBookAppointment} disabled={loading}>
                         <Calendar className="w-4 h-4 mr-2" />
                         Book Appointment
                       </Button>
-                      <Button className="w-full justify-start" variant="outline">
+                      <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab('documents')} disabled={loading}>
                         <FileText className="w-4 h-4 mr-2" />
                         View Records
                       </Button>
-                      <Button className="w-full justify-start" variant="outline">
+                      <Button className="w-full justify-start" variant="outline" onClick={handleDownloadReports} disabled={loading}>
                         <Download className="w-4 h-4 mr-2" />
                         Download Reports
                       </Button>
-                      <Button className="w-full justify-start" variant="outline">
+                      <Button className="w-full justify-start" variant="outline" onClick={handleAccountSettings} disabled={loading}>
                         <Settings className="w-4 h-4 mr-2" />
                         Account Settings
                       </Button>
@@ -455,7 +525,7 @@ const PatientProfile: React.FC = () => {
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">All Appointments</h3>
-                  <Button>
+                  <Button onClick={handleBookAppointment} disabled={loading}>
                     <Calendar className="w-4 h-4 mr-2" />
                     Book New Appointment
                   </Button>
@@ -494,7 +564,7 @@ const PatientProfile: React.FC = () => {
                             </Badge>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => handleViewAppointment(appointment.id)} disabled={loading}>
                               <Eye className="w-4 h-4 mr-1" />
                               View
                             </Button>

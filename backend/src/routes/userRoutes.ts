@@ -105,6 +105,9 @@ router.get('/dentists', [
 // Upload profile image
 router.post('/upload-image', uploadSingle('profileImage'), uploadUserProfileImage);
 
+// Add alias route for frontend compatibility
+router.post('/profile-image', uploadSingle('profileImage'), uploadUserProfileImage);
+
 // Get user by ID
 router.get('/:id', validateMongoId, getUserById);
 

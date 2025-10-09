@@ -111,7 +111,8 @@ export const optionalAuth = async (
 export const ownerOrAdmin = (resourceUserIdField: string = 'userId') => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const authReq = req as unknown as AuthenticatedRequest;
-    if (!authReq.user) {
+    console.log(authReq);
+      if (!authReq.user) {
       res.status(401).json({
         success: false,
         message: 'Access denied. User not authenticated.'
@@ -165,8 +166,11 @@ export const userOwnerOrStaff = (userIdField: string = 'userId') => {
 
 // Middleware to check if patient owns the resource or is staff/admin
 export const patientOwnerOrStaff = (patientIdField: string = 'id') => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  console.log('I.m here');
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    
     const authReq = req as unknown as AuthenticatedRequest;
+    console.log(authReq);
     if (!authReq.user) {
       res.status(401).json({
         success: false,
@@ -183,16 +187,41 @@ export const patientOwnerOrStaff = (patientIdField: string = 'id') => {
 
     // Patients can only access their own data
     if (authReq.user.role === 'patient') {
-      const patientId = req.params[patientIdField] || req.body[patientIdField];
-      if (authReq.user._id.toString() === patientId) {
-        next();
-      } else {
-        res.status(403).json({
+      try {
+        const patientId = req.params[patientIdField] || req.body[patientIdField];
+        
+        // Fetch the patient record to get the userId
+        const patient = await Patient.findById(patientId);
+        console.log(patient);
+        
+        if (!patient) {
+          res.status(404).json({
+            success: false,
+            message: 'Patient not found.'
+          });
+          return;
+        }
+        
+        // Compare the authenticated user's ID with the patient's userId
+        if (patient.userId && patient.userId.toString() === authReq.user.id.toString()) {
+          console.log('here we go');
+          next();
+          return;
+        } else {
+          res.status(403).json({
+            success: false,
+            message: 'Access denied. Patients can only access their own data111.'
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Patient ownership check error:', error);
+        res.status(500).json({
           success: false,
-          message: 'Access denied. Patients can only access their own data.'
+          message: 'Internal server error during access control check.'
         });
+        return;
       }
-      return;
     }
 
     res.status(403).json({

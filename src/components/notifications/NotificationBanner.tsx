@@ -1,7 +1,5 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
 import { Info, X } from 'lucide-react';
-import { useState } from 'react';
 
 interface NotificationBannerProps {
   show: boolean;
@@ -9,7 +7,6 @@ interface NotificationBannerProps {
 }
 
 const NotificationBanner: React.FC<NotificationBannerProps> = ({ show, onDismiss }) => {
-  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
 
   if (!show || dismissed) return null;

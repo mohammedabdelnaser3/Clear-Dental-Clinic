@@ -1,0 +1,4683 @@
+{
+  "summary": {
+    "englishPlaceholdersCount": 655,
+    "arabicPlaceholdersCount": 513,
+    "totalPlaceholders": 1168
+  },
+  "englishPlaceholders": [
+    {
+      "key": "settings.profile.patients.name",
+      "value": "[EN] الاسم"
+    },
+    {
+      "key": "settings.profile.patients.phone",
+      "value": "[EN] الهاتف"
+    },
+    {
+      "key": "settings.profile.patients.age",
+      "value": "[EN] العمر"
+    },
+    {
+      "key": "settings.profile.patients.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "settings.profile.patients.active",
+      "value": "[EN] نشط"
+    },
+    {
+      "key": "settings.profile.patients.inactive",
+      "value": "[EN] غير نشط"
+    },
+    {
+      "key": "settings.profile.patients.last_visit",
+      "value": "[EN] آخر زيارة"
+    },
+    {
+      "key": "settings.profile.patients.actions",
+      "value": "[EN] الإجراءات"
+    },
+    {
+      "key": "settings.profile.patients.view",
+      "value": "[EN] عرض"
+    },
+    {
+      "key": "settings.profile.patients.edit",
+      "value": "[EN] تعديل"
+    },
+    {
+      "key": "settings.profile.patients.my_profile",
+      "value": "[EN] ملفي الشخصي"
+    },
+    {
+      "key": "settings.profile.patients.patients",
+      "value": "[EN] المرضى"
+    },
+    {
+      "key": "settings.profile.patients.view_and_manage_personal_information",
+      "value": "[EN] عرض وإدارة معلوماتك الشخصية"
+    },
+    {
+      "key": "settings.profile.patients.manage_patient_records",
+      "value": "[EN] إدارة سجلات ومعلومات المرضى"
+    },
+    {
+      "key": "settings.profile.patients.add_patient",
+      "value": "[EN] إضافة مريض"
+    },
+    {
+      "key": "settings.profile.patients.search_patients",
+      "value": "[EN] البحث عن مرضى..."
+    },
+    {
+      "key": "settings.profile.patients.export",
+      "value": "[EN] تصدير"
+    },
+    {
+      "key": "settings.profile.patients.completeSelected",
+      "value": "[EN] إكمال المحدد"
+    },
+    {
+      "key": "settings.profile.patients.cancelSelected",
+      "value": "[EN] إلغاء المحدد"
+    },
+    {
+      "key": "settings.profile.patients.delete",
+      "value": "[EN] حذف"
+    },
+    {
+      "key": "settings.profile.patient_detail.patient_id",
+      "value": "[EN] معرف المريض"
+    },
+    {
+      "key": "settings.profile.patient_detail.edit_patient",
+      "value": "[EN] تعديل المريض"
+    },
+    {
+      "key": "settings.profile.patient_detail.delete_patient",
+      "value": "[EN] حذف المريض"
+    },
+    {
+      "key": "settings.profile.patient_detail.overview",
+      "value": "[EN] نظرة عامة"
+    },
+    {
+      "key": "settings.profile.patient_detail.personal_information",
+      "value": "[EN] المعلومات الشخصية"
+    },
+    {
+      "key": "settings.profile.patient_detail.full_name",
+      "value": "[EN] الاسم الكامل"
+    },
+    {
+      "key": "settings.profile.patient_detail.age",
+      "value": "[EN] العمر"
+    },
+    {
+      "key": "settings.profile.patient_detail.date_of_birth",
+      "value": "[EN] تاريخ الميلاد"
+    },
+    {
+      "key": "settings.profile.patient_detail.gender",
+      "value": "[EN] الجنس"
+    },
+    {
+      "key": "settings.profile.patient_detail.email",
+      "value": "[EN] البريد الإلكتروني"
+    },
+    {
+      "key": "settings.profile.patient_detail.phone",
+      "value": "[EN] الهاتف"
+    },
+    {
+      "key": "settings.profile.patient_detail.address",
+      "value": "[EN] العنوان"
+    },
+    {
+      "key": "settings.profile.patient_detail.allergies",
+      "value": "[EN] الحساسية"
+    },
+    {
+      "key": "settings.profile.patient_detail.add_allergy",
+      "value": "[EN] إضافة حساسية"
+    },
+    {
+      "key": "settings.profile.patient_detail.no_allergies_recorded",
+      "value": "[EN] لم يتم تسجيل أي حساسية."
+    },
+    {
+      "key": "settings.profile.patient_detail.medical_conditions",
+      "value": "[EN] الحالات الطبية"
+    },
+    {
+      "key": "settings.profile.patient_detail.add_condition",
+      "value": "[EN] إضافة حالة"
+    },
+    {
+      "key": "settings.profile.patient_detail.no_medical_conditions_recorded",
+      "value": "[EN] لم يتم تسجيل أي حالات طبية."
+    },
+    {
+      "key": "settings.profile.patient_detail.appointments",
+      "value": "[EN] المواعيد"
+    },
+    {
+      "key": "settings.profile.patient_detail.schedule_new",
+      "value": "[EN] جدولة جديد"
+    },
+    {
+      "key": "settings.profile.patient_detail.date",
+      "value": "[EN] التاريخ"
+    },
+    {
+      "key": "settings.profile.patient_detail.time",
+      "value": "[EN] الوقت"
+    },
+    {
+      "key": "settings.profile.patient_detail.dentist",
+      "value": "[EN] طبيب الأسنان"
+    },
+    {
+      "key": "settings.profile.patient_detail.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "settings.profile.patient_detail.actions",
+      "value": "[EN] الإجراءات"
+    },
+    {
+      "key": "settings.profile.patient_detail.no_appointments_scheduled",
+      "value": "[EN] لا توجد مواعيد مجدولة."
+    },
+    {
+      "key": "settings.profile.patient_form.first_name_required",
+      "value": "[EN] الاسم الأول مطلوب"
+    },
+    {
+      "key": "settings.profile.patient_form.last_name_required",
+      "value": "[EN] اسم العائلة مطلوب"
+    },
+    {
+      "key": "settings.profile.patient_form.email_required",
+      "value": "[EN] البريد الإلكتروني مطلوب"
+    },
+    {
+      "key": "settings.profile.patient_form.phone_required",
+      "value": "[EN] الهاتف مطلوب"
+    },
+    {
+      "key": "settings.profile.patient_form.date_of_birth_required",
+      "value": "[EN] تاريخ الميلاد مطلوب"
+    },
+    {
+      "key": "settings.profile.patient_form.patient_updated_successfully",
+      "value": "[EN] تم تحديث المريض بنجاح!"
+    },
+    {
+      "key": "settings.profile.patient_form.patient_created_successfully",
+      "value": "[EN] تم إنشاء المريض بنجاح!"
+    },
+    {
+      "key": "settings.profile.medications.my_medications",
+      "value": "[EN] أدويتي"
+    },
+    {
+      "key": "settings.profile.medications.medications",
+      "value": "[EN] الأدوية"
+    },
+    {
+      "key": "settings.profile.medications.view_prescribed_medications",
+      "value": "[EN] عرض الأدوية الموصوفة لك واتبع التعليمات بعناية"
+    },
+    {
+      "key": "settings.profile.medications.manage_medication_inventory",
+      "value": "[EN] إدارة مخزون الأدوية والوصفات الطبية في عيادتك"
+    },
+    {
+      "key": "settings.profile.billing.title",
+      "value": "[EN] الفواتير والمدفوعات"
+    },
+    {
+      "key": "settings.profile.billing.description",
+      "value": "[EN] إدارة فواتير المرضى والفواتير وسجلات الدفع"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.title",
+      "value": "[EN] جدولة الموظفين"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.description",
+      "value": "[EN] إدارة جداول الموظفين عبر العيادات"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.add_schedule",
+      "value": "[EN] إضافة جدول"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.clinic",
+      "value": "[EN] العيادة"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.select_clinic",
+      "value": "[EN] اختر عيادة"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.staff_member",
+      "value": "[EN] عضو فريق العمل"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.delete_confirmation",
+      "value": "[EN] هل أنت متأكد أنك تريد حذف هذا الجدول؟"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.all_staff",
+      "value": "[EN] جميع الموظفين"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.shift_type",
+      "value": "[EN] نوع المناوبة"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.all_shifts",
+      "value": "[EN] جميع المناوبات"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.morning",
+      "value": "[EN] صباحاً"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.afternoon",
+      "value": "[EN] ظهراً"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.evening",
+      "value": "[EN] مساءً"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.night",
+      "value": "[EN] ليلاً"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.full_day",
+      "value": "[EN] يوم كامل"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.all_status",
+      "value": "[EN] جميع الحالات"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.scheduled",
+      "value": "[EN] مجدول"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.completed",
+      "value": "[EN] مكتمل"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.cancelled",
+      "value": "[EN] ملغي"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.no_show",
+      "value": "[EN] لم يحضر"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.view_mode",
+      "value": "[EN] طريقة العرض"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.calendar",
+      "value": "[EN] التقويم"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.list",
+      "value": "[EN] القائمة"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.schedule_list",
+      "value": "[EN] قائمة الجداول"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.date",
+      "value": "[EN] التاريخ"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.time",
+      "value": "[EN] الوقت"
+    },
+    {
+      "key": "settings.profile.staff_scheduling.actions",
+      "value": "[EN] الإجراءات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.title",
+      "value": "[EN] لوحة تحكم المشرف للعيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.multi_clinic_dashboard",
+      "value": "[EN] لوحة تحكم متعددة العيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.manage_clinics",
+      "value": "[EN] إدارة العيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.refresh_data",
+      "value": "[EN] تحديث البيانات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.refreshing",
+      "value": "[EN] جاري التحديث..."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.total_clinics",
+      "value": "[EN] إجمالي العيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.total_patients",
+      "value": "[EN] إجمالي المرضى"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.total_revenue",
+      "value": "[EN] إجمالي الإيرادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.total_appointments",
+      "value": "[EN] إجمالي المواعيد"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.search_placeholder",
+      "value": "[EN] ابحث عن العيادات بالاسم أو الموقع..."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.sort_by_name",
+      "value": "[EN] فرز حسب الاسم"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.sort_by_patients",
+      "value": "[EN] فرز حسب المرضى"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.sort_by_revenue",
+      "value": "[EN] فرز حسب الإيرادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.sort_by_appointments",
+      "value": "[EN] فرز حسب المواعيد"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.all_clinics",
+      "value": "[EN] جميع العيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.active_only",
+      "value": "[EN] النشطة فقط"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.inactive_only",
+      "value": "[EN] غير النشطة فقط"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.clinic",
+      "value": "[EN] العيادة"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.location",
+      "value": "[EN] الموقع"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.patients",
+      "value": "[EN] المرضى"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.appointments",
+      "value": "[EN] المواعيد"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.revenue",
+      "value": "[EN] الإيرادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.actions",
+      "value": "[EN] الإجراءات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.no_clinics_found",
+      "value": "[EN] لم يتم العثور على عيادات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.no_clinics_available",
+      "value": "[EN] لا توجد عيادات متاحة"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.loading_clinics",
+      "value": "[EN] جاري تحميل العيادات..."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.try_again",
+      "value": "[EN] حاول مرة أخرى"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.retrying",
+      "value": "[EN] جاري إعادة المحاولة..."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.access_denied",
+      "value": "[EN] تم رفض الوصول"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.access_denied_message",
+      "value": "[EN] تحتاج إلى صلاحيات المسؤول للوصول إلى هذه الصفحة. يرجى الاتصال بالمسؤول إذا كنت تعتقد أن هذا خطأ."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.go_to_dashboard",
+      "value": "[EN] اذهب إلى لوحة التحكم"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.go_to_home",
+      "value": "[EN] اذهب إلى الصفحة الرئيسية"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.error_loading_data",
+      "value": "[EN] خطأ في تحميل البيانات"
+    },
+    {
+      "key": "settings.profile.admin_dashboard.failed_to_fetch_clinic_data",
+      "value": "[EN] فشل في جلب بيانات العيادة. يرجى المحاولة مرة أخرى."
+    },
+    {
+      "key": "settings.profile.admin_dashboard.failed_to_fetch_clinic_details",
+      "value": "[EN] فشل في جلب تفاصيل العيادة. يرجى المحاولة مرة أخرى."
+    },
+    {
+      "key": "settings.appointmentCard.unknownPatient",
+      "value": "[EN] مريض غير معروف"
+    },
+    {
+      "key": "settings.appointmentCard.unknownDentist",
+      "value": "[EN] غير معروف"
+    },
+    {
+      "key": "settings.appointmentCard.at",
+      "value": "[EN] في"
+    },
+    {
+      "key": "settings.appointmentCard.minutes",
+      "value": "[EN] دقائق"
+    },
+    {
+      "key": "settings.appointmentCard.viewDetails",
+      "value": "[EN] عرض التفاصيل"
+    },
+    {
+      "key": "settings.appointmentCard.confirm",
+      "value": "[EN] تأكيد"
+    },
+    {
+      "key": "settings.appointmentCard.complete",
+      "value": "[EN] إكمال"
+    },
+    {
+      "key": "settings.appointmentCard.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.appointmentCard.status.scheduled",
+      "value": "[EN] مجدول"
+    },
+    {
+      "key": "settings.appointmentCard.status.confirmed",
+      "value": "[EN] مؤكد"
+    },
+    {
+      "key": "settings.appointmentCard.status.completed",
+      "value": "[EN] مكتمل"
+    },
+    {
+      "key": "settings.appointmentCard.status.cancelled",
+      "value": "[EN] ملغى"
+    },
+    {
+      "key": "settings.appointmentCard.status.no-show",
+      "value": "[EN] لم يحضر"
+    },
+    {
+      "key": "settings.scheduleForm.title",
+      "value": "[EN] تفاصيل الجدول الزمني"
+    },
+    {
+      "key": "settings.scheduleForm.staffMember",
+      "value": "[EN] عضو الفريق"
+    },
+    {
+      "key": "settings.scheduleForm.selectStaff",
+      "value": "[EN] اختر عضوًا من الفريق"
+    },
+    {
+      "key": "settings.scheduleForm.date",
+      "value": "[EN] التاريخ"
+    },
+    {
+      "key": "settings.scheduleForm.startTime",
+      "value": "[EN] وقت البدء"
+    },
+    {
+      "key": "settings.scheduleForm.endTime",
+      "value": "[EN] وقت الانتهاء"
+    },
+    {
+      "key": "settings.scheduleForm.shiftType",
+      "value": "[EN] نوع المناوبة"
+    },
+    {
+      "key": "settings.scheduleForm.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "settings.scheduleForm.notes",
+      "value": "[EN] ملاحظات"
+    },
+    {
+      "key": "settings.scheduleForm.notesPlaceholder",
+      "value": "[EN] أضف أي ملاحظات ذات صلة..."
+    },
+    {
+      "key": "settings.scheduleForm.recurring",
+      "value": "[EN] جدول متكرر"
+    },
+    {
+      "key": "settings.scheduleForm.notifications",
+      "value": "[EN] الإشعارات"
+    },
+    {
+      "key": "settings.scheduleForm.enableNotifications",
+      "value": "[EN] تمكين الإشعارات"
+    },
+    {
+      "key": "settings.scheduleForm.reminderTime",
+      "value": "[EN] وقت التذكير (بالدقائق قبل)"
+    },
+    {
+      "key": "settings.scheduleForm.channels",
+      "value": "[EN] القنوات"
+    },
+    {
+      "key": "settings.scheduleForm.email",
+      "value": "[EN] البريد الإلكتروني"
+    },
+    {
+      "key": "settings.scheduleForm.sms",
+      "value": "[EN] رسالة نصية"
+    },
+    {
+      "key": "settings.scheduleForm.inApp",
+      "value": "[EN] داخل التطبيق"
+    },
+    {
+      "key": "settings.scheduleForm.frequency",
+      "value": "[EN] التكرار"
+    },
+    {
+      "key": "settings.scheduleForm.interval",
+      "value": "[EN] الفاصل الزمني"
+    },
+    {
+      "key": "settings.scheduleForm.daysOfWeek",
+      "value": "[EN] أيام الأسبوع"
+    },
+    {
+      "key": "settings.scheduleForm.endDate",
+      "value": "[EN] تاريخ الانتهاء"
+    },
+    {
+      "key": "settings.scheduleForm.save",
+      "value": "[EN] حفظ الجدول الزمني"
+    },
+    {
+      "key": "settings.scheduleForm.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.scheduleForm.validation.staffRequired",
+      "value": "[EN] عضو الفريق مطلوب"
+    },
+    {
+      "key": "settings.scheduleForm.validation.dateRequired",
+      "value": "[EN] التاريخ مطلوب"
+    },
+    {
+      "key": "settings.scheduleForm.validation.startTimeRequired",
+      "value": "[EN] وقت البدء مطلوب"
+    },
+    {
+      "key": "settings.scheduleForm.validation.endTimeRequired",
+      "value": "[EN] وقت الانتهاء مطلوب"
+    },
+    {
+      "key": "settings.scheduleForm.validation.endTimeAfterStart",
+      "value": "[EN] يجب أن يكون وقت الانتهاء بعد وقت البدء"
+    },
+    {
+      "key": "settings.scheduleForm.validation.dayRequired",
+      "value": "[EN] اختر يومًا واحدًا على الأقل للجداول الأسبوعية المتكررة"
+    },
+    {
+      "key": "settings.scheduleForm.validation.endDateRequired",
+      "value": "[EN] تاريخ الانتهاء مطلوب للجداول المتكررة"
+    },
+    {
+      "key": "settings.scheduleForm.shiftTypes.morning",
+      "value": "[EN] صباحي"
+    },
+    {
+      "key": "settings.scheduleForm.shiftTypes.afternoon",
+      "value": "[EN] بعد الظهر"
+    },
+    {
+      "key": "settings.scheduleForm.shiftTypes.evening",
+      "value": "[EN] مسائي"
+    },
+    {
+      "key": "settings.scheduleForm.shiftTypes.night",
+      "value": "[EN] ليلي"
+    },
+    {
+      "key": "settings.scheduleForm.shiftTypes.fullDay",
+      "value": "[EN] يوم كامل"
+    },
+    {
+      "key": "settings.scheduleForm.statuses.scheduled",
+      "value": "[EN] مجدول"
+    },
+    {
+      "key": "settings.scheduleForm.statuses.completed",
+      "value": "[EN] مكتمل"
+    },
+    {
+      "key": "settings.scheduleForm.statuses.cancelled",
+      "value": "[EN] ملغى"
+    },
+    {
+      "key": "settings.scheduleForm.statuses.noShow",
+      "value": "[EN] لم يحضر"
+    },
+    {
+      "key": "settings.scheduleForm.frequencies.daily",
+      "value": "[EN] يومي"
+    },
+    {
+      "key": "settings.scheduleForm.frequencies.weekly",
+      "value": "[EN] أسبوعي"
+    },
+    {
+      "key": "settings.scheduleForm.frequencies.monthly",
+      "value": "[EN] شهري"
+    },
+    {
+      "key": "settings.scheduleForm.days.sun",
+      "value": "[EN] الأحد"
+    },
+    {
+      "key": "settings.scheduleForm.days.mon",
+      "value": "[EN] الإثنين"
+    },
+    {
+      "key": "settings.scheduleForm.days.tue",
+      "value": "[EN] الثلاثاء"
+    },
+    {
+      "key": "settings.scheduleForm.days.wed",
+      "value": "[EN] الأربعاء"
+    },
+    {
+      "key": "settings.scheduleForm.days.thu",
+      "value": "[EN] الخميس"
+    },
+    {
+      "key": "settings.scheduleForm.days.fri",
+      "value": "[EN] الجمعة"
+    },
+    {
+      "key": "settings.scheduleForm.days.sat",
+      "value": "[EN] السبت"
+    },
+    {
+      "key": "settings.appointmentCalendar.month",
+      "value": "[EN] شهر"
+    },
+    {
+      "key": "settings.appointmentCalendar.week",
+      "value": "[EN] أسبوع"
+    },
+    {
+      "key": "settings.appointmentCalendar.today",
+      "value": "[EN] اليوم"
+    },
+    {
+      "key": "settings.appointmentCalendar.weekOf",
+      "value": "[EN] أسبوع من"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.sun",
+      "value": "[EN] الأحد"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.mon",
+      "value": "[EN] الإثنين"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.tue",
+      "value": "[EN] الثلاثاء"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.wed",
+      "value": "[EN] الأربعاء"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.thu",
+      "value": "[EN] الخميس"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.fri",
+      "value": "[EN] الجمعة"
+    },
+    {
+      "key": "settings.appointmentCalendar.dayNames.sat",
+      "value": "[EN] السبت"
+    },
+    {
+      "key": "settings.timeSlotPicker.loading",
+      "value": "[EN] جاري تحميل المواعيد المتاحة..."
+    },
+    {
+      "key": "settings.timeSlotPicker.error",
+      "value": "[EN] فشل تحميل المواعيد المتاحة"
+    },
+    {
+      "key": "settings.timeSlotPicker.tryAgain",
+      "value": "[EN] حاول مرة أخرى"
+    },
+    {
+      "key": "settings.timeSlotPicker.noSlots",
+      "value": "[EN] لا توجد مواعيد متاحة في {{date}}"
+    },
+    {
+      "key": "settings.timeSlotPicker.refresh",
+      "value": "[EN] تحديث"
+    },
+    {
+      "key": "settings.timeSlotPicker.morning",
+      "value": "[EN] صباحًا"
+    },
+    {
+      "key": "settings.timeSlotPicker.afternoon",
+      "value": "[EN] مساءً"
+    },
+    {
+      "key": "settings.timeSlotPicker.availableTimes",
+      "value": "[EN] الأوقات المتاحة في {{date}}"
+    },
+    {
+      "key": "settings.timeSlotPicker.selected",
+      "value": "[EN] المحدد: {{time}} في {{date}}"
+    },
+    {
+      "key": "settings.timeSlotPicker.duration",
+      "value": "[EN] المدة: {{duration}} دقيقة"
+    },
+    {
+      "key": "settings.timeSlotPicker.timezoneInfo",
+      "value": "[EN] المواعيد حسب توقيت {{timeZone}}"
+    },
+    {
+      "key": "settings.timeSlotPicker.slotDurationInfo",
+      "value": "[EN] مدة كل موعد {{duration}} دقيقة"
+    },
+    {
+      "key": "settings.timeSlotPicker.arrivalInfo",
+      "value": "[EN] يرجى الحضور قبل 15 دقيقة من الموعد المحدد"
+    },
+    {
+      "key": "settings.billingDetailsSection.invoiceTitle",
+      "value": "[EN] فاتورة رقم {{invoiceNumber}}"
+    },
+    {
+      "key": "settings.billingDetailsSection.overdue",
+      "value": "[EN] متأخرة"
+    },
+    {
+      "key": "settings.billingDetailsSection.print",
+      "value": "[EN] طباعة"
+    },
+    {
+      "key": "settings.billingDetailsSection.downloadPDF",
+      "value": "[EN] PDF"
+    },
+    {
+      "key": "settings.billingDetailsSection.addPayment",
+      "value": "[EN] إضافة دفعة"
+    },
+    {
+      "key": "settings.billingDetailsSection.fromClinic",
+      "value": "[EN] من: {{clinicName}}"
+    },
+    {
+      "key": "settings.billingDetailsSection.toPatient",
+      "value": "[EN] إلى: {{patientName}}"
+    },
+    {
+      "key": "settings.billingDetailsSection.invoiceInfo",
+      "value": "[EN] معلومات الفاتورة"
+    },
+    {
+      "key": "settings.billingDetailsSection.invoiceDate",
+      "value": "[EN] تاريخ الفاتورة"
+    },
+    {
+      "key": "settings.billingDetailsSection.dueDate",
+      "value": "[EN] تاريخ الاستحقاق"
+    },
+    {
+      "key": "settings.billingDetailsSection.paidDate",
+      "value": "[EN] تاريخ الدفع"
+    },
+    {
+      "key": "settings.billingDetailsSection.dentist",
+      "value": "[EN] طبيب الأسنان"
+    },
+    {
+      "key": "settings.billingDetailsSection.appointment",
+      "value": "[EN] الموعد"
+    },
+    {
+      "key": "settings.billingDetailsSection.treatment",
+      "value": "[EN] العلاج"
+    },
+    {
+      "key": "settings.billingDetailsSection.invoiceItems",
+      "value": "[EN] بنود الفاتورة"
+    },
+    {
+      "key": "settings.billingDetailsSection.itemDescription",
+      "value": "[EN] الوصف"
+    },
+    {
+      "key": "settings.billingDetailsSection.itemQuantity",
+      "value": "[EN] الكمية"
+    },
+    {
+      "key": "settings.billingDetailsSection.itemUnitPrice",
+      "value": "[EN] سعر الوحدة"
+    },
+    {
+      "key": "settings.billingDetailsSection.itemTotal",
+      "value": "[EN] الإجمالي"
+    },
+    {
+      "key": "settings.billingDetailsSection.summary",
+      "value": "[EN] ملخص"
+    },
+    {
+      "key": "settings.billingDetailsSection.subtotal",
+      "value": "[EN] المجموع الفرعي"
+    },
+    {
+      "key": "settings.billingDetailsSection.tax",
+      "value": "[EN] الضريبة"
+    },
+    {
+      "key": "settings.billingDetailsSection.discount",
+      "value": "[EN] الخصم"
+    },
+    {
+      "key": "settings.billingDetailsSection.totalAmount",
+      "value": "[EN] المبلغ الإجمالي"
+    },
+    {
+      "key": "settings.billingDetailsSection.paidAmount",
+      "value": "[EN] المبلغ المدفوع"
+    },
+    {
+      "key": "settings.billingDetailsSection.balanceDue",
+      "value": "[EN] الرصيد المستحق"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentHistory",
+      "value": "[EN] سجل المدفوعات"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentDate",
+      "value": "[EN] التاريخ"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentMethod",
+      "value": "[EN] طريقة الدفع"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentAmount",
+      "value": "[EN] المبلغ"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentReference",
+      "value": "[EN] مرجع"
+    },
+    {
+      "key": "settings.billingDetailsSection.noPaymentHistory",
+      "value": "[EN] لا يوجد سجل مدفوعات."
+    },
+    {
+      "key": "settings.billingDetailsSection.insuranceInfo",
+      "value": "[EN] معلومات التأمين"
+    },
+    {
+      "key": "settings.billingDetailsSection.insuranceProvider",
+      "value": "[EN] شركة التأمين"
+    },
+    {
+      "key": "settings.billingDetailsSection.insurancePolicyNumber",
+      "value": "[EN] رقم البوليصة"
+    },
+    {
+      "key": "settings.billingDetailsSection.insuranceCoverage",
+      "value": "[EN] التغطية"
+    },
+    {
+      "key": "settings.billingDetailsSection.notes",
+      "value": "[EN] ملاحظات"
+    },
+    {
+      "key": "settings.billingDetailsSection.noNotes",
+      "value": "[EN] لا توجد ملاحظات إضافية."
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentStatus.pending",
+      "value": "[EN] قيد الانتظار"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentStatus.partial",
+      "value": "[EN] جزئي"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentStatus.paid",
+      "value": "[EN] مدفوع"
+    },
+    {
+      "key": "settings.billingDetailsSection.paymentStatus.overdue",
+      "value": "[EN] متأخر"
+    },
+    {
+      "key": "settings.billingForm.title",
+      "value": "[EN] إنشاء فاتورة جديدة"
+    },
+    {
+      "key": "settings.billingForm.editTitle",
+      "value": "[EN] تعديل الفاتورة"
+    },
+    {
+      "key": "settings.billingForm.patient",
+      "value": "[EN] مريض"
+    },
+    {
+      "key": "settings.billingForm.selectPatient",
+      "value": "[EN] اختر مريض"
+    },
+    {
+      "key": "settings.billingForm.appointment",
+      "value": "[EN] موعد"
+    },
+    {
+      "key": "settings.billingForm.selectAppointment",
+      "value": "[EN] اختر موعد (اختياري)"
+    },
+    {
+      "key": "settings.billingForm.treatmentRecord",
+      "value": "[EN] سجل العلاج"
+    },
+    {
+      "key": "settings.billingForm.selectTreatment",
+      "value": "[EN] اختر علاج (اختياري)"
+    },
+    {
+      "key": "settings.billingForm.invoiceItems",
+      "value": "[EN] بنود الفاتورة"
+    },
+    {
+      "key": "settings.billingForm.description",
+      "value": "[EN] الوصف"
+    },
+    {
+      "key": "settings.billingForm.quantity",
+      "value": "[EN] الكمية"
+    },
+    {
+      "key": "settings.billingForm.unitPrice",
+      "value": "[EN] سعر الوحدة"
+    },
+    {
+      "key": "settings.billingForm.total",
+      "value": "[EN] المجموع"
+    },
+    {
+      "key": "settings.billingForm.addItem",
+      "value": "[EN] إضافة بند"
+    },
+    {
+      "key": "settings.billingForm.removeItem",
+      "value": "[EN] إزالة بند"
+    },
+    {
+      "key": "settings.billingForm.summary",
+      "value": "[EN] ملخص"
+    },
+    {
+      "key": "settings.billingForm.subtotal",
+      "value": "[EN] المجموع الفرعي"
+    },
+    {
+      "key": "settings.billingForm.discount",
+      "value": "[EN] مبلغ الخصم"
+    },
+    {
+      "key": "settings.billingForm.taxRate",
+      "value": "[EN] نسبة الضريبة (%)"
+    },
+    {
+      "key": "settings.billingForm.taxAmount",
+      "value": "[EN] مبلغ الضريبة"
+    },
+    {
+      "key": "settings.billingForm.totalAmount",
+      "value": "[EN] المبلغ الإجمالي"
+    },
+    {
+      "key": "settings.billingForm.paymentInformation",
+      "value": "[EN] معلومات الدفع"
+    },
+    {
+      "key": "settings.billingForm.paymentMethod",
+      "value": "[EN] طريقة الدفع"
+    },
+    {
+      "key": "settings.billingForm.selectPaymentMethod",
+      "value": "[EN] اختر طريقة الدفع"
+    },
+    {
+      "key": "settings.billingForm.cash",
+      "value": "[EN] نقداً"
+    },
+    {
+      "key": "settings.billingForm.creditCard",
+      "value": "[EN] بطاقة ائتمان"
+    },
+    {
+      "key": "settings.billingForm.debitCard",
+      "value": "[EN] بطاقة خصم"
+    },
+    {
+      "key": "settings.billingForm.check",
+      "value": "[EN] شيك"
+    },
+    {
+      "key": "settings.billingForm.bankTransfer",
+      "value": "[EN] تحويل بنكي"
+    },
+    {
+      "key": "settings.billingForm.insurance",
+      "value": "[EN] تأمين"
+    },
+    {
+      "key": "settings.billingForm.insuranceProvider",
+      "value": "[EN] شركة التأمين"
+    },
+    {
+      "key": "settings.billingForm.insurancePolicyNumber",
+      "value": "[EN] رقم بوليصة التأمين"
+    },
+    {
+      "key": "settings.billingForm.insuranceCoverageAmount",
+      "value": "[EN] مبلغ تغطية التأمين"
+    },
+    {
+      "key": "settings.billingForm.dueDate",
+      "value": "[EN] تاريخ الاستحقاق"
+    },
+    {
+      "key": "settings.billingForm.notes",
+      "value": "[EN] ملاحظات"
+    },
+    {
+      "key": "settings.billingForm.save",
+      "value": "[EN] حفظ الفاتورة"
+    },
+    {
+      "key": "settings.billingForm.saving",
+      "value": "[EN] جاري الحفظ..."
+    },
+    {
+      "key": "settings.billingForm.update",
+      "value": "[EN] تحديث الفاتورة"
+    },
+    {
+      "key": "settings.billingForm.updating",
+      "value": "[EN] جاري التحديث..."
+    },
+    {
+      "key": "settings.billingForm.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.billingForm.validation.patientRequired",
+      "value": "[EN] المريض مطلوب"
+    },
+    {
+      "key": "settings.billingForm.validation.itemDescriptionRequired",
+      "value": "[EN] الوصف مطلوب"
+    },
+    {
+      "key": "settings.billingForm.validation.itemQuantityMin",
+      "value": "[EN] يجب أن تكون الكمية 1 على الأقل"
+    },
+    {
+      "key": "settings.billingForm.validation.itemUnitPriceMin",
+      "value": "[EN] يجب أن يكون سعر الوحدة إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.itemTotalMin",
+      "value": "[EN] يجب أن يكون المجموع إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.atLeastOneItem",
+      "value": "[EN] مطلوب بند واحد على الأقل"
+    },
+    {
+      "key": "settings.billingForm.validation.subtotalMin",
+      "value": "[EN] يجب أن يكون المجموع الفرعي إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.taxRateMin",
+      "value": "[EN] يجب أن تكون نسبة الضريبة بين 0 و 100"
+    },
+    {
+      "key": "settings.billingForm.validation.taxAmountMin",
+      "value": "[EN] يجب أن يكون مبلغ الضريبة إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.discountAmountMin",
+      "value": "[EN] يجب أن يكون مبلغ الخصم إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.totalAmountMin",
+      "value": "[EN] يجب أن يكون المبلغ الإجمالي إيجابيًا"
+    },
+    {
+      "key": "settings.billingForm.validation.dueDateRequired",
+      "value": "[EN] تاريخ الاستحقاق مطلوب"
+    },
+    {
+      "key": "settings.billingDetails.invoiceTitle",
+      "value": "[EN] فاتورة رقم {{invoiceNumber}}"
+    },
+    {
+      "key": "settings.billingDetails.paymentStatus.pending",
+      "value": "[EN] قيد الانتظar"
+    },
+    {
+      "key": "settings.billingDetails.paymentStatus.partial",
+      "value": "[EN] مدفوع جزئياً"
+    },
+    {
+      "key": "settings.billingDetails.paymentStatus.paid",
+      "value": "[EN] مدفوع"
+    },
+    {
+      "key": "settings.billingDetails.paymentStatus.overdue",
+      "value": "[EN] متأخرة"
+    },
+    {
+      "key": "settings.billingDetails.overdue",
+      "value": "[EN] متأخرة"
+    },
+    {
+      "key": "settings.billingDetails.print",
+      "value": "[EN] طباعة"
+    },
+    {
+      "key": "settings.billingDetails.downloadPDF",
+      "value": "[EN] تحميل PDF"
+    },
+    {
+      "key": "settings.billingDetails.addPayment",
+      "value": "[EN] إضافة دفعة"
+    },
+    {
+      "key": "settings.billingDetails.fromClinic",
+      "value": "[EN] من: {{clinicName}}"
+    },
+    {
+      "key": "settings.billingDetails.billTo",
+      "value": "[EN] إلى: {{patientName}}"
+    },
+    {
+      "key": "settings.billingDetails.invoiceDetailsTitle",
+      "value": "[EN] تفاصيل الفاتورة"
+    },
+    {
+      "key": "settings.billingDetails.invoiceDate",
+      "value": "[EN] تاريخ الفاتورة"
+    },
+    {
+      "key": "settings.billingDetails.dueDate",
+      "value": "[EN] تاريخ الاستحقاق"
+    },
+    {
+      "key": "settings.billingDetails.paidDate",
+      "value": "[EN] تاريخ الدفع"
+    },
+    {
+      "key": "settings.billingDetails.provider",
+      "value": "[EN] المزود"
+    },
+    {
+      "key": "settings.billingDetails.dentistName",
+      "value": "[EN] د. {{firstName}} {{lastName}}"
+    },
+    {
+      "key": "settings.billingDetails.appointment",
+      "value": "[EN] الموعد"
+    },
+    {
+      "key": "settings.billingDetails.treatment",
+      "value": "[EN] العلاج"
+    },
+    {
+      "key": "settings.billingDetails.insuranceInfoTitle",
+      "value": "[EN] معلومات التأمين"
+    },
+    {
+      "key": "settings.billingDetails.insuranceProvider",
+      "value": "[EN] شركة التأمين"
+    },
+    {
+      "key": "settings.billingDetails.policyNumber",
+      "value": "[EN] رقم البوليصة"
+    },
+    {
+      "key": "settings.billingDetails.coverageAmount",
+      "value": "[EN] مبلغ التغطية"
+    },
+    {
+      "key": "settings.billingDetails.invoiceItemsTitle",
+      "value": "[EN] بنود الفاتورة"
+    },
+    {
+      "key": "settings.billingDetails.itemDescription",
+      "value": "[EN] الوصف"
+    },
+    {
+      "key": "settings.billingDetails.itemQuantity",
+      "value": "[EN] الكمية"
+    },
+    {
+      "key": "settings.billingDetails.itemUnitPrice",
+      "value": "[EN] سعر الوحدة"
+    },
+    {
+      "key": "settings.billingDetails.itemTotal",
+      "value": "[EN] الإجمالي"
+    },
+    {
+      "key": "settings.billingDetails.subtotal",
+      "value": "[EN] المجموع الفرعي"
+    },
+    {
+      "key": "settings.billingDetails.discount",
+      "value": "[EN] الخصم"
+    },
+    {
+      "key": "settings.billingDetails.tax",
+      "value": "[EN] الضريبة"
+    },
+    {
+      "key": "settings.billingDetails.totalAmount",
+      "value": "[EN] المبلغ الإجمالي"
+    },
+    {
+      "key": "settings.billingDetails.paidAmount",
+      "value": "[EN] المبلغ المدفوع"
+    },
+    {
+      "key": "settings.billingDetails.balanceDue",
+      "value": "[EN] الرصيد المستحق"
+    },
+    {
+      "key": "settings.billingDetails.paymentHistoryTitle",
+      "value": "[EN] سجل المدفوعات"
+    },
+    {
+      "key": "settings.billingDetails.paymentReference",
+      "value": "[EN] مرجع: {{reference}}"
+    },
+    {
+      "key": "settings.billingDetails.notesTitle",
+      "value": "[EN] ملاحظات"
+    },
+    {
+      "key": "settings.billingDetails.pdfDownloadInfo",
+      "value": "[EN] سيتم تنفيذ وظيفة تنزيل ملف PDF هنا"
+    },
+    {
+      "key": "settings.medicationForm.title",
+      "value": "[EN] نموذج الدواء"
+    },
+    {
+      "key": "settings.medicationForm.medicationName",
+      "value": "[EN] اسم الدواء"
+    },
+    {
+      "key": "settings.medicationForm.medicationNamePlaceholder",
+      "value": "[EN] أدخل اسم الدواء"
+    },
+    {
+      "key": "settings.medicationForm.genericName",
+      "value": "[EN] الاسم العام"
+    },
+    {
+      "key": "settings.medicationForm.genericNamePlaceholder",
+      "value": "[EN] أدخل الاسم العام"
+    },
+    {
+      "key": "settings.medicationForm.dosage",
+      "value": "[EN] الجرعة"
+    },
+    {
+      "key": "settings.medicationForm.dosagePlaceholder",
+      "value": "[EN] مثال: 500 ملغ"
+    },
+    {
+      "key": "settings.medicationForm.frequency",
+      "value": "[EN] التكرار"
+    },
+    {
+      "key": "settings.medicationForm.frequencyPlaceholder",
+      "value": "[EN] مثال: 3 مرات يوميًا"
+    },
+    {
+      "key": "settings.medicationForm.duration",
+      "value": "[EN] المدة"
+    },
+    {
+      "key": "settings.medicationForm.durationPlaceholder",
+      "value": "[EN] مثال: 7-10 أيام"
+    },
+    {
+      "key": "settings.medicationForm.category",
+      "value": "[EN] الفئة"
+    },
+    {
+      "key": "settings.medicationForm.activeMedication",
+      "value": "[EN] دواء نشط"
+    },
+    {
+      "key": "settings.medicationForm.instructions",
+      "value": "[EN] التعليمات"
+    },
+    {
+      "key": "settings.medicationForm.instructionsPlaceholder",
+      "value": "[EN] أدخل تعليمات خاصة لهذا الدواء"
+    },
+    {
+      "key": "settings.medicationForm.sideEffects",
+      "value": "[EN] الآثار الجانبية"
+    },
+    {
+      "key": "settings.medicationForm.addSideEffect",
+      "value": "[EN] إضافة"
+    },
+    {
+      "key": "settings.medicationForm.sideEffectPlaceholder",
+      "value": "[EN] أدخل الأثر الجانبي"
+    },
+    {
+      "key": "settings.medicationForm.contraindications",
+      "value": "[EN] موانع الاستعمال"
+    },
+    {
+      "key": "settings.medicationForm.addContraindication",
+      "value": "[EN] إضافة"
+    },
+    {
+      "key": "settings.medicationForm.contraindicationPlaceholder",
+      "value": "[EN] أدخل موانع الاستعمال"
+    },
+    {
+      "key": "settings.medicationForm.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.medicationForm.updateMedication",
+      "value": "[EN] تحديث الدواء"
+    },
+    {
+      "key": "settings.medicationForm.createMedication",
+      "value": "[EN] إنشاء دواء"
+    },
+    {
+      "key": "settings.medicationForm.validation.medicationNameRequired",
+      "value": "[EN] اسم الدواء مطلوب"
+    },
+    {
+      "key": "settings.medicationForm.validation.dosageRequired",
+      "value": "[EN] الجرعة مطلوبة"
+    },
+    {
+      "key": "settings.medicationForm.validation.frequencyRequired",
+      "value": "[EN] التكرار مطلوب"
+    },
+    {
+      "key": "settings.medicationForm.validation.durationRequired",
+      "value": "[EN] المدة مطلوبة"
+    },
+    {
+      "key": "settings.medicationForm.validation.sideEffectRequired",
+      "value": "[EN] الأثر الجانبي مطلوب"
+    },
+    {
+      "key": "settings.medicationForm.validation.contraindicationRequired",
+      "value": "[EN] موانع الاستعمال مطلوبة"
+    },
+    {
+      "key": "settings.medicationForm.successUpdate",
+      "value": "[EN] تم تحديث الدواء بنجاح"
+    },
+    {
+      "key": "settings.medicationForm.successCreate",
+      "value": "[EN] تم إنشاء الدواء بنجاح"
+    },
+    {
+      "key": "settings.medicationForm.errorSave",
+      "value": "[EN] فشل حفظ الدواء"
+    },
+    {
+      "key": "settings.medicationForm.categories.antibiotic",
+      "value": "[EN] مضاد حيوي"
+    },
+    {
+      "key": "settings.medicationForm.categories.painkiller",
+      "value": "[EN] مسكن للألم"
+    },
+    {
+      "key": "settings.medicationForm.categories.anti-inflammatory",
+      "value": "[EN] مضاد للالتهابات"
+    },
+    {
+      "key": "settings.medicationForm.categories.anesthetic",
+      "value": "[EN] مخدر"
+    },
+    {
+      "key": "settings.medicationForm.categories.antiseptic",
+      "value": "[EN] مطهر"
+    },
+    {
+      "key": "settings.medicationForm.categories.other",
+      "value": "[EN] أخرى"
+    },
+    {
+      "key": "settings.medicationList.title",
+      "value": "[EN] الأدوية"
+    },
+    {
+      "key": "settings.medicationList.selectTitle",
+      "value": "[EN] اختر دواء"
+    },
+    {
+      "key": "settings.medicationList.myTitle",
+      "value": "[EN] أدويتي"
+    },
+    {
+      "key": "settings.medicationList.addMedication",
+      "value": "[EN] إضافة دواء"
+    },
+    {
+      "key": "settings.medicationList.searchPlaceholder",
+      "value": "[EN] ابحث عن الأدوية..."
+    },
+    {
+      "key": "settings.medicationList.filterByCategory",
+      "value": "[EN] تصفية حسب الفئة"
+    },
+    {
+      "key": "settings.medicationList.categories.all",
+      "value": "[EN] جميع الفئات"
+    },
+    {
+      "key": "settings.medicationList.categories.antibiotic",
+      "value": "[EN] مضادات حيوية"
+    },
+    {
+      "key": "settings.medicationList.categories.painkiller",
+      "value": "[EN] مسكنات"
+    },
+    {
+      "key": "settings.medicationList.categories.anti-inflammatory",
+      "value": "[EN] مضادات الالتهاب"
+    },
+    {
+      "key": "settings.medicationList.categories.anesthetic",
+      "value": "[EN] مخدرات"
+    },
+    {
+      "key": "settings.medicationList.categories.antiseptic",
+      "value": "[EN] مطهرات"
+    },
+    {
+      "key": "settings.medicationList.categories.other",
+      "value": "[EN] أخرى"
+    },
+    {
+      "key": "settings.medicationList.patientInfoTitle",
+      "value": "[EN] الأدوية الموصوفة لك"
+    },
+    {
+      "key": "settings.medicationList.patientInfoText",
+      "value": "[EN] فيما يلي الأدوية التي تم وصفها لك. يرجى اتباع تعليمات الجرعة والتكرار بعناية."
+    },
+    {
+      "key": "settings.medicationList.noMedicationsFound",
+      "value": "[EN] لم يتم العثور على أدوية"
+    },
+    {
+      "key": "settings.medicationList.noMedicationsMatchFilters",
+      "value": "[EN] لا توجد أدوية تطابق عوامل التصفية الحالية."
+    },
+    {
+      "key": "settings.medicationList.noMedicationsPrescribed",
+      "value": "[EN] لا توجد أدوية موصوفة"
+    },
+    {
+      "key": "settings.medicationList.noMedicationsPrescribedInfo",
+      "value": "[EN] ليس لديك حاليًا أي أدوية موصوفة. اتصل بطبيب الأسنان إذا كان لديك أي مخاوف."
+    },
+    {
+      "key": "settings.medicationList.genericName",
+      "value": "[EN] الاسم العام: {{name}}"
+    },
+    {
+      "key": "settings.medicationList.dosage",
+      "value": "[EN] الجرعة:"
+    },
+    {
+      "key": "settings.medicationList.frequency",
+      "value": "[EN] التكرار:"
+    },
+    {
+      "key": "settings.medicationList.duration",
+      "value": "[EN] المدة:"
+    },
+    {
+      "key": "settings.medicationList.instructions",
+      "value": "[EN] التعليمات:"
+    },
+    {
+      "key": "settings.medicationList.sideEffects",
+      "value": "[EN] الآثار الجانبية:"
+    },
+    {
+      "key": "settings.medicationList.moreItems",
+      "value": "[EN] +{{count}} المزيد"
+    },
+    {
+      "key": "settings.medicationList.select",
+      "value": "[EN] اختر"
+    },
+    {
+      "key": "settings.medicationList.active",
+      "value": "[EN] نشط"
+    },
+    {
+      "key": "settings.medicationList.inactive",
+      "value": "[EN] غير نشط"
+    },
+    {
+      "key": "settings.medicationList.previousPage",
+      "value": "[EN] السابق"
+    },
+    {
+      "key": "settings.medicationList.nextPage",
+      "value": "[EN] التالي"
+    },
+    {
+      "key": "settings.medicationList.pageInfo",
+      "value": "[EN] صفحة {{currentPage}} من {{totalPages}}"
+    },
+    {
+      "key": "settings.medicationList.editMedication",
+      "value": "[EN] تعديل الدواء"
+    },
+    {
+      "key": "settings.medicationList.addModalTitle",
+      "value": "[EN] إضافة دواء جديد"
+    },
+    {
+      "key": "settings.medicationList.deleteConfirmation",
+      "value": "[EN] هل أنت متأكد أنك تريد حذف هذا الدواء؟"
+    },
+    {
+      "key": "settings.medicationList.deleteSuccess",
+      "value": "[EN] تم حذف الدواء بنجاح"
+    },
+    {
+      "key": "settings.medicationList.deleteError",
+      "value": "[EN] فشل حذف الدواء"
+    },
+    {
+      "key": "settings.medicationList.fetchError",
+      "value": "[EN] فشل في جلب الأدوية"
+    },
+    {
+      "key": "settings.medicationList.createFirstMedication",
+      "value": "[EN] إنشاء الدواء الأول"
+    },
+    {
+      "key": "settings.prescriptions.title",
+      "value": "[EN] الوصفات الطبية"
+    },
+    {
+      "key": "settings.prescriptions.patientPrescriptions",
+      "value": "[EN] وصفات المريض الطبية"
+    },
+    {
+      "key": "settings.prescriptions.newPrescription",
+      "value": "[EN] وصفة طبية جديدة"
+    },
+    {
+      "key": "settings.prescriptions.editPrescription",
+      "value": "[EN] تعديل الوصفة الطبية"
+    },
+    {
+      "key": "settings.prescriptions.prescriptionDetails",
+      "value": "[EN] تفاصيل الوصفة الطبية"
+    },
+    {
+      "key": "settings.prescriptions.searchPlaceholder",
+      "value": "[EN] ابحث عن طريق المريض، طبيب الأسنان، أو الدواء..."
+    },
+    {
+      "key": "settings.prescriptions.filterByStatus",
+      "value": "[EN] تصفية حسب الحالة"
+    },
+    {
+      "key": "settings.prescriptions.allStatus",
+      "value": "[EN] جميع الحالات"
+    },
+    {
+      "key": "settings.prescriptions.active",
+      "value": "[EN] نشطة"
+    },
+    {
+      "key": "settings.prescriptions.completed",
+      "value": "[EN] مكتملة"
+    },
+    {
+      "key": "settings.prescriptions.cancelled",
+      "value": "[EN] ملغاة"
+    },
+    {
+      "key": "settings.prescriptions.expired",
+      "value": "[EN] منتهية الصلاحية"
+    },
+    {
+      "key": "settings.prescriptions.prescriptionNumber",
+      "value": "[EN] وصفة طبية #{{id}}"
+    },
+    {
+      "key": "settings.prescriptions.issued",
+      "value": "[EN] صادرة في: {{date}}"
+    },
+    {
+      "key": "settings.prescriptions.expires",
+      "value": "[EN] تنتهي في: {{date}}"
+    },
+    {
+      "key": "settings.prescriptions.diagnosis",
+      "value": "[EN] التشخيص"
+    },
+    {
+      "key": "settings.prescriptions.medications",
+      "value": "[EN] الأدوية"
+    },
+    {
+      "key": "settings.prescriptions.dosage",
+      "value": "[EN] الجرعة: {{dosage}}"
+    },
+    {
+      "key": "settings.prescriptions.frequency",
+      "value": "[EN] التكرار: {{frequency}}"
+    },
+    {
+      "key": "settings.prescriptions.duration",
+      "value": "[EN] المدة: {{duration}}"
+    },
+    {
+      "key": "settings.prescriptions.refills",
+      "value": "[EN] {{current}}/{{max}} إعادة صرف"
+    },
+    {
+      "key": "settings.prescriptions.noPrescriptionsFound",
+      "value": "[EN] لم يتم العثور على وصفات طبية"
+    },
+    {
+      "key": "settings.prescriptions.noPatientPrescriptions",
+      "value": "[EN] هذا المريض ليس لديه وصفات طبية حالية أو سابقة."
+    },
+    {
+      "key": "settings.prescriptions.noFilteredPrescriptions",
+      "value": "[EN] لا توجد وصفات طبية تطابق فلاتر البحث الحالية."
+    },
+    {
+      "key": "settings.prescriptions.createFirstPrescription",
+      "value": "[EN] إنشاء أول وصفة طبية"
+    },
+    {
+      "key": "settings.prescriptions.previous",
+      "value": "[EN] السابق"
+    },
+    {
+      "key": "settings.prescriptions.next",
+      "value": "[EN] التالي"
+    },
+    {
+      "key": "settings.prescriptions.pageOf",
+      "value": "[EN] صفحة {{currentPage}} من {{totalPages}}"
+    },
+    {
+      "key": "settings.prescriptions.fetchError",
+      "value": "[EN] فشل في جلب الوصفات الطبية."
+    },
+    {
+      "key": "settings.prescriptions.deleteConfirmation",
+      "value": "[EN] هل أنت متأكد أنك تريد حذف هذه الوصفة الطبية؟"
+    },
+    {
+      "key": "settings.prescriptions.deleteSuccess",
+      "value": "[EN] تم حذف الوصفة الطبية بنجاح."
+    },
+    {
+      "key": "settings.prescriptions.deleteError",
+      "value": "[EN] فشل في حذف الوصفة الطبية."
+    },
+    {
+      "key": "settings.prescriptionForm.patientLabel",
+      "value": "[EN] المريض *"
+    },
+    {
+      "key": "settings.prescriptionForm.selectPatient",
+      "value": "[EN] اختر مريضًا"
+    },
+    {
+      "key": "settings.prescriptionForm.relatedAppointmentLabel",
+      "value": "[EN] الموعد ذو الصلة"
+    },
+    {
+      "key": "settings.prescriptionForm.selectAppointment",
+      "value": "[EN] اختر موعدًا (اختياري)"
+    },
+    {
+      "key": "settings.prescriptionForm.noSpecificAppointment",
+      "value": "[EN] لا يوجد موعد محدد"
+    },
+    {
+      "key": "settings.prescriptionForm.diagnosisLabel",
+      "value": "[EN] التشخيص *"
+    },
+    {
+      "key": "settings.prescriptionForm.diagnosisPlaceholder",
+      "value": "[EN] أدخل التشخيص"
+    },
+    {
+      "key": "settings.prescriptionForm.medicationsLabel",
+      "value": "[EN] الأدوية *"
+    },
+    {
+      "key": "settings.prescriptionForm.addMedication",
+      "value": "[EN] إضافة دواء"
+    },
+    {
+      "key": "settings.prescriptionForm.medicationItem",
+      "value": "[EN] الدواء {{index}}"
+    },
+    {
+      "key": "settings.prescriptionForm.selectMedicationButton",
+      "value": "[EN] اختر"
+    },
+    {
+      "key": "settings.prescriptionForm.medicationIdPlaceholder",
+      "value": "[EN] معرف الدواء (استخدم زر الاختيار)"
+    },
+    {
+      "key": "settings.prescriptionForm.dosageLabel",
+      "value": "[EN] الجرعة"
+    },
+    {
+      "key": "settings.prescriptionForm.dosagePlaceholder",
+      "value": "[EN] مثال: 500 ملغ"
+    },
+    {
+      "key": "settings.prescriptionForm.frequencyLabel",
+      "value": "[EN] التكرار"
+    },
+    {
+      "key": "settings.prescriptionForm.frequencyPlaceholder",
+      "value": "[EN] مثال: 3 مرات يوميًا"
+    },
+    {
+      "key": "settings.prescriptionForm.durationLabel",
+      "value": "[EN] المدة"
+    },
+    {
+      "key": "settings.prescriptionForm.durationPlaceholder",
+      "value": "[EN] مثال: 7 أيام"
+    },
+    {
+      "key": "settings.prescriptionForm.instructionsLabel",
+      "value": "[EN] التعليمات"
+    },
+    {
+      "key": "settings.prescriptionForm.instructionsPlaceholder",
+      "value": "[EN] تعليمات خاصة"
+    },
+    {
+      "key": "settings.prescriptionForm.expiryDateLabel",
+      "value": "[EN] تاريخ انتهاء الصلاحية *"
+    },
+    {
+      "key": "settings.prescriptionForm.maxRefillsLabel",
+      "value": "[EN] الحد الأقصى لإعادة الصرف"
+    },
+    {
+      "key": "settings.prescriptionForm.additionalNotesLabel",
+      "value": "[EN] ملاحظات إضافية"
+    },
+    {
+      "key": "settings.prescriptionForm.notesPlaceholder",
+      "value": "[EN] أي ملاحظات أو تعليمات إضافية"
+    },
+    {
+      "key": "settings.prescriptionForm.cancelButton",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.prescriptionForm.updateButton",
+      "value": "[EN] تحديث الوصفة الطبية"
+    },
+    {
+      "key": "settings.prescriptionForm.createButton",
+      "value": "[EN] إنشاء وصفة طبية"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.patientRequired",
+      "value": "[EN] المريض مطلوب"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.medicationRequired",
+      "value": "[EN] الدواء مطلوب"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.dosageRequired",
+      "value": "[EN] الجرعة مطلوبة"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.frequencyRequired",
+      "value": "[EN] التكرار مطلوب"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.durationRequired",
+      "value": "[EN] المدة مطلوبة"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.atLeastOneMedication",
+      "value": "[EN] مطلوب دواء واحد على الأقل"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.diagnosisRequired",
+      "value": "[EN] التشخيص مطلوب"
+    },
+    {
+      "key": "settings.prescriptionForm.validation.expiryDateRequired",
+      "value": "[EN] تاريخ انتهاء الصلاحية مطلوب"
+    },
+    {
+      "key": "settings.prescriptionForm.successUpdate",
+      "value": "[EN] تم تحديث الوصفة الطبية بنجاح"
+    },
+    {
+      "key": "settings.prescriptionForm.successCreate",
+      "value": "[EN] تم إنشاء الوصفة الطبية بنجاح"
+    },
+    {
+      "key": "settings.prescriptionForm.errorSave",
+      "value": "[EN] فشل حفظ الوصفة الطبية"
+    },
+    {
+      "key": "settings.prescriptionDetails.title",
+      "value": "[EN] وصفة طبية #{{id}}"
+    },
+    {
+      "key": "settings.prescriptionDetails.expired",
+      "value": "[EN] منتهية الصلاحية"
+    },
+    {
+      "key": "settings.prescriptionDetails.addRefill",
+      "value": "[EN] إضافة إعادة صرف"
+    },
+    {
+      "key": "settings.prescriptionDetails.patientInfo",
+      "value": "[EN] معلومات المريض"
+    },
+    {
+      "key": "settings.prescriptionDetails.name",
+      "value": "[EN] الاسم"
+    },
+    {
+      "key": "settings.prescriptionDetails.email",
+      "value": "[EN] البريد الإلكتروني"
+    },
+    {
+      "key": "settings.prescriptionDetails.prescriptionInfo",
+      "value": "[EN] تفاصيل الوصفة الطبية"
+    },
+    {
+      "key": "settings.prescriptionDetails.diagnosis",
+      "value": "[EN] التشخيص"
+    },
+    {
+      "key": "settings.prescriptionDetails.notes",
+      "value": "[EN] ملاحظات"
+    },
+    {
+      "key": "settings.prescriptionDetails.issuedDate",
+      "value": "[EN] تاريخ الإصدار"
+    },
+    {
+      "key": "settings.prescriptionDetails.expiryDate",
+      "value": "[EN] تاريخ انتهاء الصلاحية"
+    },
+    {
+      "key": "settings.prescriptionDetails.maxRefills",
+      "value": "[EN] الحد الأقصى لإعادة الصرف"
+    },
+    {
+      "key": "settings.prescriptionDetails.medications",
+      "value": "[EN] الأدوية"
+    },
+    {
+      "key": "settings.prescriptionDetails.genericName",
+      "value": "[EN] الاسم العلمي: {{name}}"
+    },
+    {
+      "key": "settings.prescriptionDetails.dosage",
+      "value": "[EN] الجرعة"
+    },
+    {
+      "key": "settings.prescriptionDetails.frequency",
+      "value": "[EN] التكرار"
+    },
+    {
+      "key": "settings.prescriptionDetails.duration",
+      "value": "[EN] المدة"
+    },
+    {
+      "key": "settings.prescriptionDetails.instructions",
+      "value": "[EN] التعليمات"
+    },
+    {
+      "key": "settings.prescriptionDetails.refillHistory",
+      "value": "[EN] سجل إعادة الصرف ({{count}}/{{max}})"
+    },
+    {
+      "key": "settings.prescriptionDetails.refillTitle",
+      "value": "[EN] إعادة صرف #{{number}}"
+    },
+    {
+      "key": "settings.prescriptionDetails.noRefills",
+      "value": "[EN] لم يتم إصدار أي إعادة صرف حتى الآن."
+    },
+    {
+      "key": "settings.prescriptionDetails.providerInfo",
+      "value": "[EN] معلومات مقدم الخدمة"
+    },
+    {
+      "key": "settings.prescriptionDetails.prescribingDentist",
+      "value": "[EN] طبيب الأسنان الذي وصف الدواء"
+    },
+    {
+      "key": "settings.prescriptionDetails.dentistPrefix",
+      "value": "[EN] د."
+    },
+    {
+      "key": "settings.prescriptionDetails.clinic",
+      "value": "[EN] العيادة"
+    },
+    {
+      "key": "settings.prescriptionDetails.relatedAppointment",
+      "value": "[EN] الموعد ذو الصلة"
+    },
+    {
+      "key": "settings.prescriptionDetails.close",
+      "value": "[EN] إغلاق"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.title",
+      "value": "[EN] إضافة إعادة صرف"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.addingRefill",
+      "value": "[EN] إضافة إعادة صرف #{{count}} من {{max}}"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.patient",
+      "value": "[EN] المريض: {{name}}"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.notesLabel",
+      "value": "[EN] ملاحظات (اختياري)"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.notesPlaceholder",
+      "value": "[EN] أضف أي ملاحظات حول إعادة الصرف هذه..."
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "settings.prescriptionDetails.modal.submit",
+      "value": "[EN] إضافة إعادة صرف"
+    },
+    {
+      "key": "settings.prescriptionDetails.toasts.refillSuccess",
+      "value": "[EN] تمت إضافة إعادة الصرف بنجاح"
+    },
+    {
+      "key": "settings.prescriptionDetails.toasts.refillError",
+      "value": "[EN] فشل في إضافة إعادة الصرف"
+    },
+    {
+      "key": "settings.prescriptionDetails.status.active",
+      "value": "[EN] نشط"
+    },
+    {
+      "key": "settings.prescriptionDetails.status.completed",
+      "value": "[EN] مكتمل"
+    },
+    {
+      "key": "settings.prescriptionDetails.status.cancelled",
+      "value": "[EN] ملغاة"
+    },
+    {
+      "key": "settings.hero.title",
+      "value": "[EN] Contact Us"
+    },
+    {
+      "key": "settings.hero.description",
+      "value": "[EN] We're here to help! Reach out to us with any questions or inquiries."
+    },
+    {
+      "key": "settings.contactForm.title",
+      "value": "[EN] Send us a Message"
+    },
+    {
+      "key": "settings.contactForm.description",
+      "value": "[EN] Fill out the form below and we'll get back to you as soon as possible."
+    },
+    {
+      "key": "settings.contactForm.name",
+      "value": "[EN] Your Name"
+    },
+    {
+      "key": "settings.contactForm.namePlaceholder",
+      "value": "[EN] Enter your name"
+    },
+    {
+      "key": "settings.contactForm.email",
+      "value": "[EN] Your Email"
+    },
+    {
+      "key": "settings.contactForm.emailPlaceholder",
+      "value": "[EN] Enter your email"
+    },
+    {
+      "key": "settings.contactForm.subject",
+      "value": "[EN] Subject"
+    },
+    {
+      "key": "settings.contactForm.subjectPlaceholder",
+      "value": "[EN] Enter the subject"
+    },
+    {
+      "key": "settings.contactForm.message",
+      "value": "[EN] Your Message"
+    },
+    {
+      "key": "settings.contactForm.messagePlaceholder",
+      "value": "[EN] Enter your message"
+    },
+    {
+      "key": "settings.contactForm.sending",
+      "value": "[EN] Sending..."
+    },
+    {
+      "key": "settings.contactForm.send",
+      "value": "[EN] Send Message"
+    },
+    {
+      "key": "settings.contactForm.success",
+      "value": "[EN] Message sent successfully!"
+    },
+    {
+      "key": "settings.contactForm.error",
+      "value": "[EN] Failed to send message. Please try again later."
+    },
+    {
+      "key": "settings.contactInfo.title",
+      "value": "[EN] Our Contact Information"
+    },
+    {
+      "key": "settings.contactInfo.address.title",
+      "value": "[EN] Address"
+    },
+    {
+      "key": "settings.contactInfo.address.line1",
+      "value": "[EN] 123 Clinic Street"
+    },
+    {
+      "key": "settings.contactInfo.address.line2",
+      "value": "[EN] Medical City, MC 12345"
+    },
+    {
+      "key": "settings.contactInfo.contactDetails.title",
+      "value": "[EN] Contact Details"
+    },
+    {
+      "key": "settings.contactInfo.contactDetails.phone",
+      "value": "[EN] Phone: +1 (123) 456-7890"
+    },
+    {
+      "key": "settings.contactInfo.contactDetails.email",
+      "value": "[EN] Email: info@clinic.com"
+    },
+    {
+      "key": "settings.contactInfo.businessHours.title",
+      "value": "[EN] Business Hours"
+    },
+    {
+      "key": "settings.contactInfo.businessHours.days",
+      "value": "[EN] Monday - Friday:"
+    },
+    {
+      "key": "settings.contactInfo.businessHours.hours",
+      "value": "[EN] 9:00 AM - 5:00 PM"
+    },
+    {
+      "key": "story.title",
+      "value": "[EN] قصتنا"
+    },
+    {
+      "key": "story.paragraph1",
+      "value": "[EN] تأسست عيادتنا في عام 2005 برؤية بسيطة: إنشاء عيادة أسنان يشعر فيها المرضى بالراحة والتقدير ويتلقون أعلى مستويات الجودة في الرعاية. على مر السنين، نمت عيادتنا، لكن قيمنا الأساسية بقيت كما هي."
+    },
+    {
+      "key": "story.paragraph2",
+      "value": "[EN] نحن نؤمن ببناء علاقات دائمة مع مرضانا، وفهم احتياجاتهم الفريدة، وتمكينهم بالمعرفة حول صحة فمهم. فريقنا متحمس لطب الأسنان وملتزم بالتعلم المستمر لتقديم أحدث التطورات في علوم طب الأسنان."
+    },
+    {
+      "key": "story.paragraph3",
+      "value": "[EN] من عيادة صغيرة إلى مزود رعاية أسنان رائد في المجتمع، نحن فخورون بالرحلة التي قطعناها وممتنون للثقة التي يضعها مرضانا فينا. نتطلع إلى سنوات عديدة أخرى من خدمتكم وعائلاتكم."
+    },
+    {
+      "key": "mission.title",
+      "value": "[EN] مهمتنا"
+    },
+    {
+      "key": "mission.description",
+      "value": "[EN] تبسيط رعاية الأسنان، تمكين المرضى، وتحسين الابتسامات من خلال الابتكار والخدمة الرحيمة."
+    },
+    {
+      "key": "mission.simplify.title",
+      "value": "[EN] تبسيط رعاية الأسنان"
+    },
+    {
+      "key": "mission.simplify.description",
+      "value": "[EN] جعل زيارات الأسنان سهلة وخالية من التوتر من خلال عمليات مبسطة وتواصل واضح."
+    },
+    {
+      "key": "mission.empower.title",
+      "value": "[EN] تمكين المرضى"
+    },
+    {
+      "key": "mission.empower.description",
+      "value": "[EN] تثقيف المرضى وإشراكهم في قرارات علاجهم لتحقيق نتائج أفضل لصحة الفم."
+    },
+    {
+      "key": "mission.enhance.title",
+      "value": "[EN] تحسين الابتسامات"
+    },
+    {
+      "key": "mission.enhance.description",
+      "value": "[EN] استخدام التقنيات المتقدمة والرعاية الشخصية لتحقيق ابتسامات جميلة وصحية."
+    },
+    {
+      "key": "team.title",
+      "value": "[EN] تعرف على فريقنا المتفاني"
+    },
+    {
+      "key": "team.member1.name",
+      "value": "[EN] د. أحمد حسن"
+    },
+    {
+      "key": "team.member1.role",
+      "value": "[EN] المؤسس وكبير أطباء الأسنان"
+    },
+    {
+      "key": "team.member1.bio",
+      "value": "[EN] أسس الدكتور حسن العيادة برؤية للرعاية المتمحورة حول المريض. مع أكثر من 20 عامًا من الخبرة، وهو مكرس لتقنيات طب الأسنان المتقدمة."
+    },
+    {
+      "key": "team.member2.name",
+      "value": "[EN] د. سارة خان"
+    },
+    {
+      "key": "team.member2.role",
+      "value": "[EN] أخصائية تقويم الأسنان"
+    },
+    {
+      "key": "team.member2.bio",
+      "value": "[EN] تتخصص الدكتورة خان في تقويم الأسنان، وتخلق ابتسامات مثالية للمرضى من جميع الأعمار. نهجها اللطيف يجعل كل زيارة مريحة."
+    },
+    {
+      "key": "team.member3.name",
+      "value": "[EN] د. عمر شريف"
+    },
+    {
+      "key": "team.member3.role",
+      "value": "[EN] جراح الفم"
+    },
+    {
+      "key": "team.member3.bio",
+      "value": "[EN] الدكتور شريف هو خبيرنا في جراحة الفم، ويقدم إجراءات آمنة وفعالة بأقصى درجات الدقة والعناية."
+    },
+    {
+      "key": "cta.title",
+      "value": "[EN] هل أنت مستعد لتجربة رعاية أسنان استثنائية؟"
+    },
+    {
+      "key": "cta.description",
+      "value": "[EN] اتصل بنا اليوم لتحديد موعدك والانضمام إلى عائلتنا من الابتسامات السعيدة والصحية."
+    },
+    {
+      "key": "cta.contact",
+      "value": "[EN] اتصل بنا"
+    },
+    {
+      "key": "cta.getStarted",
+      "value": "[EN] ابدأ الآن"
+    },
+    {
+      "key": "paymentForm.title",
+      "value": "[EN] إضافة دفعة"
+    },
+    {
+      "key": "paymentForm.invoiceSummary",
+      "value": "[EN] ملخص الفاتورة"
+    },
+    {
+      "key": "paymentForm.invoiceNumber",
+      "value": "[EN] رقم الفاتورة:"
+    },
+    {
+      "key": "paymentForm.patient",
+      "value": "[EN] المريض:"
+    },
+    {
+      "key": "paymentForm.totalAmount",
+      "value": "[EN] المبلغ الإجمالي:"
+    },
+    {
+      "key": "paymentForm.paidAmount",
+      "value": "[EN] المبلغ المدفوع:"
+    },
+    {
+      "key": "paymentForm.currentBalance",
+      "value": "[EN] الرصيد الحالي:"
+    },
+    {
+      "key": "paymentForm.newBalance",
+      "value": "[EN] الرصيد الجديد:"
+    },
+    {
+      "key": "paymentForm.paymentAmount",
+      "value": "[EN] مبلغ الدفعة *"
+    },
+    {
+      "key": "paymentForm.paymentAmountPlaceholder",
+      "value": "[EN] 0.00"
+    },
+    {
+      "key": "paymentForm.fullPayment",
+      "value": "[EN] دفعة كاملة"
+    },
+    {
+      "key": "paymentForm.partialPayment50",
+      "value": "[EN] 50%"
+    },
+    {
+      "key": "paymentForm.partialPayment25",
+      "value": "[EN] 25%"
+    },
+    {
+      "key": "paymentForm.paymentMethod",
+      "value": "[EN] طريقة الدفع *"
+    },
+    {
+      "key": "paymentForm.selectPaymentMethod",
+      "value": "[EN] اختر طريقة الدفع"
+    },
+    {
+      "key": "paymentForm.cash",
+      "value": "[EN] نقداً"
+    },
+    {
+      "key": "paymentForm.creditCard",
+      "value": "[EN] بطاقة ائتمان"
+    },
+    {
+      "key": "paymentForm.debitCard",
+      "value": "[EN] بطاقة خصم"
+    },
+    {
+      "key": "paymentForm.check",
+      "value": "[EN] شيك"
+    },
+    {
+      "key": "paymentForm.bankTransfer",
+      "value": "[EN] تحويل بنكي"
+    },
+    {
+      "key": "paymentForm.insurancePayment",
+      "value": "[EN] دفعة تأمين"
+    },
+    {
+      "key": "paymentForm.other",
+      "value": "[EN] أخرى"
+    },
+    {
+      "key": "paymentForm.paymentDate",
+      "value": "[EN] تاريخ الدفعة *"
+    },
+    {
+      "key": "paymentForm.referenceNumber",
+      "value": "[EN] الرقم المرجعي"
+    },
+    {
+      "key": "paymentForm.referencePlaceholder",
+      "value": "[EN] معرف المعاملة، رقم الشيك، إلخ."
+    },
+    {
+      "key": "paymentForm.paymentNotes",
+      "value": "[EN] ملاحظات الدفع"
+    },
+    {
+      "key": "paymentForm.notesPlaceholder",
+      "value": "[EN] ملاحظات إضافية حول هذه الدفعة..."
+    },
+    {
+      "key": "paymentForm.paymentPreview",
+      "value": "[EN] معاينة الدفعة"
+    },
+    {
+      "key": "paymentForm.previewAmount",
+      "value": "[EN] مبلغ الدفعة:"
+    },
+    {
+      "key": "paymentForm.previewRemaining",
+      "value": "[EN] الرصيد المتبقي:"
+    },
+    {
+      "key": "paymentForm.previewStatus",
+      "value": "[EN] الحالة الجديدة:"
+    },
+    {
+      "key": "paymentForm.errorAmountExceedsBalance",
+      "value": "[EN] لا يمكن أن يتجاوز مبلغ الدفعة الرصيد المستحق البالغ ${{balance}}"
+    },
+    {
+      "key": "paymentForm.infoFullSettlement",
+      "value": "[EN] هذه الدفعة ستسوي الفاتورة بالكامل."
+    },
+    {
+      "key": "paymentForm.infoPartialPayment",
+      "value": "[EN] هذه دفعة جزئية. سيكون الرصيد المتبقي ${{balance}}."
+    },
+    {
+      "key": "paymentForm.cancel",
+      "value": "[EN] إلغاء"
+    },
+    {
+      "key": "paymentForm.addPayment",
+      "value": "[EN] إضافة دفعة"
+    },
+    {
+      "key": "paymentForm.processing",
+      "value": "[EN] قيد المعالجة..."
+    },
+    {
+      "key": "paymentForm.validation.amountRequired",
+      "value": "[EN] يجب أن يكون مبلغ الدفعة أكبر من 0"
+    },
+    {
+      "key": "paymentForm.validation.amountMax",
+      "value": "[EN] لا يمكن أن يتجاوز المبلغ 1,000,000 دولار"
+    },
+    {
+      "key": "paymentForm.validation.methodRequired",
+      "value": "[EN] طريقة الدفع مطلوبة"
+    },
+    {
+      "key": "paymentForm.validation.notesMax",
+      "value": "[EN] لا يمكن أن تتجاوز الملاحظات 500 حرف"
+    },
+    {
+      "key": "paymentForm.validation.dateRequired",
+      "value": "[EN] تاريخ الدفع مطلوب"
+    },
+    {
+      "key": "paymentForm.successMessage",
+      "value": "[EN] تمت إضافة الدفعة بنجاح"
+    },
+    {
+      "key": "paymentForm.errorMessage",
+      "value": "[EN] فشل في إضافة الدفعة"
+    },
+    {
+      "key": "billingList.title",
+      "value": "[EN] سجلات الفواتير"
+    },
+    {
+      "key": "billingList.searchPlaceholder",
+      "value": "[EN] البحث عن طريق المريض, رقم الفاتورة..."
+    },
+    {
+      "key": "billingList.allStatus",
+      "value": "[EN] كل الحالات"
+    },
+    {
+      "key": "billingList.pending",
+      "value": "[EN] قيد الانتظار"
+    },
+    {
+      "key": "billingList.partial",
+      "value": "[EN] جزئي"
+    },
+    {
+      "key": "billingList.paid",
+      "value": "[EN] مدفوع"
+    },
+    {
+      "key": "billingList.overdue",
+      "value": "[EN] متأخر"
+    },
+    {
+      "key": "billingList.addRecord",
+      "value": "[EN] إضافة فاتورة جديدة"
+    },
+    {
+      "key": "billingList.invoiceNumber",
+      "value": "[EN] رقم الفاتورة"
+    },
+    {
+      "key": "billingList.patient",
+      "value": "[EN] المريض"
+    },
+    {
+      "key": "billingList.date",
+      "value": "[EN] التاريخ"
+    },
+    {
+      "key": "billingList.dueDate",
+      "value": "[EN] تاريخ الاستحقاق"
+    },
+    {
+      "key": "billingList.total",
+      "value": "[EN] الإجمالي"
+    },
+    {
+      "key": "billingList.paidAmount",
+      "value": "[EN] المبلغ المدفوع"
+    },
+    {
+      "key": "billingList.balance",
+      "value": "[EN] الرصيد"
+    },
+    {
+      "key": "billingList.status",
+      "value": "[EN] الحالة"
+    },
+    {
+      "key": "billingList.actions",
+      "value": "[EN] الإجراءات"
+    },
+    {
+      "key": "billingList.noRecords",
+      "value": "[EN] لم يتم العثور على سجلات فواتير."
+    },
+    {
+      "key": "billingList.loading",
+      "value": "[EN] جارٍ تحميل سجلات الفواتير..."
+    },
+    {
+      "key": "billingList.addPayment",
+      "value": "[EN] إضافة دفعة"
+    },
+    {
+      "key": "billingList.viewDetails",
+      "value": "[EN] عرض التفاصيل"
+    },
+    {
+      "key": "billingList.edit",
+      "value": "[EN] تعديل"
+    },
+    {
+      "key": "billingList.delete",
+      "value": "[EN] حذف"
+    },
+    {
+      "key": "billingList.deleteConfirmation",
+      "value": "[EN] هل أنت متأكد أنك تريد حذف سجل الفاتورة هذا؟"
+    },
+    {
+      "key": "billingList.deleteSuccess",
+      "value": "[EN] تم حذف سجل الفاتورة بنجاح"
+    },
+    {
+      "key": "billingList.deleteError",
+      "value": "[EN] فشل حذف سجل الفاتورة"
+    },
+    {
+      "key": "billingList.fetchError",
+      "value": "[EN] فشل في جلب سجلات الفواتير"
+    },
+    {
+      "key": "billingList.previous",
+      "value": "[EN] السابق"
+    },
+    {
+      "key": "billingList.next",
+      "value": "[EN] التالي"
+    },
+    {
+      "key": "billingList.page",
+      "value": "[EN] صفحة"
+    }
+  ],
+  "arabicPlaceholders": [
+    {
+      "key": "clinicLocations.title",
+      "value": "[AR] Our Clinic Locations"
+    },
+    {
+      "key": "clinicLocations.description",
+      "value": "[AR] Find a convenient location near you."
+    },
+    {
+      "key": "testimonials.title",
+      "value": "[AR] What Our Patients Say"
+    },
+    {
+      "key": "testimonials.description",
+      "value": "[AR] Hear from those who trust us with their smiles."
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.title",
+      "value": "[AR] Create New Invoice"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.editTitle",
+      "value": "[AR] Edit Invoice"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.patient",
+      "value": "[AR] Patient"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.selectPatient",
+      "value": "[AR] Select a patient"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.appointment",
+      "value": "[AR] Appointment"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.selectAppointment",
+      "value": "[AR] Select an appointment (optional)"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.treatmentRecord",
+      "value": "[AR] Treatment Record"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.selectTreatment",
+      "value": "[AR] Select a treatment (optional)"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.invoiceItems",
+      "value": "[AR] Invoice Items"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.description",
+      "value": "[AR] Description"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.quantity",
+      "value": "[AR] Quantity"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.unitPrice",
+      "value": "[AR] Unit Price"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.total",
+      "value": "[AR] Total"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.addItem",
+      "value": "[AR] Add Item"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.removeItem",
+      "value": "[AR] Remove Item"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.summary",
+      "value": "[AR] Summary"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.subtotal",
+      "value": "[AR] Subtotal"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.discount",
+      "value": "[AR] Discount Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.taxRate",
+      "value": "[AR] Tax Rate (%)"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.taxAmount",
+      "value": "[AR] Tax Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.totalAmount",
+      "value": "[AR] Total Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.paymentInformation",
+      "value": "[AR] Payment Information"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.paymentMethod",
+      "value": "[AR] Payment Method"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.selectPaymentMethod",
+      "value": "[AR] Select payment method"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.cash",
+      "value": "[AR] Cash"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.creditCard",
+      "value": "[AR] Credit Card"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.debitCard",
+      "value": "[AR] Debit Card"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.check",
+      "value": "[AR] Check"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.bankTransfer",
+      "value": "[AR] Bank Transfer"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.insurance",
+      "value": "[AR] Insurance"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.insuranceProvider",
+      "value": "[AR] Insurance Provider"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.insurancePolicyNumber",
+      "value": "[AR] Insurance Policy Number"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.insuranceCoverageAmount",
+      "value": "[AR] Insurance Coverage Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.dueDate",
+      "value": "[AR] Due Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.notes",
+      "value": "[AR] Notes"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.save",
+      "value": "[AR] Save Invoice"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.saving",
+      "value": "[AR] Saving..."
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.update",
+      "value": "[AR] Update Invoice"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.updating",
+      "value": "[AR] Updating..."
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.patientRequired",
+      "value": "[AR] Patient is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.itemDescriptionRequired",
+      "value": "[AR] Description is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.itemQuantityMin",
+      "value": "[AR] Quantity must be at least 1"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.itemUnitPriceMin",
+      "value": "[AR] Unit price must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.itemTotalMin",
+      "value": "[AR] Total must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.atLeastOneItem",
+      "value": "[AR] At least one item is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.subtotalMin",
+      "value": "[AR] Subtotal must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.taxRateMin",
+      "value": "[AR] Tax rate must be between 0 and 100"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.taxAmountMin",
+      "value": "[AR] Tax amount must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.discountAmountMin",
+      "value": "[AR] Discount amount must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.totalAmountMin",
+      "value": "[AR] Total amount must be positive"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingForm.validation.dueDateRequired",
+      "value": "[AR] Due date is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.invoiceTitle",
+      "value": "[AR] Invoice #{{invoiceNumber}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentStatus.pending",
+      "value": "[AR] Pending"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentStatus.partial",
+      "value": "[AR] Partial"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentStatus.paid",
+      "value": "[AR] Paid"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentStatus.overdue",
+      "value": "[AR] Overdue"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.overdue",
+      "value": "[AR] Overdue"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.print",
+      "value": "[AR] Print"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.downloadPDF",
+      "value": "[AR] Download PDF"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.addPayment",
+      "value": "[AR] Add Payment"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.fromClinic",
+      "value": "[AR] From: {{clinicName}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.billTo",
+      "value": "[AR] Bill to: {{patientName}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.invoiceDetailsTitle",
+      "value": "[AR] Invoice Details"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.invoiceDate",
+      "value": "[AR] Invoice Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.dueDate",
+      "value": "[AR] Due Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paidDate",
+      "value": "[AR] Paid Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.provider",
+      "value": "[AR] Provider"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.dentistName",
+      "value": "[AR] Dr. {{firstName}} {{lastName}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.appointment",
+      "value": "[AR] Appointment"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.treatment",
+      "value": "[AR] Treatment"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.insuranceInfoTitle",
+      "value": "[AR] Insurance Information"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.insuranceProvider",
+      "value": "[AR] Provider"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.policyNumber",
+      "value": "[AR] Policy Number"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.coverageAmount",
+      "value": "[AR] Coverage Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.invoiceItemsTitle",
+      "value": "[AR] Invoice Items"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.itemDescription",
+      "value": "[AR] Description"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.itemQuantity",
+      "value": "[AR] Quantity"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.itemUnitPrice",
+      "value": "[AR] Unit Price"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.itemTotal",
+      "value": "[AR] Total"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.subtotal",
+      "value": "[AR] Subtotal"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.discount",
+      "value": "[AR] Discount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.tax",
+      "value": "[AR] Tax"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.totalAmount",
+      "value": "[AR] Total Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paidAmount",
+      "value": "[AR] Paid Amount"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.balanceDue",
+      "value": "[AR] Balance Due"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentHistoryTitle",
+      "value": "[AR] Payment History"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.paymentReference",
+      "value": "[AR] Ref: {{reference}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.notesTitle",
+      "value": "[AR] Notes"
+    },
+    {
+      "key": "settings.scheduleCalendar.billingDetails.pdfDownloadInfo",
+      "value": "[AR] PDF download functionality would be implemented here"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.title",
+      "value": "[AR] Medication Form"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.medicationName",
+      "value": "[AR] Medication Name"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.medicationNamePlaceholder",
+      "value": "[AR] Enter medication name"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.genericName",
+      "value": "[AR] Generic Name"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.genericNamePlaceholder",
+      "value": "[AR] Enter generic name"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.dosage",
+      "value": "[AR] Dosage"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.dosagePlaceholder",
+      "value": "[AR] e.g., 500mg"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.frequency",
+      "value": "[AR] Frequency"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.frequencyPlaceholder",
+      "value": "[AR] e.g., 3 times daily"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.duration",
+      "value": "[AR] Duration"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.durationPlaceholder",
+      "value": "[AR] e.g., 7-10 days"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.category",
+      "value": "[AR] Category"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.activeMedication",
+      "value": "[AR] Active medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.instructions",
+      "value": "[AR] Instructions"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.instructionsPlaceholder",
+      "value": "[AR] Enter special instructions for this medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.sideEffects",
+      "value": "[AR] Side Effects"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.addSideEffect",
+      "value": "[AR] Add"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.sideEffectPlaceholder",
+      "value": "[AR] Enter side effect"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.contraindications",
+      "value": "[AR] Contraindications"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.addContraindication",
+      "value": "[AR] Add"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.contraindicationPlaceholder",
+      "value": "[AR] Enter contraindication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.updateMedication",
+      "value": "[AR] Update Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.createMedication",
+      "value": "[AR] Create Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.medicationNameRequired",
+      "value": "[AR] Medication name is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.dosageRequired",
+      "value": "[AR] Dosage is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.frequencyRequired",
+      "value": "[AR] Frequency is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.durationRequired",
+      "value": "[AR] Duration is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.sideEffectRequired",
+      "value": "[AR] Side effect is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.validation.contraindicationRequired",
+      "value": "[AR] Contraindication is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.successUpdate",
+      "value": "[AR] Medication updated successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.successCreate",
+      "value": "[AR] Medication created successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.errorSave",
+      "value": "[AR] Failed to save medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.antibiotic",
+      "value": "[AR] Antibiotic"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.painkiller",
+      "value": "[AR] Painkiller"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.anti-inflammatory",
+      "value": "[AR] Anti-inflammatory"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.anesthetic",
+      "value": "[AR] Anesthetic"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.antiseptic",
+      "value": "[AR] Antiseptic"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationForm.categories.other",
+      "value": "[AR] Other"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.title",
+      "value": "[AR] Medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.selectTitle",
+      "value": "[AR] Select Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.myTitle",
+      "value": "[AR] My Medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.addMedication",
+      "value": "[AR] Add Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.searchPlaceholder",
+      "value": "[AR] Search medications..."
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.filterByCategory",
+      "value": "[AR] Filter by category"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.all",
+      "value": "[AR] All Categories"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.antibiotic",
+      "value": "[AR] Antibiotics"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.painkiller",
+      "value": "[AR] Painkillers"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.anti-inflammatory",
+      "value": "[AR] Anti-inflammatory"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.anesthetic",
+      "value": "[AR] Anesthetics"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.antiseptic",
+      "value": "[AR] Antiseptics"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.categories.other",
+      "value": "[AR] Other"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.patientInfoTitle",
+      "value": "[AR] Your Prescribed Medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.patientInfoText",
+      "value": "[AR] Below are the medications that have been prescribed to you. Please follow the dosage and frequency instructions carefully."
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.noMedicationsFound",
+      "value": "[AR] No medications found"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.noMedicationsMatchFilters",
+      "value": "[AR] No medications match your current filters."
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.noMedicationsPrescribed",
+      "value": "[AR] No medications prescribed"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.noMedicationsPrescribedInfo",
+      "value": "[AR] You currently have no medications prescribed. Contact your dentist if you have any concerns."
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.genericName",
+      "value": "[AR] Generic: {{name}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.dosage",
+      "value": "[AR] Dosage:"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.frequency",
+      "value": "[AR] Frequency:"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.duration",
+      "value": "[AR] Duration:"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.instructions",
+      "value": "[AR] Instructions:"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.sideEffects",
+      "value": "[AR] Side Effects:"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.moreItems",
+      "value": "[AR] +{{count}} more"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.select",
+      "value": "[AR] Select"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.active",
+      "value": "[AR] Active"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.inactive",
+      "value": "[AR] Inactive"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.previousPage",
+      "value": "[AR] Previous"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.nextPage",
+      "value": "[AR] Next"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.pageInfo",
+      "value": "[AR] Page {{currentPage}} of {{totalPages}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.editMedication",
+      "value": "[AR] Edit Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.addModalTitle",
+      "value": "[AR] Add New Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.deleteConfirmation",
+      "value": "[AR] Are you sure you want to delete this medication?"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.deleteSuccess",
+      "value": "[AR] Medication deleted successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.deleteError",
+      "value": "[AR] Failed to delete medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.medicationList.fetchError",
+      "value": "[AR] Failed to fetch medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.title",
+      "value": "[AR] Prescriptions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.patientPrescriptions",
+      "value": "[AR] Patient's Prescriptions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.newPrescription",
+      "value": "[AR] New Prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.editPrescription",
+      "value": "[AR] Edit Prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.prescriptionDetails",
+      "value": "[AR] Prescription Details"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.searchPlaceholder",
+      "value": "[AR] Search by patient, dentist, or medication..."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.filterByStatus",
+      "value": "[AR] Filter by status"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.allStatus",
+      "value": "[AR] All Statuses"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.active",
+      "value": "[AR] Active"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.completed",
+      "value": "[AR] Completed"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.cancelled",
+      "value": "[AR] Cancelled"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.expired",
+      "value": "[AR] Expired"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.prescriptionNumber",
+      "value": "[AR] Prescription #{{id}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.issued",
+      "value": "[AR] Issued: {{date}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.expires",
+      "value": "[AR] Expires: {{date}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.diagnosis",
+      "value": "[AR] Diagnosis"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.medications",
+      "value": "[AR] Medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.dosage",
+      "value": "[AR] Dosage: {{dosage}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.frequency",
+      "value": "[AR] Frequency: {{frequency}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.duration",
+      "value": "[AR] Duration: {{duration}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.refills",
+      "value": "[AR] {{current}}/{{max}} Refills"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.noPrescriptionsFound",
+      "value": "[AR] No Prescriptions Found"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.noPatientPrescriptions",
+      "value": "[AR] This patient has no active or past prescriptions."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.noFilteredPrescriptions",
+      "value": "[AR] No prescriptions match your current filters."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.createFirstPrescription",
+      "value": "[AR] Create First Prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.previous",
+      "value": "[AR] Previous"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.next",
+      "value": "[AR] Next"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.pageOf",
+      "value": "[AR] Page {{currentPage}} of {{totalPages}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.fetchError",
+      "value": "[AR] Failed to fetch prescriptions."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.deleteConfirmation",
+      "value": "[AR] Are you sure you want to delete this prescription?"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.deleteSuccess",
+      "value": "[AR] Prescription deleted successfully."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptions.deleteError",
+      "value": "[AR] Failed to delete prescription."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.patientLabel",
+      "value": "[AR] Patient *"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.selectPatient",
+      "value": "[AR] Select a patient"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.relatedAppointmentLabel",
+      "value": "[AR] Related Appointment"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.selectAppointment",
+      "value": "[AR] Select an appointment (optional)"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.noSpecificAppointment",
+      "value": "[AR] No specific appointment"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.diagnosisLabel",
+      "value": "[AR] Diagnosis *"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.diagnosisPlaceholder",
+      "value": "[AR] Enter diagnosis"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.medicationsLabel",
+      "value": "[AR] Medications *"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.addMedication",
+      "value": "[AR] Add Medication"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.medicationItem",
+      "value": "[AR] Medication {{index}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.selectMedicationButton",
+      "value": "[AR] Select"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.medicationIdPlaceholder",
+      "value": "[AR] Medication ID (use Select button)"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.dosageLabel",
+      "value": "[AR] Dosage"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.dosagePlaceholder",
+      "value": "[AR] e.g., 500mg"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.frequencyLabel",
+      "value": "[AR] Frequency"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.frequencyPlaceholder",
+      "value": "[AR] e.g., 3 times daily"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.durationLabel",
+      "value": "[AR] Duration"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.durationPlaceholder",
+      "value": "[AR] e.g., 7 days"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.instructionsLabel",
+      "value": "[AR] Instructions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.instructionsPlaceholder",
+      "value": "[AR] Special instructions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.expiryDateLabel",
+      "value": "[AR] Expiry Date *"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.maxRefillsLabel",
+      "value": "[AR] Maximum Refills"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.additionalNotesLabel",
+      "value": "[AR] Additional Notes"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.notesPlaceholder",
+      "value": "[AR] Any additional notes or instructions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.cancelButton",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.updateButton",
+      "value": "[AR] Update Prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.createButton",
+      "value": "[AR] Create Prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.patientRequired",
+      "value": "[AR] Patient is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.medicationRequired",
+      "value": "[AR] Medication is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.dosageRequired",
+      "value": "[AR] Dosage is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.frequencyRequired",
+      "value": "[AR] Frequency is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.durationRequired",
+      "value": "[AR] Duration is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.atLeastOneMedication",
+      "value": "[AR] At least one medication is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.diagnosisRequired",
+      "value": "[AR] Diagnosis is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.validation.expiryDateRequired",
+      "value": "[AR] Expiry date is required"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.successUpdate",
+      "value": "[AR] Prescription updated successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.successCreate",
+      "value": "[AR] Prescription created successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionForm.errorSave",
+      "value": "[AR] Failed to save prescription"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.title",
+      "value": "[AR] Prescription #{{id}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.expired",
+      "value": "[AR] Expired"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.addRefill",
+      "value": "[AR] Add Refill"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.patientInfo",
+      "value": "[AR] Patient Information"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.name",
+      "value": "[AR] Name"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.email",
+      "value": "[AR] Email"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.prescriptionInfo",
+      "value": "[AR] Prescription Details"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.diagnosis",
+      "value": "[AR] Diagnosis"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.notes",
+      "value": "[AR] Notes"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.issuedDate",
+      "value": "[AR] Issued Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.expiryDate",
+      "value": "[AR] Expiry Date"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.maxRefills",
+      "value": "[AR] Max Refills"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.medications",
+      "value": "[AR] Medications"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.genericName",
+      "value": "[AR] Generic: {{name}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.dosage",
+      "value": "[AR] Dosage"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.frequency",
+      "value": "[AR] Frequency"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.duration",
+      "value": "[AR] Duration"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.instructions",
+      "value": "[AR] Instructions"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.refillHistory",
+      "value": "[AR] Refill History ({{count}}/{{max}})"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.refillTitle",
+      "value": "[AR] Refill #{{number}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.noRefills",
+      "value": "[AR] No refills have been issued yet."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.providerInfo",
+      "value": "[AR] Provider Information"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.prescribingDentist",
+      "value": "[AR] Prescribing Dentist"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.dentistPrefix",
+      "value": "[AR] Dr."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.clinic",
+      "value": "[AR] Clinic"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.relatedAppointment",
+      "value": "[AR] Related Appointment"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.close",
+      "value": "[AR] Close"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.title",
+      "value": "[AR] Add Refill"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.addingRefill",
+      "value": "[AR] Adding refill #{{count}} of {{max}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.patient",
+      "value": "[AR] Patient: {{name}}"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.notesLabel",
+      "value": "[AR] Notes (Optional)"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.notesPlaceholder",
+      "value": "[AR] Add any notes about this refill..."
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.modal.submit",
+      "value": "[AR] Add Refill"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.toasts.refillSuccess",
+      "value": "[AR] Refill added successfully"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.toasts.refillError",
+      "value": "[AR] Failed to add refill"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.status.active",
+      "value": "[AR] Active"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.status.completed",
+      "value": "[AR] Completed"
+    },
+    {
+      "key": "settings.scheduleCalendar.prescriptionDetails.status.cancelled",
+      "value": "[AR] Cancelled"
+    },
+    {
+      "key": "settings.paymentForm.title",
+      "value": "[AR] Add Payment"
+    },
+    {
+      "key": "settings.paymentForm.invoiceSummary",
+      "value": "[AR] Invoice Summary"
+    },
+    {
+      "key": "settings.paymentForm.invoiceNumber",
+      "value": "[AR] Invoice Number:"
+    },
+    {
+      "key": "settings.paymentForm.patient",
+      "value": "[AR] Patient:"
+    },
+    {
+      "key": "settings.paymentForm.totalAmount",
+      "value": "[AR] Total Amount:"
+    },
+    {
+      "key": "settings.paymentForm.paidAmount",
+      "value": "[AR] Paid Amount:"
+    },
+    {
+      "key": "settings.paymentForm.currentBalance",
+      "value": "[AR] Current Balance:"
+    },
+    {
+      "key": "settings.paymentForm.newBalance",
+      "value": "[AR] New Balance:"
+    },
+    {
+      "key": "settings.paymentForm.paymentAmount",
+      "value": "[AR] Payment Amount *"
+    },
+    {
+      "key": "settings.paymentForm.paymentAmountPlaceholder",
+      "value": "[AR] 0.00"
+    },
+    {
+      "key": "settings.paymentForm.fullPayment",
+      "value": "[AR] Full Payment"
+    },
+    {
+      "key": "settings.paymentForm.partialPayment50",
+      "value": "[AR] 50%"
+    },
+    {
+      "key": "settings.paymentForm.partialPayment25",
+      "value": "[AR] 25%"
+    },
+    {
+      "key": "settings.paymentForm.paymentMethod",
+      "value": "[AR] Payment Method *"
+    },
+    {
+      "key": "settings.paymentForm.selectPaymentMethod",
+      "value": "[AR] Select payment method"
+    },
+    {
+      "key": "settings.paymentForm.cash",
+      "value": "[AR] Cash"
+    },
+    {
+      "key": "settings.paymentForm.creditCard",
+      "value": "[AR] Credit Card"
+    },
+    {
+      "key": "settings.paymentForm.debitCard",
+      "value": "[AR] Debit Card"
+    },
+    {
+      "key": "settings.paymentForm.check",
+      "value": "[AR] Check"
+    },
+    {
+      "key": "settings.paymentForm.bankTransfer",
+      "value": "[AR] Bank Transfer"
+    },
+    {
+      "key": "settings.paymentForm.insurancePayment",
+      "value": "[AR] Insurance Payment"
+    },
+    {
+      "key": "settings.paymentForm.other",
+      "value": "[AR] Other"
+    },
+    {
+      "key": "settings.paymentForm.paymentDate",
+      "value": "[AR] Payment Date *"
+    },
+    {
+      "key": "settings.paymentForm.referenceNumber",
+      "value": "[AR] Reference Number"
+    },
+    {
+      "key": "settings.paymentForm.referencePlaceholder",
+      "value": "[AR] Transaction ID, check number, etc."
+    },
+    {
+      "key": "settings.paymentForm.paymentNotes",
+      "value": "[AR] Payment Notes"
+    },
+    {
+      "key": "settings.paymentForm.notesPlaceholder",
+      "value": "[AR] Additional notes about this payment..."
+    },
+    {
+      "key": "settings.paymentForm.paymentPreview",
+      "value": "[AR] Payment Preview"
+    },
+    {
+      "key": "settings.paymentForm.previewAmount",
+      "value": "[AR] Payment Amount:"
+    },
+    {
+      "key": "settings.paymentForm.previewRemaining",
+      "value": "[AR] Remaining Balance:"
+    },
+    {
+      "key": "settings.paymentForm.previewStatus",
+      "value": "[AR] New Status:"
+    },
+    {
+      "key": "settings.paymentForm.errorAmountExceedsBalance",
+      "value": "[AR] Payment amount cannot exceed the balance due of ${{balance}}"
+    },
+    {
+      "key": "settings.paymentForm.infoFullSettlement",
+      "value": "[AR] This payment will fully settle the invoice."
+    },
+    {
+      "key": "settings.paymentForm.infoPartialPayment",
+      "value": "[AR] This is a partial payment. The remaining balance will be ${{balance}}."
+    },
+    {
+      "key": "settings.paymentForm.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "settings.paymentForm.addPayment",
+      "value": "[AR] Add Payment"
+    },
+    {
+      "key": "settings.paymentForm.processing",
+      "value": "[AR] Processing..."
+    },
+    {
+      "key": "settings.paymentForm.validation.amountRequired",
+      "value": "[AR] Payment amount must be greater than 0"
+    },
+    {
+      "key": "settings.paymentForm.validation.amountMax",
+      "value": "[AR] Amount cannot exceed $1,000,000"
+    },
+    {
+      "key": "settings.paymentForm.validation.methodRequired",
+      "value": "[AR] Payment method is required"
+    },
+    {
+      "key": "settings.paymentForm.validation.notesMax",
+      "value": "[AR] Notes cannot exceed 500 characters"
+    },
+    {
+      "key": "settings.paymentForm.validation.dateRequired",
+      "value": "[AR] Payment date is required"
+    },
+    {
+      "key": "settings.paymentForm.successMessage",
+      "value": "[AR] Payment added successfully"
+    },
+    {
+      "key": "settings.paymentForm.errorMessage",
+      "value": "[AR] Failed to add payment"
+    },
+    {
+      "key": "settings.billingList.title",
+      "value": "[AR] Billing Records"
+    },
+    {
+      "key": "settings.billingList.searchPlaceholder",
+      "value": "[AR] Search by patient, invoice #..."
+    },
+    {
+      "key": "settings.billingList.allStatus",
+      "value": "[AR] All Status"
+    },
+    {
+      "key": "settings.billingList.pending",
+      "value": "[AR] Pending"
+    },
+    {
+      "key": "settings.billingList.partial",
+      "value": "[AR] Partial"
+    },
+    {
+      "key": "settings.billingList.paid",
+      "value": "[AR] Paid"
+    },
+    {
+      "key": "settings.billingList.overdue",
+      "value": "[AR] Overdue"
+    },
+    {
+      "key": "settings.billingList.addRecord",
+      "value": "[AR] Add New Invoice"
+    },
+    {
+      "key": "settings.billingList.invoiceNumber",
+      "value": "[AR] Invoice #"
+    },
+    {
+      "key": "settings.billingList.patient",
+      "value": "[AR] Patient"
+    },
+    {
+      "key": "settings.billingList.date",
+      "value": "[AR] Date"
+    },
+    {
+      "key": "settings.billingList.dueDate",
+      "value": "[AR] Due Date"
+    },
+    {
+      "key": "settings.billingList.total",
+      "value": "[AR] Total"
+    },
+    {
+      "key": "settings.billingList.paidAmount",
+      "value": "[AR] Paid"
+    },
+    {
+      "key": "settings.billingList.balance",
+      "value": "[AR] Balance"
+    },
+    {
+      "key": "settings.billingList.status",
+      "value": "[AR] Status"
+    },
+    {
+      "key": "settings.billingList.actions",
+      "value": "[AR] Actions"
+    },
+    {
+      "key": "settings.billingList.noRecords",
+      "value": "[AR] No billing records found."
+    },
+    {
+      "key": "settings.billingList.loading",
+      "value": "[AR] Loading billing records..."
+    },
+    {
+      "key": "settings.billingList.addPayment",
+      "value": "[AR] Add Payment"
+    },
+    {
+      "key": "settings.billingList.viewDetails",
+      "value": "[AR] View Details"
+    },
+    {
+      "key": "settings.billingList.edit",
+      "value": "[AR] Edit"
+    },
+    {
+      "key": "settings.billingList.delete",
+      "value": "[AR] Delete"
+    },
+    {
+      "key": "settings.billingList.deleteConfirmation",
+      "value": "[AR] Are you sure you want to delete this billing record?"
+    },
+    {
+      "key": "settings.billingList.deleteSuccess",
+      "value": "[AR] Billing record deleted successfully"
+    },
+    {
+      "key": "settings.billingList.deleteError",
+      "value": "[AR] Failed to delete billing record"
+    },
+    {
+      "key": "settings.billingList.fetchError",
+      "value": "[AR] Failed to fetch billing records"
+    },
+    {
+      "key": "settings.billingList.previous",
+      "value": "[AR] Previous"
+    },
+    {
+      "key": "settings.billingList.next",
+      "value": "[AR] Next"
+    },
+    {
+      "key": "settings.billingList.page",
+      "value": "[AR] Page"
+    },
+    {
+      "key": "appointments.completeSelected",
+      "value": "[AR] Complete Selected"
+    },
+    {
+      "key": "appointments.cancelSelected",
+      "value": "[AR] Cancel Selected"
+    },
+    {
+      "key": "appointmentCard.unknownPatient",
+      "value": "[AR] Unknown Patient"
+    },
+    {
+      "key": "appointmentCard.unknownDentist",
+      "value": "[AR] Unknown"
+    },
+    {
+      "key": "appointmentCard.at",
+      "value": "[AR] at"
+    },
+    {
+      "key": "appointmentCard.minutes",
+      "value": "[AR] minutes"
+    },
+    {
+      "key": "appointmentCard.viewDetails",
+      "value": "[AR] View Details"
+    },
+    {
+      "key": "appointmentCard.confirm",
+      "value": "[AR] Confirm"
+    },
+    {
+      "key": "appointmentCard.complete",
+      "value": "[AR] Complete"
+    },
+    {
+      "key": "appointmentCard.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "appointmentCard.status.scheduled",
+      "value": "[AR] Scheduled"
+    },
+    {
+      "key": "appointmentCard.status.confirmed",
+      "value": "[AR] Confirmed"
+    },
+    {
+      "key": "appointmentCard.status.completed",
+      "value": "[AR] Completed"
+    },
+    {
+      "key": "appointmentCard.status.cancelled",
+      "value": "[AR] Cancelled"
+    },
+    {
+      "key": "appointmentCard.status.no-show",
+      "value": "[AR] No-Show"
+    },
+    {
+      "key": "scheduleForm.title",
+      "value": "[AR] Schedule Details"
+    },
+    {
+      "key": "scheduleForm.staffMember",
+      "value": "[AR] Staff Member"
+    },
+    {
+      "key": "scheduleForm.selectStaff",
+      "value": "[AR] Select a staff member"
+    },
+    {
+      "key": "scheduleForm.date",
+      "value": "[AR] Date"
+    },
+    {
+      "key": "scheduleForm.startTime",
+      "value": "[AR] Start Time"
+    },
+    {
+      "key": "scheduleForm.endTime",
+      "value": "[AR] End Time"
+    },
+    {
+      "key": "scheduleForm.shiftType",
+      "value": "[AR] Shift Type"
+    },
+    {
+      "key": "scheduleForm.status",
+      "value": "[AR] Status"
+    },
+    {
+      "key": "scheduleForm.notes",
+      "value": "[AR] Notes"
+    },
+    {
+      "key": "scheduleForm.notesPlaceholder",
+      "value": "[AR] Add any relevant notes..."
+    },
+    {
+      "key": "scheduleForm.recurring",
+      "value": "[AR] Recurring Schedule"
+    },
+    {
+      "key": "scheduleForm.notifications",
+      "value": "[AR] Notifications"
+    },
+    {
+      "key": "scheduleForm.enableNotifications",
+      "value": "[AR] Enable Notifications"
+    },
+    {
+      "key": "scheduleForm.reminderTime",
+      "value": "[AR] Reminder Time (minutes before)"
+    },
+    {
+      "key": "scheduleForm.channels",
+      "value": "[AR] Channels"
+    },
+    {
+      "key": "scheduleForm.email",
+      "value": "[AR] Email"
+    },
+    {
+      "key": "scheduleForm.sms",
+      "value": "[AR] SMS"
+    },
+    {
+      "key": "scheduleForm.inApp",
+      "value": "[AR] In-App"
+    },
+    {
+      "key": "scheduleForm.frequency",
+      "value": "[AR] Frequency"
+    },
+    {
+      "key": "scheduleForm.interval",
+      "value": "[AR] Interval"
+    },
+    {
+      "key": "scheduleForm.daysOfWeek",
+      "value": "[AR] Days of the Week"
+    },
+    {
+      "key": "scheduleForm.endDate",
+      "value": "[AR] End Date"
+    },
+    {
+      "key": "scheduleForm.save",
+      "value": "[AR] Save Schedule"
+    },
+    {
+      "key": "scheduleForm.cancel",
+      "value": "[AR] Cancel"
+    },
+    {
+      "key": "scheduleForm.validation.staffRequired",
+      "value": "[AR] Staff member is required"
+    },
+    {
+      "key": "scheduleForm.validation.dateRequired",
+      "value": "[AR] Date is required"
+    },
+    {
+      "key": "scheduleForm.validation.startTimeRequired",
+      "value": "[AR] Start time is required"
+    },
+    {
+      "key": "scheduleForm.validation.endTimeRequired",
+      "value": "[AR] End time is required"
+    },
+    {
+      "key": "scheduleForm.validation.endTimeAfterStart",
+      "value": "[AR] End time must be after start time"
+    },
+    {
+      "key": "scheduleForm.validation.dayRequired",
+      "value": "[AR] Select at least one day for weekly recurring schedules"
+    },
+    {
+      "key": "scheduleForm.validation.endDateRequired",
+      "value": "[AR] End date is required for recurring schedules"
+    },
+    {
+      "key": "scheduleForm.shiftTypes.morning",
+      "value": "[AR] Morning"
+    },
+    {
+      "key": "scheduleForm.shiftTypes.afternoon",
+      "value": "[AR] Afternoon"
+    },
+    {
+      "key": "scheduleForm.shiftTypes.evening",
+      "value": "[AR] Evening"
+    },
+    {
+      "key": "scheduleForm.shiftTypes.night",
+      "value": "[AR] Night"
+    },
+    {
+      "key": "scheduleForm.shiftTypes.fullDay",
+      "value": "[AR] Full-Day"
+    },
+    {
+      "key": "scheduleForm.statuses.scheduled",
+      "value": "[AR] Scheduled"
+    },
+    {
+      "key": "scheduleForm.statuses.completed",
+      "value": "[AR] Completed"
+    },
+    {
+      "key": "scheduleForm.statuses.cancelled",
+      "value": "[AR] Cancelled"
+    },
+    {
+      "key": "scheduleForm.statuses.noShow",
+      "value": "[AR] No-Show"
+    },
+    {
+      "key": "timeSlotPicker.loading",
+      "value": "[AR] Loading available time slots..."
+    },
+    {
+      "key": "timeSlotPicker.error",
+      "value": "[AR] Failed to load available time slots"
+    },
+    {
+      "key": "timeSlotPicker.tryAgain",
+      "value": "[AR] Try Again"
+    },
+    {
+      "key": "timeSlotPicker.noSlots",
+      "value": "[AR] No available time slots for {{date}}"
+    },
+    {
+      "key": "timeSlotPicker.refresh",
+      "value": "[AR] Refresh"
+    },
+    {
+      "key": "timeSlotPicker.morning",
+      "value": "[AR] Morning"
+    },
+    {
+      "key": "timeSlotPicker.afternoon",
+      "value": "[AR] Afternoon"
+    },
+    {
+      "key": "timeSlotPicker.availableTimes",
+      "value": "[AR] Available Times for {{date}}"
+    },
+    {
+      "key": "timeSlotPicker.selected",
+      "value": "[AR] Selected: {{time}} on {{date}}"
+    },
+    {
+      "key": "timeSlotPicker.duration",
+      "value": "[AR] Duration: {{duration}} minutes"
+    },
+    {
+      "key": "timeSlotPicker.timezoneInfo",
+      "value": "[AR] Time slots are in {{timeZone}} timezone"
+    },
+    {
+      "key": "timeSlotPicker.slotDurationInfo",
+      "value": "[AR] Each appointment slot is {{duration}} minutes long"
+    },
+    {
+      "key": "timeSlotPicker.arrivalInfo",
+      "value": "[AR] Please arrive 15 minutes before your scheduled time"
+    },
+    {
+      "key": "billingDetails.invoiceTitle",
+      "value": "[AR] Invoice #{{invoiceNumber}}"
+    },
+    {
+      "key": "billingDetails.overdue",
+      "value": "[AR] Overdue"
+    },
+    {
+      "key": "billingDetails.print",
+      "value": "[AR] Print"
+    },
+    {
+      "key": "billingDetails.downloadPDF",
+      "value": "[AR] PDF"
+    },
+    {
+      "key": "billingDetails.addPayment",
+      "value": "[AR] Add Payment"
+    },
+    {
+      "key": "billingDetails.fromClinic",
+      "value": "[AR] From: {{clinicName}}"
+    },
+    {
+      "key": "billingDetails.toPatient",
+      "value": "[AR] To: {{patientName}}"
+    },
+    {
+      "key": "billingDetails.invoiceInfo",
+      "value": "[AR] Invoice Information"
+    },
+    {
+      "key": "billingDetails.invoiceDate",
+      "value": "[AR] Invoice Date"
+    },
+    {
+      "key": "billingDetails.dueDate",
+      "value": "[AR] Due Date"
+    },
+    {
+      "key": "billingDetails.paidDate",
+      "value": "[AR] Paid Date"
+    },
+    {
+      "key": "billingDetails.dentist",
+      "value": "[AR] Dentist"
+    },
+    {
+      "key": "billingDetails.appointment",
+      "value": "[AR] Appointment"
+    },
+    {
+      "key": "billingDetails.treatment",
+      "value": "[AR] Treatment"
+    },
+    {
+      "key": "billingDetails.invoiceItems",
+      "value": "[AR] Invoice Items"
+    },
+    {
+      "key": "billingDetails.itemDescription",
+      "value": "[AR] Description"
+    },
+    {
+      "key": "billingDetails.itemQuantity",
+      "value": "[AR] Quantity"
+    },
+    {
+      "key": "billingDetails.itemUnitPrice",
+      "value": "[AR] Unit Price"
+    },
+    {
+      "key": "billingDetails.itemTotal",
+      "value": "[AR] Total"
+    },
+    {
+      "key": "billingDetails.summary",
+      "value": "[AR] Summary"
+    },
+    {
+      "key": "billingDetails.subtotal",
+      "value": "[AR] Subtotal"
+    },
+    {
+      "key": "billingDetails.tax",
+      "value": "[AR] Tax"
+    },
+    {
+      "key": "billingDetails.discount",
+      "value": "[AR] Discount"
+    },
+    {
+      "key": "billingDetails.totalAmount",
+      "value": "[AR] Total Amount"
+    },
+    {
+      "key": "billingDetails.paidAmount",
+      "value": "[AR] Paid Amount"
+    },
+    {
+      "key": "billingDetails.balanceDue",
+      "value": "[AR] Balance Due"
+    },
+    {
+      "key": "billingDetails.paymentHistory",
+      "value": "[AR] Payment History"
+    },
+    {
+      "key": "billingDetails.paymentDate",
+      "value": "[AR] Date"
+    },
+    {
+      "key": "billingDetails.paymentMethod",
+      "value": "[AR] Method"
+    },
+    {
+      "key": "billingDetails.paymentAmount",
+      "value": "[AR] Amount"
+    },
+    {
+      "key": "billingDetails.paymentReference",
+      "value": "[AR] Reference"
+    },
+    {
+      "key": "billingDetails.noPaymentHistory",
+      "value": "[AR] No payment history available."
+    },
+    {
+      "key": "billingDetails.insuranceInfo",
+      "value": "[AR] Insurance Information"
+    },
+    {
+      "key": "billingDetails.insuranceProvider",
+      "value": "[AR] Provider"
+    },
+    {
+      "key": "billingDetails.insurancePolicyNumber",
+      "value": "[AR] Policy #"
+    },
+    {
+      "key": "billingDetails.insuranceCoverage",
+      "value": "[AR] Coverage"
+    },
+    {
+      "key": "billingDetails.notes",
+      "value": "[AR] Notes"
+    },
+    {
+      "key": "billingDetails.noNotes",
+      "value": "[AR] No additional notes."
+    },
+    {
+      "key": "billingDetails.paymentStatus.pending",
+      "value": "[AR] Pending"
+    },
+    {
+      "key": "billingDetails.paymentStatus.partial",
+      "value": "[AR] Partial"
+    },
+    {
+      "key": "billingDetails.paymentStatus.paid",
+      "value": "[AR] Paid"
+    },
+    {
+      "key": "billingDetails.paymentStatus.overdue",
+      "value": "[AR] Overdue"
+    },
+    {
+      "key": "frequencies.daily",
+      "value": "[AR] Daily"
+    },
+    {
+      "key": "frequencies.weekly",
+      "value": "[AR] Weekly"
+    },
+    {
+      "key": "frequencies.monthly",
+      "value": "[AR] Monthly"
+    },
+    {
+      "key": "days.sun",
+      "value": "[AR] Sunday"
+    },
+    {
+      "key": "days.mon",
+      "value": "[AR] Monday"
+    },
+    {
+      "key": "days.tue",
+      "value": "[AR] Tuesday"
+    },
+    {
+      "key": "days.wed",
+      "value": "[AR] Wednesday"
+    },
+    {
+      "key": "days.thu",
+      "value": "[AR] Thursday"
+    },
+    {
+      "key": "days.fri",
+      "value": "[AR] Friday"
+    },
+    {
+      "key": "days.sat",
+      "value": "[AR] Saturday"
+    },
+    {
+      "key": "appointmentCalendar.month",
+      "value": "[AR] Month"
+    },
+    {
+      "key": "appointmentCalendar.week",
+      "value": "[AR] Week"
+    },
+    {
+      "key": "appointmentCalendar.today",
+      "value": "[AR] Today"
+    },
+    {
+      "key": "appointmentCalendar.weekOf",
+      "value": "[AR] Week of"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.sun",
+      "value": "[AR] Sun"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.mon",
+      "value": "[AR] Mon"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.tue",
+      "value": "[AR] Tue"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.wed",
+      "value": "[AR] Wed"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.thu",
+      "value": "[AR] Thu"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.fri",
+      "value": "[AR] Fri"
+    },
+    {
+      "key": "appointmentCalendar.dayNames.sat",
+      "value": "[AR] Sat"
+    },
+    {
+      "key": "about.hero.title",
+      "value": "[AR] About Our Clinic"
+    },
+    {
+      "key": "about.hero.description",
+      "value": "[AR] Dedicated to providing exceptional dental care with a compassionate touch."
+    },
+    {
+      "key": "about.story.title",
+      "value": "[AR] Our Story"
+    },
+    {
+      "key": "about.story.paragraph1",
+      "value": "[AR] Founded in 2005, our clinic started with a simple vision: to create a dental practice where patients feel comfortable, valued, and receive the highest quality of care. Over the years, we've grown, but our core values remain the same."
+    },
+    {
+      "key": "about.story.paragraph2",
+      "value": "[AR] We believe in building lasting relationships with our patients, understanding their unique needs, and empowering them with knowledge about their oral health. Our team is passionate about dentistry and committed to continuous learning to bring you the latest advancements in dental science."
+    },
+    {
+      "key": "about.story.paragraph3",
+      "value": "[AR] From a small practice to a leading dental care provider in the community, we are proud of the journey we've taken and grateful for the trust our patients place in us. We look forward to many more years of serving you and your family."
+    },
+    {
+      "key": "about.mission.title",
+      "value": "[AR] Our Mission"
+    },
+    {
+      "key": "about.mission.description",
+      "value": "[AR] To simplify dental care, empower patients, and enhance smiles through innovation and compassionate service."
+    },
+    {
+      "key": "about.mission.simplify.title",
+      "value": "[AR] Simplify Dental Care"
+    },
+    {
+      "key": "about.mission.simplify.description",
+      "value": "[AR] Making dental visits easy and stress-free with streamlined processes and clear communication."
+    },
+    {
+      "key": "about.mission.empower.title",
+      "value": "[AR] Empower Patients"
+    },
+    {
+      "key": "about.mission.empower.description",
+      "value": "[AR] Educating and involving patients in their treatment decisions for better oral health outcomes."
+    },
+    {
+      "key": "about.mission.enhance.title",
+      "value": "[AR] Enhance Smiles"
+    },
+    {
+      "key": "about.mission.enhance.description",
+      "value": "[AR] Utilizing advanced techniques and personalized care to achieve beautiful, healthy smiles."
+    },
+    {
+      "key": "about.team.title",
+      "value": "[AR] Meet Our Dedicated Team"
+    },
+    {
+      "key": "about.team.member1.name",
+      "value": "[AR] Dr. Ahmed Hassan"
+    },
+    {
+      "key": "about.team.member1.role",
+      "value": "[AR] Founder & Lead Dentist"
+    },
+    {
+      "key": "about.team.member1.bio",
+      "value": "[AR] Dr. Hassan established the clinic with a vision for patient-centered care. With over 20 years of experience, he is dedicated to advanced dental techniques."
+    },
+    {
+      "key": "about.team.member2.name",
+      "value": "[AR] Dr. Sara Khan"
+    },
+    {
+      "key": "about.team.member2.role",
+      "value": "[AR] Orthodontist"
+    },
+    {
+      "key": "about.team.member2.bio",
+      "value": "[AR] Dr. Khan specializes in orthodontics, creating perfect smiles for patients of all ages. Her gentle approach makes every visit comfortable."
+    },
+    {
+      "key": "about.team.member3.name",
+      "value": "[AR] Dr. Omar Sharif"
+    },
+    {
+      "key": "about.team.member3.role",
+      "value": "[AR] Oral Surgeon"
+    },
+    {
+      "key": "about.team.member3.bio",
+      "value": "[AR] Dr. Sharif is our expert in oral surgery, providing safe and effective procedures with utmost precision and care."
+    },
+    {
+      "key": "about.cta.title",
+      "value": "[AR] Ready to Experience Exceptional Dental Care?"
+    },
+    {
+      "key": "about.cta.description",
+      "value": "[AR] Contact us today to schedule your appointment and join our family of happy, healthy smiles."
+    },
+    {
+      "key": "about.cta.contact",
+      "value": "[AR] Contact Us"
+    },
+    {
+      "key": "about.cta.getStarted",
+      "value": "[AR] Get Started"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Badge, Button } from '../ui';
 import type { Clinic } from '../../types';
 import { formatPhoneNumber } from '../../utils';
@@ -23,6 +24,8 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
   showActions = true,
   compact = false
 }) => {
+  const { t } = useTranslation();
+  
   const handleSelect = () => {
     if (onSelect) {
       onSelect(clinic);
@@ -36,7 +39,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
   };
 
   const handleDelete = () => {
-    if (onDelete && window.confirm(`Are you sure you want to delete ${clinic.name}?`)) {
+    if (onDelete && window.confirm(t('clinicCard.deleteConfirm', { name: clinic.name }))) {
       onDelete(clinic.id);
     }
   };
@@ -73,10 +76,10 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant={getStatusColor()}>
-                  Active
+                  {t('clinicCard.active')}
                 </Badge>
                 {isSelected && (
-                  <Badge variant="primary">Selected</Badge>
+                  <Badge variant="primary">{t('clinicCard.selected')}</Badge>
                 )}
               </div>
             </div>
@@ -142,13 +145,13 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-700">Operating Hours</div>
+                  <div className="font-medium text-gray-700">{t('clinicCard.operatingHours')}</div>
                   {!compact && (
                     <div className="mt-1 space-y-1">
                       {clinic.operatingHours.map((hours) => (
                         <div key={hours.day} className="flex justify-between text-xs">
                           <span className="capitalize">{hours.day}:</span>
-                          <span>{hours.closed ? 'Closed' : `${hours.open} - ${hours.close}`}</span>
+                          <span>{hours.closed ? t('clinicCard.closed') : `${hours.open} - ${hours.close}`}</span>
                         </div>
                       ))}
                     </div>
@@ -164,7 +167,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-700 mb-1">Services</div>
+                  <div className="font-medium text-gray-700 mb-1">{t('clinicCard.services')}</div>
                   <div className="flex flex-wrap gap-1">
                     {clinic.services.slice(0, compact ? 2 : 4).map((service, index) => (
                       <Badge key={index} variant="primary" size="sm">
@@ -173,7 +176,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
                     ))}
                     {clinic.services.length > (compact ? 2 : 4) && (
                       <Badge variant="gray" size="sm">
-                        +{clinic.services.length - (compact ? 2 : 4)} more
+                        {t('clinicCard.moreServices', { count: clinic.services.length - (compact ? 2 : 4) })}
                       </Badge>
                     )}
                   </div>
@@ -188,7 +191,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
           <div className="flex flex-col gap-2 ml-4 flex-shrink-0">
             <Link to={`/clinics/${clinic.id}`} onClick={(e) => e.stopPropagation()}>
               <Button variant="outline" size="sm" className="w-full">
-                View Details
+                {t('clinicCard.viewDetails')}
               </Button>
             </Link>
             
@@ -201,7 +204,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
               }}
               className="w-full"
             >
-              Edit
+              {t('clinicCard.edit')}
             </Button>
             
             {onSelect && (
@@ -214,7 +217,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
                 }}
                 className="w-full"
               >
-                {isSelected ? 'Selected' : 'Select'}
+                {isSelected ? t('clinicCard.selected') : t('clinicCard.select')}
               </Button>
             )}
             
@@ -227,7 +230,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
               }}
               className="w-full text-red-600 border-red-300 hover:bg-red-50"
             >
-              Delete
+              {t('clinicCard.delete')}
             </Button>
           </div>
         )}
@@ -245,7 +248,7 @@ const ClinicCard: React.FC<ClinicCardProps> = ({
               <div className="text-lg font-semibold text-gray-900">
                 {clinic.staff?.length || 0}
               </div>
-              <div className="text-xs text-gray-500">Staff Members</div>
+              <div className="text-xs text-gray-500">{t('clinicCard.staffMembers')}</div>
             </div>
           </div>
         </div>

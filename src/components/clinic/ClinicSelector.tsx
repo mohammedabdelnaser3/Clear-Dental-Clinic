@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDownIcon, CheckIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 import { getAllClinics } from '../../services/clinicService';
 import { type Clinic } from '../../types';
 import { toast } from 'react-hot-toast';
@@ -18,13 +19,15 @@ export const ClinicSelector: React.FC<ClinicSelectorProps> = ({
   onClinicSelect,
   disabled = false,
   className = '',
-  placeholder = 'Select a clinic',
+  placeholder,
   error
 }) => {
+  const { t } = useTranslation();
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
+  const defaultPlaceholder = placeholder || t('clinicSelector.selectClinic');
 
   // Fetch clinics on component mount
   useEffect(() => {
@@ -72,7 +75,7 @@ export const ClinicSelector: React.FC<ClinicSelectorProps> = ({
         <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span className="text-gray-500">Loading clinics...</span>
+            <span className="text-gray-500">{t('clinicSelector.loadingClinics')}</span>
           </div>
         </div>
       </div>
@@ -85,7 +88,7 @@ export const ClinicSelector: React.FC<ClinicSelectorProps> = ({
         <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50">
           <div className="flex items-center space-x-2">
             <MapPinIcon className="h-4 w-4 text-red-500" />
-            <span className="text-red-600">No clinics available</span>
+            <span className="text-red-600">{t('clinicSelector.noClinicsAvailable')}</span>
           </div>
         </div>
       </div>
@@ -140,7 +143,7 @@ export const ClinicSelector: React.FC<ClinicSelectorProps> = ({
                   )}
                 </>
               ) : (
-                <span className="text-gray-500">{placeholder}</span>
+                <span className="text-gray-500">{defaultPlaceholder}</span>
               )}
             </div>
           </div>

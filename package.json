@@ -61,7 +61,8 @@
     "test:watch": "jest --watch",
 
 
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "check:translations": "node check-translation-coverage.cjs"
 
 
   },
@@ -95,6 +96,9 @@
 
 
     "i18next-browser-languagedetector": "^8.2.0",
+
+
+    "i18next-http-backend": "^3.0.2",
 
 
     "init": "^0.1.2",

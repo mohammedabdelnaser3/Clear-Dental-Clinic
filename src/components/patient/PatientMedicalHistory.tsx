@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Button, Badge, Modal, Input, Textarea } from '../ui';
 import type { Patient } from '../../types';
 import { formatDate } from '../../utils';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface MedicalRecord {
   id: string;
@@ -24,6 +25,7 @@ const PatientMedicalHistory: React.FC<PatientMedicalHistoryProps> = ({
   onUpdate,
   readOnly = false
 }) => {
+  const { t } = useLanguage();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingAllergy, setEditingAllergy] = useState<string | null>(null);
   const [editingCondition, setEditingCondition] = useState<string | null>(null);
@@ -192,8 +194,8 @@ const PatientMedicalHistory: React.FC<PatientMedicalHistoryProps> = ({
                     onKeyPress={(e) => e.key === 'Enter' && handleAddAllergy()}
                     className="flex-1"
                   />
-                  <Button size="sm" onClick={handleAddAllergy}>Add</Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditingAllergy(null)}>Cancel</Button>
+                  <Button size="sm" onClick={handleAddAllergy}>{t('patientSettings.medical.addAllergy')}</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditingAllergy(null)}>{t('patientSettings.buttons.cancel')}</Button>
                 </div>
               ) : (
                 <Button size="sm" variant="outline" onClick={() => setEditingAllergy('new')}>
@@ -245,8 +247,8 @@ const PatientMedicalHistory: React.FC<PatientMedicalHistoryProps> = ({
                     onKeyPress={(e) => e.key === 'Enter' && handleAddCondition()}
                     className="flex-1"
                   />
-                  <Button size="sm" onClick={handleAddCondition}>Add</Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditingCondition(null)}>Cancel</Button>
+                  <Button size="sm" onClick={handleAddCondition}>{t('patientSettings.medical.addCondition')}</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditingCondition(null)}>{t('patientSettings.buttons.cancel')}</Button>
                 </div>
               ) : (
                 <Button size="sm" variant="outline" onClick={() => setEditingCondition('new')}>

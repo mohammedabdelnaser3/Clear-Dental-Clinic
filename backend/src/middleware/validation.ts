@@ -5,7 +5,9 @@ import { AppError } from '../utils/AppError';
 // Handle validation errors
 export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
+  console.log('errors1' , errors);
   if (!errors.isEmpty()) {
+    console.log('errors' , errors);
     const errorMessages = errors.array().map(error => ({
       field: 'path' in error ? error.path : 'param' in error ? error.param : 'unknown',
       message: error.msg,
@@ -13,6 +15,7 @@ export const handleValidationErrors = (req: Request, res: Response, next: NextFu
     }));
     return next(new AppError('Validation failed', 400, errorMessages));
   }
+    console.log('errors2' , errors);
   next();
 };
 

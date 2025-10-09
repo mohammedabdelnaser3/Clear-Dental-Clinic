@@ -86,7 +86,7 @@ const ForgotPassword: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('forgotPassword.emailPlaceholder')}
                   required
                   autoComplete="email"
                 />

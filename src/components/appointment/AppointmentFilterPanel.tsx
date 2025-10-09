@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 
 interface Filters {
@@ -27,6 +28,7 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
   filters,
   onFiltersChange
 }) => {
+  const { t } = useTranslation();
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [localFilters, setLocalFilters] = useState<Filters>(filters);
 
@@ -75,7 +77,7 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
         {/* Date Range */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Start Date
+            {t('appointmentFilter.startDate')}
           </label>
           <input
             type="date"
@@ -87,7 +89,7 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            End Date
+            {t('appointmentFilter.endDate')}
           </label>
           <input
             type="date"
@@ -100,14 +102,14 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
         {/* Clinic Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Clinic
+            {t('appointmentFilter.clinic')}
           </label>
           <select
             value={localFilters.clinicId}
             onChange={(e) => handleChange('clinicId', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">All Clinics</option>
+            <option value="">{t('appointmentFilter.allClinics')}</option>
             {clinics.map(clinic => (
               <option key={clinic._id} value={clinic._id}>
                 {clinic.name}
@@ -119,11 +121,11 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
         {/* Patient Name Search */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Patient Name
+            {t('appointmentFilter.patientName')}
           </label>
           <input
             type="text"
-            placeholder="Search by patient name..."
+            placeholder={t('appointmentFilter.searchPlaceholder')}
             value={localFilters.patientName}
             onChange={(e) => handleChange('patientName', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -133,27 +135,27 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
         {/* Status Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
+            {t('appointmentFilter.status')}
           </label>
           <select
             value={localFilters.status}
             onChange={(e) => handleChange('status', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">All Statuses</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="no-show">No Show</option>
+            <option value="">{t('appointmentFilter.allStatuses')}</option>
+            <option value="scheduled">{t('appointments.scheduled')}</option>
+            <option value="confirmed">{t('appointments.confirmed')}</option>
+            <option value="in-progress">{t('appointments.inProgress')}</option>
+            <option value="completed">{t('appointments.completed')}</option>
+            <option value="cancelled">{t('appointments.cancelled')}</option>
+            <option value="no-show">{t('appointments.noshow')}</option>
           </select>
         </div>
 
         {/* Sort Options */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sort By
+            {t('appointmentFilter.sortBy')}
           </label>
           <div className="flex gap-2">
             <select
@@ -161,17 +163,17 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
               onChange={(e) => handleChange('sortBy', e.target.value as any)}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="date">Date</option>
-              <option value="createdAt">Created</option>
-              <option value="status">Status</option>
+              <option value="date">{t('appointmentFilter.sortOptions.date')}</option>
+              <option value="createdAt">{t('appointmentFilter.sortOptions.createdAt')}</option>
+              <option value="status">{t('appointmentFilter.sortOptions.status')}</option>
             </select>
             <select
               value={localFilters.sortOrder}
               onChange={(e) => handleChange('sortOrder', e.target.value as any)}
               className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="asc">Asc</option>
-              <option value="desc">Desc</option>
+              <option value="asc">{t('appointmentFilter.sortOrder.asc')}</option>
+              <option value="desc">{t('appointmentFilter.sortOrder.desc')}</option>
             </select>
           </div>
         </div>
@@ -184,13 +186,13 @@ const AppointmentFilterPanel: React.FC<AppointmentFilterPanelProps> = ({
           className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <X className="w-4 h-4 inline mr-1" />
-          Reset
+          {t('appointmentFilter.reset')}
         </button>
         <button
           onClick={applyFilters}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Apply Filters
+          {t('appointmentFilter.applyFilters')}
         </button>
       </div>
     </div>

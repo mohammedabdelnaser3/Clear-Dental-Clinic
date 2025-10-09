@@ -41,31 +41,31 @@ const patientSchema = new Schema<IPatient>({
   address: {
     street: {
       type: String,
-      required: [true, 'Street address is required'],
+      required: false,
       trim: true,
       maxlength: [200, 'Street address cannot exceed 200 characters']
     },
     city: {
       type: String,
-      required: [true, 'City is required'],
+      required: false,
       trim: true,
       maxlength: [100, 'City cannot exceed 100 characters']
     },
     state: {
       type: String,
-      required: [true, 'State is required'],
+      required: false,
       trim: true,
       maxlength: [100, 'State cannot exceed 100 characters']
     },
     zipCode: {
       type: String,
-      required: [true, 'Zip code is required'],
+      required: false,
       trim: true,
       maxlength: [20, 'Zip code cannot exceed 20 characters']
     },
     country: {
       type: String,
-      required: [true, 'Country is required'],
+      required: false,
       trim: true,
       maxlength: [100, 'Country cannot exceed 100 characters']
     }

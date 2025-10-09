@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { Card, Button, Input, Select, Alert, Avatar, Badge } from '../../components/ui';
 import { useAuth } from '../../hooks/useAuth';
 import { patientService } from '../../services/patientService';
+import { userService } from '../../services/userService';
 import type { Patient } from '../../types';
 import {
   User,
@@ -10,7 +12,6 @@ import {
   Phone,
   MapPin,
   Shield,
-  Bell,
   Save,
   X,
   Check,
@@ -18,15 +19,18 @@ import {
   Camera,
   Heart,
   Settings} from 'lucide-react';
+import { validateEmail, validatePhone, validateRequired, validateZipCode, validateDate } from '../../utils/validation';
 
 const PatientSettings: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, refreshUser, changePassword } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeSection, setActiveSection] = useState('personal');
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [patient, setPatient] = useState<Patient | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -72,13 +76,25 @@ const PatientSettings: React.FC = () => {
 
   const [newAllergy, setNewAllergy] = useState('');
   const [newCondition, setNewCondition] = useState('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
         setLoading(true);
+        setMessage(null);
+        
         const patientData = await patientService.getPatientsByUserId(user?.id!);
         const patientRecord = patientData.data?.[0];
+        
+        if (!patientRecord) {
+          console.warn('No patient record found for user:', user?.id);
+          const errorMsg = 'Patient profile not found. Please contact support.';
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+          return;
+        }
+        
         setPatient(patientRecord);
         
         // Populate form data if patient record exists
@@ -111,7 +127,41 @@ const PatientSettings: React.FC = () => {
           });
         }
       } catch (err: any) {
-        setMessage({ type: 'error', text: err.message || 'Failed to load patient data' });
+        console.error('Error fetching patient data:', {
+          error: err,
+          message: err.message,
+          status: err.response?.status,
+          userId: user?.id
+        });
+        
+        let errorMsg = 'Failed to load patient data';
+        
+        // Handle specific error cases
+        if (err.response?.status === 401) {
+          errorMsg = 'Your session has expired. Please log in again.';
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+          // Redirect to login after a short delay
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else if (err.response?.status === 403) {
+          errorMsg = 'You do not have permission to access this page.';
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+        } else if (err.response?.status === 404) {
+          errorMsg = 'Patient profile not found. Please contact support.';
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+        } else if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+          errorMsg = 'Network error. Please check your internet connection and try again.';
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+        } else {
+          errorMsg = err.message || errorMsg;
+          toast.error(errorMsg);
+          setMessage({ type: 'error', text: errorMsg });
+        }
       } finally {
         setLoading(false);
       }
@@ -123,6 +173,15 @@ const PatientSettings: React.FC = () => {
   }, [user?.id]);
 
   const handleInputChange = (field: string, value: string) => {
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+
     if (field.startsWith('address.')) {
       const addressField = field.split('.')[1];
       setFormData(prev => ({
@@ -203,10 +262,157 @@ const PatientSettings: React.FC = () => {
     }));
   };
 
+  const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      const errorMsg = 'File size must be less than 5MB';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      const errorMsg = 'Please upload a valid image file (JPG, PNG, or GIF)';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setMessage(null);
+      
+      await userService.uploadProfileImage(file);
+      toast.success('Profile picture updated successfully');
+      setMessage({ type: 'success', text: 'Profile picture updated successfully' });
+      
+      // Refresh user context to show new image
+      if (refreshUser) {
+        try {
+          await refreshUser();
+        } catch (refreshErr: any) {
+          console.error('Failed to refresh user after image upload:', refreshErr);
+          // Don't show error to user as the upload was successful
+        }
+      }
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error: any) {
+      console.error('Error uploading profile picture:', {
+        error,
+        message: error.message,
+        status: error.response?.status
+      });
+      
+      let errorMsg = 'Failed to upload profile picture';
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        errorMsg = 'Your session has expired. Please log in again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else if (error.response?.status === 413) {
+        errorMsg = 'File is too large. Please upload a smaller image.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        errorMsg = 'Network error. Please check your internet connection and try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else {
+        errorMsg = error.message || errorMsg;
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      }
+    } finally {
+      setUploadingImage(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    // Validate required fields
+    const firstNameValidation = validateRequired(formData.firstName, 'First name');
+    if (!firstNameValidation.isValid) {
+      errors.firstName = firstNameValidation.error!;
+    }
+
+    const lastNameValidation = validateRequired(formData.lastName, 'Last name');
+    if (!lastNameValidation.isValid) {
+      errors.lastName = lastNameValidation.error!;
+    }
+
+    // Validate email
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      errors.email = emailValidation.error!;
+    }
+
+    // Validate phone
+    const phoneValidation = validatePhone(formData.phone);
+    if (!phoneValidation.isValid) {
+      errors.phone = phoneValidation.error!;
+    }
+
+    // Validate date of birth
+    const dobValidation = validateDate(formData.dateOfBirth, 'Date of birth');
+    if (!dobValidation.isValid) {
+      errors.dateOfBirth = dobValidation.error!;
+    }
+
+    // Validate ZIP code
+    const zipValidation = validateZipCode(formData.address.zipCode);
+    if (!zipValidation.isValid) {
+      errors['address.zipCode'] = zipValidation.error!;
+    }
+
+    // Validate emergency contact phone if provided
+    if (formData.emergencyContact.phone) {
+      const emergencyPhoneValidation = validatePhone(formData.emergencyContact.phone);
+      if (!emergencyPhoneValidation.isValid) {
+        errors['emergencyContact.phone'] = emergencyPhoneValidation.error!;
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMessage(null);
+    console.log(formData);
+
+    // Validate form before submission
+    if (!validateForm()) {
+      const errorMsg = 'Please fix the validation errors before submitting';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+
+    if (!patient?.id) {
+      const errorMsg = 'Patient ID not found. Please refresh the page and try again.';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const updateData = {
@@ -216,10 +422,51 @@ const PatientSettings: React.FC = () => {
         id: patient?.id
       };
       
-      await patientService.updatePatient(patient?.id!, updateData);
+      await patientService.updatePatient(patient.id, updateData);
+      toast.success('Profile updated successfully!');
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+      console.error('Error updating patient profile:', {
+        error: err,
+        message: err.message,
+        status: err.response?.status,
+        patientId: patient?.id
+      });
+      
+      let errorMsg = 'Failed to update profile';
+      
+      // Handle specific error cases
+      if (err.response?.status === 401) {
+        errorMsg = 'Your session has expired. Please log in again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else if (err.response?.status === 403) {
+        errorMsg = 'You do not have permission to update this profile.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (err.response?.status === 404) {
+        errorMsg = 'Patient profile not found. Please refresh the page and try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (err.response?.status === 422) {
+        errorMsg = 'Invalid data provided. Please check your inputs and try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+        errorMsg = 'Network error. Please check your internet connection and try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else {
+        errorMsg = err.message || errorMsg;
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      }
     } finally {
       setLoading(false);
     }
@@ -227,19 +474,90 @@ const PatientSettings: React.FC = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage(null);
+    
+    // Validation: Check if current password is provided
+    if (!passwordData.currentPassword) {
+      const errorMsg = 'Current password is required';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+    
+    // Validation: Check if passwords match
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'New passwords do not match' });
+      const errorMsg = 'New passwords do not match';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+    
+    // Validation: Check password length (min 8 characters)
+    if (passwordData.newPassword.length < 8) {
+      const errorMsg = 'Password must be at least 8 characters long';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
+      return;
+    }
+    
+    // Validation: Check if new password is different from current
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      const errorMsg = 'New password must be different from current password';
+      toast.error(errorMsg);
+      setMessage({ type: 'error', text: errorMsg });
       return;
     }
     
     setLoading(true);
     try {
-      // Add password change logic here
+      // Call the changePassword method from useAuth hook
+      await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      
+      toast.success('Password updated successfully');
       setMessage({ type: 'success', text: 'Password updated successfully' });
+      
+      // Clear password fields on success
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      
+      // Hide password fields on success
       setShowPasswordFields(false);
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update password' });
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error: any) {
+      console.error('Error changing password:', {
+        error,
+        message: error.message,
+        status: error.response?.status
+      });
+      
+      let errorMsg = 'Failed to update password';
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        errorMsg = 'Current password is incorrect. Please try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (error.response?.status === 403) {
+        errorMsg = 'Your session has expired. Please log in again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else if (error.response?.status === 422) {
+        errorMsg = 'Password does not meet security requirements. Please use a stronger password.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        errorMsg = 'Network error. Please check your internet connection and try again.';
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      } else {
+        errorMsg = error.message || errorMsg;
+        toast.error(errorMsg);
+        setMessage({ type: 'error', text: errorMsg });
+      }
     } finally {
       setLoading(false);
     }
@@ -326,8 +644,24 @@ const PatientSettings: React.FC = () => {
                     fallback={`${formData.firstName[0] || ''}${formData.lastName[0] || ''}`}
                     className="ring-4 ring-white shadow-2xl w-32 h-32"
                   />
-                  <button className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
-                    <Camera className="w-4 h-4" />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/gif"
+                    onChange={handleProfilePictureUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage || loading}
+                    className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {uploadingImage ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <Camera className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2">
@@ -362,7 +696,8 @@ const PatientSettings: React.FC = () => {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                    disabled={loading}
+                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                       activeSection === section.id
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -410,27 +745,42 @@ const PatientSettings: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input
-                      label="First Name"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      required
-                    />
-                    <Input
-                      label="Last Name"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      required
-                    />
+                    <div>
+                      <Input
+                        label="First Name"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        required
+                      />
+                      {validationErrors.firstName && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.firstName}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Input
+                        label="Last Name"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        required
+                      />
+                      {validationErrors.lastName && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.lastName}</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input
-                      label="Date of Birth"
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                    />
+                    <div>
+                      <Input
+                        label="Date of Birth"
+                        type="date"
+                        value={formData.dateOfBirth}
+                        onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                      />
+                      {validationErrors.dateOfBirth && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.dateOfBirth}</p>
+                      )}
+                    </div>
                     <Select
                       label="Gender"
                       options={genderOptions}
@@ -465,6 +815,9 @@ const PatientSettings: React.FC = () => {
                         className="pl-10"
                       />
                       <Mail className="w-4 h-4 absolute left-3 top-9 text-gray-400" />
+                      {validationErrors.email && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                      )}
                     </div>
                     <div className="relative">
                       <Input
@@ -472,10 +825,13 @@ const PatientSettings: React.FC = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
-                        placeholder="+20 123 456 7890"
+                        placeholder={t('patientSettings.contact.phonePlaceholder')}
                         className="pl-10"
                       />
                       <Phone className="w-4 h-4 absolute left-3 top-9 text-gray-400" />
+                      {validationErrors.phone && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.phone}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -499,14 +855,14 @@ const PatientSettings: React.FC = () => {
                       label="Street Address"
                       value={formData.address.street}
                       onChange={(e) => handleInputChange('address.street', e.target.value)}
-                      placeholder="123 Main Street"
+                      placeholder={t('patientSettings.address.streetPlaceholder')}
                     />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <Input
                         label="City"
                         value={formData.address.city}
                         onChange={(e) => handleInputChange('address.city', e.target.value)}
-                        placeholder="Cairo"
+                        placeholder={t('patientSettings.address.cityPlaceholder')}
                       />
                       <Select
                         label="State/Province"
@@ -514,18 +870,23 @@ const PatientSettings: React.FC = () => {
                         value={formData.address.state}
                         onChange={(e) => handleInputChange('address.state', e.target.value)}
                       />
-                      <Input
-                        label="ZIP/Postal Code"
-                        value={formData.address.zipCode}
-                        onChange={(e) => handleInputChange('address.zipCode', e.target.value)}
-                        placeholder="12345"
-                      />
+                      <div>
+                        <Input
+                          label="ZIP/Postal Code"
+                          value={formData.address.zipCode}
+                          onChange={(e) => handleInputChange('address.zipCode', e.target.value)}
+                          placeholder={t('patientSettings.address.zipCodePlaceholder')}
+                        />
+                        {validationErrors['address.zipCode'] && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors['address.zipCode']}</p>
+                        )}
+                      </div>
                     </div>
                     <Input
                       label="Country"
                       value={formData.address.country}
                       onChange={(e) => handleInputChange('address.country', e.target.value)}
-                      placeholder="Egypt"
+                      placeholder={t('patientSettings.address.countryPlaceholder')}
                     />
                   </div>
                 </div>
@@ -549,15 +910,20 @@ const PatientSettings: React.FC = () => {
                       label="Contact Name"
                       value={formData.emergencyContact.name}
                       onChange={(e) => handleInputChange('emergencyContact.name', e.target.value)}
-                      placeholder="Full Name"
+                      placeholder={t('patientSettings.emergency.namePlaceholder')}
                     />
-                    <Input
-                      label="Phone Number"
-                      type="tel"
-                      value={formData.emergencyContact.phone}
-                      onChange={(e) => handleInputChange('emergencyContact.phone', e.target.value)}
-                      placeholder="+20 123 456 7890"
-                    />
+                    <div>
+                      <Input
+                        label="Phone Number"
+                        type="tel"
+                        value={formData.emergencyContact.phone}
+                        onChange={(e) => handleInputChange('emergencyContact.phone', e.target.value)}
+                        placeholder={t('patientSettings.emergency.phonePlaceholder')}
+                      />
+                      {validationErrors['emergencyContact.phone'] && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors['emergencyContact.phone']}</p>
+                      )}
+                    </div>
                     <Select
                       label="Relationship"
                       options={relationshipOptions}
@@ -587,12 +953,12 @@ const PatientSettings: React.FC = () => {
                       <h4 className="text-lg font-medium text-gray-900 mb-4">Allergies</h4>
                       <div className="flex gap-2 mb-4">
                         <Input
-                          placeholder="Add new allergy"
+                          placeholder={t('patientSettings.medical.allergyPlaceholder')}
                           value={newAllergy}
                           onChange={(e) => setNewAllergy(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAllergy())}
                         />
-                        <Button type="button" onClick={handleAddAllergy} variant="outline">
+                        <Button type="button" onClick={handleAddAllergy} variant="outline" disabled={loading || !newAllergy.trim()}>
                           Add
                         </Button>
                       </div>
@@ -606,6 +972,7 @@ const PatientSettings: React.FC = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleRemoveAllergy(index)}
+                                disabled={loading}
                                 className="text-red-600 hover:text-red-700"
                               >
                                 Remove
@@ -621,12 +988,12 @@ const PatientSettings: React.FC = () => {
                       <h4 className="text-lg font-medium text-gray-900 mb-4">Medical Conditions</h4>
                       <div className="flex gap-2 mb-4">
                         <Input
-                          placeholder="Add medical condition"
+                          placeholder={t('patientSettings.medical.conditionPlaceholder')}
                           value={newCondition}
                           onChange={(e) => setNewCondition(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCondition())}
                         />
-                        <Button type="button" onClick={handleAddCondition} variant="outline">
+                        <Button type="button" onClick={handleAddCondition} variant="outline" disabled={loading || !newCondition.trim()}>
                           Add
                         </Button>
                       </div>
@@ -640,6 +1007,7 @@ const PatientSettings: React.FC = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleRemoveCondition(index)}
+                                disabled={loading}
                                 className="text-blue-600 hover:text-blue-700"
                               >
                                 Remove
@@ -660,7 +1028,7 @@ const PatientSettings: React.FC = () => {
                         value={formData.medicalHistory.notes}
                         onChange={(e) => handleInputChange('medicalHistory.notes', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Any additional medical information, medications, or notes..."
+                        placeholder={t('patientSettings.medical.notesPlaceholder')}
                       />
                     </div>
                   </div>
@@ -691,6 +1059,7 @@ const PatientSettings: React.FC = () => {
                           type="button"
                           variant="outline"
                           onClick={() => setShowPasswordFields(!showPasswordFields)}
+                          disabled={loading}
                         >
                           {showPasswordFields ? 'Cancel' : 'Change Password'}
                         </Button>
@@ -724,9 +1093,10 @@ const PatientSettings: React.FC = () => {
                               type="button"
                               onClick={handlePasswordChange}
                               disabled={loading}
+                              isLoading={loading}
                               className="bg-red-600 hover:bg-red-700"
                             >
-                              Update Password
+                              {loading ? 'Updating...' : 'Update Password'}
                             </Button>
                             <Button
                               type="button"
@@ -735,6 +1105,7 @@ const PatientSettings: React.FC = () => {
                                 setShowPasswordFields(false);
                                 setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
                               }}
+                              disabled={loading}
                             >
                               Cancel
                             </Button>
@@ -848,6 +1219,7 @@ const PatientSettings: React.FC = () => {
                     type="button"
                     variant="outline"
                     onClick={() => window.location.reload()}
+                    disabled={loading}
                   >
                     <X className="w-4 h-4 mr-2" />
                     Cancel
@@ -855,18 +1227,14 @@ const PatientSettings: React.FC = () => {
                   <Button
                     type="submit"
                     disabled={loading}
+                    isLoading={loading}
                     className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
                   >
-                    {loading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Saving...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Save className="w-4 h-4" />
+                    {loading ? 'Saving...' : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
                         Save Changes
-                      </div>
+                      </>
                     )}
                   </Button>
                 </div>

@@ -87,21 +87,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ className =
     }
   };
 
-  const getNotificationTypeColor = (type: string) => {
-    switch (type) {
-      case 'appointment_reminder':
-        return 'bg-blue-50 border-blue-200';
-      case 'appointment_confirmation':
-        return 'bg-green-50 border-green-200';
-      case 'appointment_cancellation':
-        return 'bg-red-50 border-red-200';
-      case 'system':
-        return 'bg-purple-50 border-purple-200';
-      default:
-        return 'bg-gray-50 border-gray-200';
-    }
-  };
-
   const formatNotificationTime = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), { 

@@ -16,6 +16,7 @@ export interface UpdateProfileData {
     country?: string;
   };
   specialization?: string;
+  licenseNumber?: string;
   bio?: string;
 }
 

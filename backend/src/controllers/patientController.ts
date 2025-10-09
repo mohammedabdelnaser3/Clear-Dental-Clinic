@@ -128,9 +128,10 @@ export const createPatient = asyncHandler(async (req: Request, res: Response) =>
 
 // Update patient
 export const updatePatient = asyncHandler(async (req: Request, res: Response) => {
+  console.log('REQ', req);
   const { id } = req.params;
   const updateData = req.body;
-
+  console.log('final', updateData);
   // Remove sensitive fields
   delete updateData.password;
   delete updateData.role;

@@ -6,7 +6,6 @@ import { useClinic } from '../../hooks/useClinic';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import { NotificationDropdown } from '../notifications';
 import { 
-  Bell, 
   Menu, 
   X, 
   ChevronDown, 
