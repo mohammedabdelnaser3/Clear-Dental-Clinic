@@ -138,7 +138,7 @@ const StaffScheduling: React.FC = () => {
 
   const clinics: Clinic[] = clinicsData?.data?.clinics || [];
   const staff: StaffMember[] = staffData?.data?.staff || [];
-  const schedules: StaffSchedule[] = schedulesData?.data?.schedules || [];
+  const schedules: StaffSchedule[] = (schedulesData?.data as any)?.items || [];
 
   useEffect(() => {
     if (clinics.length > 0 && !selectedClinic) {

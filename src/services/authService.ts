@@ -174,7 +174,7 @@ export const validateToken = async (): Promise<boolean> => {
         return !!refreshResult?.token;
       }
       
-    } catch (decodeError) {
+    } catch (_decodeError) {
       // If token is malformed, remove it and make API call to be sure
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');

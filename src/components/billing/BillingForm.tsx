@@ -39,9 +39,7 @@ const getBillingSchema = (t: (key: string) => string) => z.object({
   notes: z.string().optional()
 });
 
-const billingSchemaForType = getBillingSchema((key: string) => key);
-
-type BillingFormData = z.infer<typeof billingSchemaForType>;
+type BillingFormData = z.infer<ReturnType<typeof getBillingSchema>>;
 
 interface BillingRecord {
   _id: string;

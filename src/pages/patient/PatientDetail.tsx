@@ -91,50 +91,52 @@ const PatientDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Header */}
-        <div className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Enhanced Header - Responsive */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4 lg:gap-6">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold shadow-lg flex-shrink-0">
                 {patient.firstName[0]}{patient.lastName[0]}
               </div>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 truncate">
                   {patient.firstName} {patient.lastName}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge variant={patient.isActive ? 'success' : 'gray'} className="px-3 py-1">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <Badge variant={patient.isActive ? 'success' : 'gray'} className="px-2 sm:px-3 py-1">
                     {patient.isActive ? 'Active' : 'Inactive'}
                   </Badge>
-                  <Badge className="bg-blue-100 text-blue-800 px-3 py-1">
+                  <Badge className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1">
                     Age {calculateAge(patient.dateOfBirth)}
                   </Badge>
-                  <Badge className="bg-purple-100 text-purple-800 px-3 py-1 capitalize">
+                  <Badge className="bg-purple-100 text-purple-800 px-2 sm:px-3 py-1 capitalize">
                     {patient.gender}
                   </Badge>
-                  <span className="text-gray-500 text-sm">ID: {patient.id}</span>
+                  <span className="text-gray-500 text-xs sm:text-sm hidden sm:inline">ID: {patient.id}</span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Link to={`/patients/${patient.id}/edit`}>
-                <Button variant="outline" className="flex items-center gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <Link to={`/patients/${patient.id}/edit`} className="flex-1 sm:flex-none">
+                <Button variant="outline" className="flex items-center justify-center gap-2 w-full min-h-[44px]">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  Edit Patient
+                  <span className="hidden sm:inline">Edit Patient</span>
+                  <span className="sm:hidden">Edit</span>
                 </Button>
               </Link>
               <Button 
                 variant="outline" 
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex items-center gap-2" 
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex items-center justify-center gap-2 flex-1 sm:flex-none min-h-[44px]" 
                 onClick={handleDeletePatient}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                Delete Patient
+                <span className="hidden sm:inline">Delete Patient</span>
+                <span className="sm:hidden">Delete</span>
               </Button>
             </div>
           </div>
@@ -146,17 +148,17 @@ const PatientDetail: React.FC = () => {
               id: 'overview',
               label: 'Overview',
               content: (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                   {/* Main Content */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <Card className="p-6 bg-gradient-to-r from-white to-blue-50 border-0 shadow-lg">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                    <Card className="p-4 sm:p-6 bg-gradient-to-r from-white to-blue-50 border-0 shadow-lg">
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         Personal Information
                       </h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div className="space-y-4">
                           <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -233,14 +235,14 @@ const PatientDetail: React.FC = () => {
                     </Card>
 
                     {/* Quick Stats */}
-                    <Card className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Card className="p-4 sm:p-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                         Patient Statistics
                       </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div className="bg-blue-50 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600 mb-1">{appointments.length}</div>
                           <div className="text-sm text-gray-600">Total Visits</div>
@@ -268,27 +270,27 @@ const PatientDetail: React.FC = () => {
                   </div>
 
                   {/* Sidebar */}
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {/* Quick Actions */}
-                    <Card className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                      <div className="space-y-3">
+                    <Card className="p-4 sm:p-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Quick Actions</h3>
+                      <div className="space-y-2 sm:space-y-3">
                         <Link to={`/appointments/create?patientId=${patient.id}`}>
-                          <Button className="w-full justify-start" variant="outline">
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <Button className="w-full justify-start min-h-[44px]" variant="outline">
+                            <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z" />
                             </svg>
                             Schedule Appointment
                           </Button>
                         </Link>
-                        <Button className="w-full justify-start" variant="outline">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <Button className="w-full justify-start min-h-[44px]" variant="outline">
+                          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                           View Records
                         </Button>
-                        <Button className="w-full justify-start" variant="outline">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <Button className="w-full justify-start min-h-[44px]" variant="outline">
+                          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                           Download Reports
@@ -298,9 +300,9 @@ const PatientDetail: React.FC = () => {
 
                     {/* Emergency Contact */}
                     {patient.emergencyContact && (
-                      <Card className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <Card className="p-4 sm:p-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
                           Emergency Contact
@@ -314,9 +316,9 @@ const PatientDetail: React.FC = () => {
                     )}
 
                     {/* Medical Information Cards */}
-                    <div className="space-y-6">
-                      <Card className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="space-y-4 sm:space-y-6">
+                      <Card className="p-4 sm:p-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                           <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                           </svg>
@@ -338,9 +340,9 @@ const PatientDetail: React.FC = () => {
                         )}
                       </Card>
 
-                      <Card className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <Card className="p-4 sm:p-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                           Medical Conditions
@@ -369,15 +371,15 @@ const PatientDetail: React.FC = () => {
               id: 'appointments',
               label: 'Appointments',
               content: (
-                <Card className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg font-medium text-gray-900">Appointments</h2>
+                <Card className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
+                    <h2 className="text-base sm:text-lg font-medium text-gray-900">Appointments</h2>
                     <Link to={`/appointments/create?patientId=${patient.id}`}>
-                      <Button variant="outline" size="sm">Schedule New</Button>
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">Schedule New</Button>
                     </Link>
                   </div>
                   {appointments.length > 0 ? (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>

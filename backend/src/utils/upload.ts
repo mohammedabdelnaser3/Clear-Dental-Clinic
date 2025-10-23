@@ -2,14 +2,23 @@ import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { Request as _Request } from 'express';
 import path from 'path';
+import fs from 'fs';
 import { AppError } from '../middleware/errorHandler';
 
 // Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const isCloudinaryConfigured = !!(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
+
+if (isCloudinaryConfigured) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+}
 
 // File filter function
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -43,7 +52,49 @@ export const upload = multer({
 // Single file upload middleware
 export const uploadSingle = (fieldName: string) => upload.single(fieldName);
 
-// Upload single file to Cloudinary
+// Upload to local storage (fallback when Cloudinary is not configured)
+const uploadToLocal = async (
+  file: Express.Multer.File,
+  folder: string = 'dental-clinic'
+): Promise<{
+  public_id: string;
+  secure_url: string;
+  format: string;
+  bytes: number;
+}> => {
+  try {
+    // Create uploads directory if it doesn't exist
+    const uploadsDir = path.join(process.cwd(), 'uploads', folder);
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const fileExtension = path.extname(file.originalname);
+    const filename = `${timestamp}-${randomString}${fileExtension}`;
+    const filePath = path.join(uploadsDir, filename);
+
+    // Write file to disk
+    fs.writeFileSync(filePath, file.buffer);
+
+    // Return URL that can be served by the backend
+    const baseUrl = process.env.CLIENT_URL || 'http://localhost:5000';
+    const fileUrl = `${baseUrl}/uploads/${folder}/${filename}`;
+
+    return {
+      public_id: `${folder}/${filename}`,
+      secure_url: fileUrl,
+      format: fileExtension.substring(1),
+      bytes: file.buffer.length
+    };
+  } catch (error) {
+    throw new AppError('Failed to save file locally', 500);
+  }
+};
+
+// Upload single file to Cloudinary or local storage
 export const uploadToCloudinary = async (
   file: Express.Multer.File,
   folder: string = 'dental-clinic'
@@ -53,6 +104,12 @@ export const uploadToCloudinary = async (
   format: string;
   bytes: number;
 }> => {
+  // Use local storage if Cloudinary is not configured
+  if (!isCloudinaryConfigured) {
+    console.log('Cloudinary not configured, using local storage');
+    return uploadToLocal(file, folder);
+  }
+
   try {
     return new Promise((resolve, reject) => {
       const uploadOptions = {
@@ -66,6 +123,7 @@ export const uploadToCloudinary = async (
         uploadOptions,
         (error, result) => {
           if (error) {
+            console.error('Cloudinary upload error:', error);
             reject(new AppError('Failed to upload file to cloud storage', 500));
           } else if (result) {
             resolve({
@@ -81,6 +139,7 @@ export const uploadToCloudinary = async (
       ).end(file.buffer);
     });
   } catch (error) {
+    console.error('Upload error:', error);
     throw new AppError('File upload failed', 500);
   }
 };

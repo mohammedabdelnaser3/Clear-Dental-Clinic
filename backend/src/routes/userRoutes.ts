@@ -9,6 +9,9 @@ import {
   assignClinicToUser,
   removeClinicFromUser,
   setPreferredClinic,
+  getUserClinics,
+  getUserAvailability,
+  updateUserAvailability,
   uploadUserProfileImage,
   getUserStatistics,
   searchUsers,
@@ -108,8 +111,20 @@ router.post('/upload-image', uploadSingle('profileImage'), uploadUserProfileImag
 // Add alias route for frontend compatibility
 router.post('/profile-image', uploadSingle('profileImage'), uploadUserProfileImage);
 
+// Upload profile image with user ID in URL (for dentist service compatibility)
+router.post('/:id/upload-image', validateMongoId, uploadSingle('profileImage'), uploadUserProfileImage);
+
 // Get user by ID
 router.get('/:id', validateMongoId, getUserById);
+
+// Get user's assigned clinics
+router.get('/:id/clinics', validateMongoId, getUserClinics);
+
+// Get user's availability schedule
+router.get('/:id/availability', validateMongoId, getUserAvailability);
+
+// Update user's availability schedule
+router.put('/:id/availability', validateMongoId, updateUserAvailability);
 
 // Update user (admin only or self)
 router.put('/:id', [

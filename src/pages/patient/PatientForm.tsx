@@ -173,6 +173,7 @@ const PatientForm: React.FC = () => {
   };
 
   const validateForm = () => {
+    // Only validate personal information fields as mandatory
     if (!formData.firstName.trim()) {
       setError(t('patient_form.first_name_required'));
       return false;
@@ -194,25 +195,10 @@ const PatientForm: React.FC = () => {
       return false;
     }
     if (!formData.preferredClinicId) {
-      setError(t('patient_form.clinic_required'));
+      setError(t('patient_form.preferred_clinic_required') || 'Preferred clinic is required');
       return false;
     }
-    if (!formData.address.street.trim()) {
-      setError(t('patient_form.street_address_required'));
-      return false;
-    }
-    if (!formData.address.city.trim()) {
-      setError(t('patient_form.city_required'));
-      return false;
-    }
-    if (!formData.address.state.trim()) {
-      setError(t('patient_form.state_required'));
-      return false;
-    }
-    if (!formData.address.zipCode.trim()) {
-      setError(t('patient_form.zip_code_required'));
-      return false;
-    }
+    // All other fields (address, etc.) are now optional
     return true;
   };
 
@@ -280,10 +266,10 @@ const PatientForm: React.FC = () => {
   }
 
   return (
-    <div className="py-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div className="py-4 sm:py-6 px-4 sm:px-0">
+      <div className="flex flex-col space-y-2 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
             {isEditMode ? t('patient_form.edit_patient') : t('patient_form.add_new_patient')}
           </h1>
           <p className="mt-1 text-sm text-gray-600">
@@ -304,10 +290,10 @@ const PatientForm: React.FC = () => {
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('patient_form.personal_information')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">{t('patient_form.personal_information')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
               label={t('patient_form.first_name')}
               name="firstName"
@@ -369,21 +355,21 @@ const PatientForm: React.FC = () => {
                 value: clinic.id,
                 label: clinic.name
               }))}
-              required
+              required={false}
             />
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('patient_form.address_information')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">{t('patient_form.address_information')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="sm:col-span-2">
              <Input
                label={t('patient_form.street_address')}
                name="address.street"
                value={formData.address.street}
                onChange={handleInputChange}
-               required
+               required={false}
              />
              </div>
              <Input
@@ -391,40 +377,41 @@ const PatientForm: React.FC = () => {
                name="address.city"
                value={formData.address.city}
                onChange={handleInputChange}
-               required
+               required={false}
              />
              <Input
                label={t('patient_form.state')}
                name="address.state"
                value={formData.address.state}
                onChange={handleInputChange}
-               required
+               required={false}
              />
              <Input
                label={t('patient_form.zip_code')}
                name="address.zipCode"
                value={formData.address.zipCode}
                onChange={handleInputChange}
-               required
+               required={false}
              />
              <Input
                label={t('patient_form.country')}
                name="address.country"
                value={formData.address.country}
                onChange={handleInputChange}
-               required
+               required={false}
              />
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('patient_form.emergency_contact')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">{t('patient_form.emergency_contact')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Input
                label={t('patient_form.contact_name')}
                name="emergencyContact.name"
                value={formData.emergencyContact?.name || ''}
                onChange={handleInputChange}
+               required={false}
              />
              <Input
                label={t('patient_form.contact_phone')}
@@ -432,30 +419,33 @@ const PatientForm: React.FC = () => {
                type="tel"
                value={formData.emergencyContact?.phone || ''}
                onChange={handleInputChange}
+               required={false}
              />
              <Input
                label={t('patient_form.relationship')}
                name="emergencyContact.relationship"
                value={formData.emergencyContact?.relationship || ''}
                onChange={handleInputChange}
+               required={false}
              />
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('patient_form.medical_information')}</h2>
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">{t('patient_form.medical_information')}</h2>
           
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div>
-              <h3 className="text-md font-medium text-gray-700 mb-2">{t('patient_form.allergies')}</h3>
-              <div className="flex gap-2 mb-2">
+              <h3 className="text-sm sm:text-md font-medium text-gray-700 mb-2">{t('patient_form.allergies')}</h3>
+              <div className="flex flex-col sm:flex-row gap-2 mb-2">
                 <Input
                   placeholder={t('patient_form.add_allergy')}
                   value={newAllergy}
                   onChange={(e) => setNewAllergy(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAllergy())}
+                  className="flex-1"
                 />
-                <Button type="button" onClick={handleAddAllergy} variant="outline">
+                <Button type="button" onClick={handleAddAllergy} variant="outline" className="w-full sm:w-auto min-h-[44px]">
                   {t('patient_form.add')}
                 </Button>
               </div>
@@ -479,15 +469,16 @@ const PatientForm: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="text-md font-medium text-gray-700 mb-2">{t('patient_form.medical_conditions')}</h3>
-              <div className="flex gap-2 mb-2">
+              <h3 className="text-sm sm:text-md font-medium text-gray-700 mb-2">{t('patient_form.medical_conditions')}</h3>
+              <div className="flex flex-col sm:flex-row gap-2 mb-2">
                 <Input
                   placeholder={t('patient_form.add_medical_condition')}
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCondition())}
+                  className="flex-1"
                 />
-                <Button type="button" onClick={handleAddCondition} variant="outline">
+                <Button type="button" onClick={handleAddCondition} variant="outline" className="w-full sm:w-auto min-h-[44px]">
                   {t('patient_form.add')}
                 </Button>
               </div>
@@ -523,13 +514,13 @@ const PatientForm: React.FC = () => {
           </div>
         </Card>
 
-        <div className="flex justify-end space-x-3">
-          <Link to="/patients">
-            <Button type="button" variant="outline">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 sticky bottom-0 bg-white py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:static border-t sm:border-t-0 border-gray-200">
+          <Link to="/patients" className="flex-1 sm:flex-none">
+            <Button type="button" variant="outline" className="w-full min-h-[44px]">
               {t('patient_form.cancel')}
             </Button>
           </Link>
-          <Button type="submit" isLoading={isLoading}>
+          <Button type="submit" isLoading={isLoading} className="flex-1 sm:flex-none min-h-[44px]">
             {isEditMode ? t('patient_form.update_patient') : t('patient_form.create_patient')}
           </Button>
         </div>

@@ -84,7 +84,14 @@ const PatientSettings: React.FC = () => {
         setLoading(true);
         setMessage(null);
         
-        const patientData = await patientService.getPatientsByUserId(user?.id!);
+        const userId = user?.id;
+        if (!userId) {
+          console.warn('No authenticated user ID available');
+          toast.error('User not authenticated. Please sign in again.');
+          setLoading(false);
+          return;
+        }
+        const patientData = await patientService.getPatientsByUserId(userId);
         const patientRecord = patientData.data?.[0];
         
         if (!patientRecord) {
@@ -616,14 +623,14 @@ const PatientSettings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('patientSettings.title')}</h1>
-                <p className="text-xl text-gray-600">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{t('patientSettings.title')}</h1>
+                <p className="text-base sm:text-lg lg:text-xl text-gray-600">
                   {t('patientSettings.subtitle')}
                 </p>
               </div>
@@ -633,8 +640,8 @@ const PatientSettings: React.FC = () => {
           </div>
 
           {/* Profile Header Card */}
-          <Card className="p-8 mb-8 bg-gradient-to-r from-white to-blue-50 border-0 shadow-xl">
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+          <Card className="p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 bg-gradient-to-r from-white to-blue-50 border-0 shadow-xl">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 sm:gap-6 lg:gap-8">
               <div className="relative">
                 <div className="relative">
                   <Avatar
@@ -642,7 +649,7 @@ const PatientSettings: React.FC = () => {
                     alt={`${formData.firstName} ${formData.lastName}`}
                     size="xl"
                     fallback={`${formData.firstName[0] || ''}${formData.lastName[0] || ''}`}
-                    className="ring-4 ring-white shadow-2xl w-32 h-32"
+                    className="ring-4 ring-white shadow-2xl w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
                   />
                   <input
                     ref={fileInputRef}
@@ -655,55 +662,74 @@ const PatientSettings: React.FC = () => {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingImage || loading}
-                    className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-blue-600 text-white rounded-full p-2 sm:p-3 hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     {uploadingImage ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     ) : (
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
                     )}
                   </button>
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1.5 sm:p-2">
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
                 </div>
               </div>
               
               <div className="flex-1 text-center lg:text-left">
                 <div className="mb-4">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                     {formData.firstName} {formData.lastName}
                   </h2>
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-3">
-                    <Badge className="bg-green-100 text-green-800 px-3 py-1 text-sm font-medium">
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 mb-3">
+                    <Badge className="bg-green-100 text-green-800 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">
                       {t('patientProfile.activePatient')}
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 px-3 py-1 text-sm">
+                    <Badge className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 text-xs sm:text-sm">
                       {t('patientSettings.profileComplete', { percent: 85 })}
                     </Badge>
                   </div>
-                  <p className="text-gray-600 text-lg">{formData.email}</p>
+                  <p className="text-gray-600 text-sm sm:text-base lg:text-lg break-all">{formData.email}</p>
                 </div>
               </div>
             </div>
           </Card>
 
           {/* Navigation Tabs */}
-          <div className="mb-8">
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8 overflow-x-auto">
+          <div className="mb-6 sm:mb-8">
+            {/* Mobile: Dropdown Navigation */}
+            <div className="block sm:hidden mb-4">
+              <label htmlFor="section-select" className="sr-only">Select Section</label>
+              <select
+                id="section-select"
+                value={activeSection}
+                onChange={(e) => setActiveSection(e.target.value)}
+                disabled={loading}
+                className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+              >
+                {sections.map((section) => (
+                  <option key={section.id} value={section.id}>
+                    {section.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Tablet & Desktop: Horizontal Tabs */}
+            <div className="hidden sm:block border-b border-gray-200">
+              <nav className="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide">
                 {sections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     disabled={loading}
-                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`flex items-center gap-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] ${
                       activeSection === section.id
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    {section.icon}
+                    <span className="hidden sm:inline">{section.icon}</span>
                     {section.label}
                   </button>
                 ))}
@@ -729,22 +755,22 @@ const PatientSettings: React.FC = () => {
           )}
 
           {/* Form Content */}
-          <Card className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <Card className="p-4 sm:p-6 lg:p-8">
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               {/* Personal Information Section */}
               {activeSection === 'personal' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <User className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
-                      <p className="text-gray-600">Update your basic personal details</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Personal Information</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Update your basic personal details</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <Input
                         label="First Name"
@@ -769,7 +795,7 @@ const PatientSettings: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <Input
                         label="Date of Birth"
@@ -793,18 +819,18 @@ const PatientSettings: React.FC = () => {
 
               {/* Contact Details Section */}
               {activeSection === 'contact' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Mail className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Contact Details</h3>
-                      <p className="text-gray-600">Manage your contact information</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Contact Details</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Manage your contact information</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     <div className="relative">
                       <Input
                         label="Email Address"
@@ -839,25 +865,25 @@ const PatientSettings: React.FC = () => {
 
               {/* Address Section */}
               {activeSection === 'address' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <MapPin className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Address Information</h3>
-                      <p className="text-gray-600">Update your address details</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Address Information</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Update your address details</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     <Input
                       label="Street Address"
                       value={formData.address.street}
                       onChange={(e) => handleInputChange('address.street', e.target.value)}
                       placeholder={t('patientSettings.address.streetPlaceholder')}
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       <Input
                         label="City"
                         value={formData.address.city}
@@ -894,18 +920,18 @@ const PatientSettings: React.FC = () => {
 
               {/* Emergency Contact Section */}
               {activeSection === 'emergency' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Phone className="w-5 h-5 text-red-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Emergency Contact</h3>
-                      <p className="text-gray-600">Person to contact in case of emergency</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Emergency Contact</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Person to contact in case of emergency</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     <Input
                       label="Contact Name"
                       value={formData.emergencyContact.name}
@@ -936,46 +962,55 @@ const PatientSettings: React.FC = () => {
 
               {/* Medical Information Section */}
               {activeSection === 'medical' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Heart className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Medical Information</h3>
-                      <p className="text-gray-600">Update your medical history and conditions</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Medical Information</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Update your medical history and conditions</p>
                     </div>
                   </div>
 
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     {/* Allergies */}
                     <div>
-                      <h4 className="text-lg font-medium text-gray-900 mb-4">Allergies</h4>
-                      <div className="flex gap-2 mb-4">
-                        <Input
-                          placeholder={t('patientSettings.medical.allergyPlaceholder')}
-                          value={newAllergy}
-                          onChange={(e) => setNewAllergy(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAllergy())}
-                        />
-                        <Button type="button" onClick={handleAddAllergy} variant="outline" disabled={loading || !newAllergy.trim()}>
+                      <h4 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Allergies</h4>
+                      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                        <div className="flex-1">
+                          <Input
+                            placeholder={t('patientSettings.medical.allergyPlaceholder')}
+                            value={newAllergy}
+                            onChange={(e) => setNewAllergy(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAllergy())}
+                          />
+                        </div>
+                        <Button 
+                          type="button" 
+                          onClick={handleAddAllergy} 
+                          variant="outline" 
+                          disabled={loading || !newAllergy.trim()}
+                          className="w-full sm:w-auto min-h-[44px]"
+                        >
                           Add
                         </Button>
                       </div>
                       {formData.medicalHistory.allergies.length > 0 && (
                         <div className="space-y-2">
                           {formData.medicalHistory.allergies.map((allergy, index) => (
-                            <div key={index} className="flex items-center justify-between bg-red-50 p-3 rounded-lg">
-                              <span className="text-red-800">{allergy}</span>
+                            <div key={index} className="flex items-center justify-between bg-red-50 p-3 sm:p-4 rounded-lg gap-2">
+                              <span className="text-red-800 text-sm sm:text-base break-words flex-1">{allergy}</span>
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleRemoveAllergy(index)}
                                 disabled={loading}
-                                className="text-red-600 hover:text-red-700"
+                                className="text-red-600 hover:text-red-700 flex-shrink-0 min-h-[44px] min-w-[44px] sm:min-w-0"
                               >
-                                Remove
+                                <span className="hidden sm:inline">Remove</span>
+                                <X className="w-4 h-4 sm:hidden" />
                               </Button>
                             </div>
                           ))}
@@ -985,32 +1020,41 @@ const PatientSettings: React.FC = () => {
 
                     {/* Medical Conditions */}
                     <div>
-                      <h4 className="text-lg font-medium text-gray-900 mb-4">Medical Conditions</h4>
-                      <div className="flex gap-2 mb-4">
-                        <Input
-                          placeholder={t('patientSettings.medical.conditionPlaceholder')}
-                          value={newCondition}
-                          onChange={(e) => setNewCondition(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCondition())}
-                        />
-                        <Button type="button" onClick={handleAddCondition} variant="outline" disabled={loading || !newCondition.trim()}>
+                      <h4 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Medical Conditions</h4>
+                      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                        <div className="flex-1">
+                          <Input
+                            placeholder={t('patientSettings.medical.conditionPlaceholder')}
+                            value={newCondition}
+                            onChange={(e) => setNewCondition(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCondition())}
+                          />
+                        </div>
+                        <Button 
+                          type="button" 
+                          onClick={handleAddCondition} 
+                          variant="outline" 
+                          disabled={loading || !newCondition.trim()}
+                          className="w-full sm:w-auto min-h-[44px]"
+                        >
                           Add
                         </Button>
                       </div>
                       {formData.medicalHistory.conditions.length > 0 && (
                         <div className="space-y-2">
                           {formData.medicalHistory.conditions.map((condition, index) => (
-                            <div key={index} className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
-                              <span className="text-blue-800">{condition}</span>
+                            <div key={index} className="flex items-center justify-between bg-blue-50 p-3 sm:p-4 rounded-lg gap-2">
+                              <span className="text-blue-800 text-sm sm:text-base break-words flex-1">{condition}</span>
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleRemoveCondition(index)}
                                 disabled={loading}
-                                className="text-blue-600 hover:text-blue-700"
+                                className="text-blue-600 hover:text-blue-700 flex-shrink-0 min-h-[44px] min-w-[44px] sm:min-w-0"
                               >
-                                Remove
+                                <span className="hidden sm:inline">Remove</span>
+                                <X className="w-4 h-4 sm:hidden" />
                               </Button>
                             </div>
                           ))}
@@ -1020,14 +1064,14 @@ const PatientSettings: React.FC = () => {
 
                     {/* Medical Notes */}
                     <div>
-                      <label className="block text-lg font-medium text-gray-900 mb-2">
+                      <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
                         Additional Medical Notes
                       </label>
                       <textarea
                         rows={4}
                         value={formData.medicalHistory.notes}
                         onChange={(e) => handleInputChange('medicalHistory.notes', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                         placeholder={t('patientSettings.medical.notesPlaceholder')}
                       />
                     </div>
@@ -1037,29 +1081,30 @@ const PatientSettings: React.FC = () => {
 
               {/* Security Section */}
               {activeSection === 'security' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Shield className="w-5 h-5 text-red-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Security Settings</h3>
-                      <p className="text-gray-600">Manage your account security</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Security Settings</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Manage your account security</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h4 className="font-medium text-gray-900">Change Password</h4>
-                          <p className="text-sm text-gray-600">Update your account password</p>
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base">Change Password</h4>
+                          <p className="text-xs sm:text-sm text-gray-600">Update your account password</p>
                         </div>
                         <Button
                           type="button"
                           variant="outline"
                           onClick={() => setShowPasswordFields(!showPasswordFields)}
                           disabled={loading}
+                          className="w-full sm:w-auto min-h-[44px]"
                         >
                           {showPasswordFields ? 'Cancel' : 'Change Password'}
                         </Button>
@@ -1088,13 +1133,13 @@ const PatientSettings: React.FC = () => {
                             onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                             required
                           />
-                          <div className="flex gap-3">
+                          <div className="flex flex-col sm:flex-row gap-3">
                             <Button
                               type="button"
                               onClick={handlePasswordChange}
                               disabled={loading}
                               isLoading={loading}
-                              className="bg-red-600 hover:bg-red-700"
+                              className="bg-red-600 hover:bg-red-700 w-full sm:w-auto min-h-[44px]"
                             >
                               {loading ? 'Updating...' : 'Update Password'}
                             </Button>
@@ -1106,6 +1151,7 @@ const PatientSettings: React.FC = () => {
                                 setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
                               }}
                               disabled={loading}
+                              className="w-full sm:w-auto min-h-[44px]"
                             >
                               Cancel
                             </Button>
@@ -1114,13 +1160,13 @@ const PatientSettings: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900">Two-Factor Authentication</h4>
-                          <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
+                    <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base">Two-Factor Authentication</h4>
+                          <p className="text-xs sm:text-sm text-gray-600">Add an extra layer of security to your account</p>
                         </div>
-                        <Badge className="bg-red-100 text-red-800">
+                        <Badge className="bg-red-100 text-red-800 self-start sm:self-center">
                           Disabled
                         </Badge>
                       </div>
@@ -1131,62 +1177,62 @@ const PatientSettings: React.FC = () => {
 
               {/* Preferences Section */}
               {activeSection === 'preferences' && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Settings className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">Preferences</h3>
-                      <p className="text-gray-600">Customize your experience</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Preferences</h3>
+                      <p className="text-sm sm:text-base text-gray-600">Customize your experience</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="font-medium text-gray-900 mb-4">Notifications</h4>
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                      <h4 className="font-medium text-gray-900 mb-4 text-sm sm:text-base">Notifications</h4>
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">Email Notifications</p>
-                            <p className="text-sm text-gray-600">Receive updates via email</p>
+                        <div className="flex items-start sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900 text-sm sm:text-base">Email Notifications</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Receive updates via email</p>
                           </div>
                           <input
                             type="checkbox"
                             checked={preferences.emailNotifications}
                             onChange={(e) => setPreferences(prev => ({ ...prev, emailNotifications: e.target.checked }))}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="h-5 w-5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0 mt-1 sm:mt-0"
                           />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">SMS Notifications</p>
-                            <p className="text-sm text-gray-600">Receive updates via SMS</p>
+                        <div className="flex items-start sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900 text-sm sm:text-base">SMS Notifications</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Receive updates via SMS</p>
                           </div>
                           <input
                             type="checkbox"
                             checked={preferences.smsNotifications}
                             onChange={(e) => setPreferences(prev => ({ ...prev, smsNotifications: e.target.checked }))}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="h-5 w-5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0 mt-1 sm:mt-0"
                           />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">Appointment Reminders</p>
-                            <p className="text-sm text-gray-600">Get reminded about upcoming appointments</p>
+                        <div className="flex items-start sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900 text-sm sm:text-base">Appointment Reminders</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Get reminded about upcoming appointments</p>
                           </div>
                           <input
                             type="checkbox"
                             checked={preferences.appointmentReminders}
                             onChange={(e) => setPreferences(prev => ({ ...prev, appointmentReminders: e.target.checked }))}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="h-5 w-5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0 mt-1 sm:mt-0"
                           />
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="font-medium text-gray-900 mb-4">Language & Region</h4>
+                    <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                      <h4 className="font-medium text-gray-900 mb-4 text-sm sm:text-base">Language & Region</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Select
                           label="Language"
@@ -1213,31 +1259,30 @@ const PatientSettings: React.FC = () => {
               )}
 
               {/* Submit Button */}
-              <div className="flex justify-end pt-8 border-t border-gray-200">
-                <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => window.location.reload()}
-                    disabled={loading}
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    isLoading={loading}
-                    className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
-                  >
-                    {loading ? 'Saving...' : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Changes
-                      </>
-                    )}
-                  </Button>
-                </div>
+              <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                  disabled={loading}
+                  className="w-full sm:w-auto min-h-[44px] order-2 sm:order-1"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  isLoading={loading}
+                  className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto sm:min-w-[120px] min-h-[44px] order-1 sm:order-2"
+                >
+                  {loading ? 'Saving...' : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </form>
           </Card>

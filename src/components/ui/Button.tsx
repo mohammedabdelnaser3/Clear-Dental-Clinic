@@ -23,8 +23,16 @@ const Button: React.FC<ButtonProps> = ({
   rightIcon,
   className = '',
   disabled,
+  onClick,
   ...rest
 }) => {
+  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if ((e.key === 'Enter' || e.key === ' ') && onClick && !disabled && !isLoading) {
+      e.preventDefault();
+      onClick(e as unknown as React.MouseEvent<HTMLButtonElement>);
+    }
+  };
   const getVariantClasses = (): string => {
     const disabledStyles = disabled || isLoading ? '' : '';
     switch (variant) {
@@ -56,13 +64,13 @@ const Button: React.FC<ButtonProps> = ({
   const getSizeClasses = (): string => {
     switch (size) {
       case 'sm':
-        return 'py-1 px-3 text-xs';
+        return 'py-2 px-3 text-xs sm:py-1 sm:px-3'; // Min 44px touch target on mobile
       case 'md':
-        return 'py-2 px-4 text-sm';
+        return 'py-2.5 px-4 text-sm sm:py-2 sm:px-4'; // Min 44px touch target on mobile
       case 'lg':
-        return 'py-3 px-6 text-base';
+        return 'py-3 px-6 text-base'; // Already meets 44px minimum
       default:
-        return 'py-2 px-4 text-sm';
+        return 'py-2.5 px-4 text-sm sm:py-2 sm:px-4';
     }
   };
 
@@ -78,6 +86,10 @@ const Button: React.FC<ButtonProps> = ({
     <button
       className={`${baseClasses} ${getBorderClasses()} ${getVariantClasses()} ${getSizeClasses()} ${widthClass} ${disabledClass} ${className}`}
       disabled={disabled || isLoading}
+      tabIndex={disabled ? -1 : 0}
+      role="button"
+      aria-disabled={disabled || isLoading}
+      onKeyDown={handleKeyDown}
       {...rest}
     >
       {isLoading && (

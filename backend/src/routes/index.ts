@@ -12,6 +12,7 @@ import billingRoutes from './billing';
 import adminRoutes from './adminRoutes';
 import staffScheduleRoutes from './staffScheduleRoutes';
 import scheduleRoutes from './schedules';
+import inventoryRoutes from './inventoryRoutes';
 
 const router = Router();
 
@@ -32,6 +33,7 @@ router.use(`${API_VERSION}/billing`, billingRoutes);
 router.use(`${API_VERSION}/admin`, adminRoutes);
 router.use(`${API_VERSION}/staff-schedules`, staffScheduleRoutes);
 router.use(`${API_VERSION}/schedules`, scheduleRoutes);
+router.use(`${API_VERSION}/inventory`, inventoryRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -60,6 +62,7 @@ router.get(`${API_VERSION}`, (req, res) => {
       medications: `${API_VERSION}/medications`,
       prescriptions: `${API_VERSION}/prescriptions`,
       billing: `${API_VERSION}/billing`,
+      inventory: `${API_VERSION}/inventory`,
       admin: `${API_VERSION}/admin`,
       staffSchedules: `${API_VERSION}/staff-schedules`,
       schedules: `${API_VERSION}/schedules`

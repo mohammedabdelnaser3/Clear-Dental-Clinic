@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -11,7 +11,6 @@ import { connectDB } from "./config/database";
 import routes from "./routes";
 import { errorHandler, notFound, AppError } from "./middleware/errorHandler";
 import { testEmailConfiguration } from "./utils/email";
-import { Server } from 'socket.io';
 
 // Create Express app
 const app = express();
@@ -88,7 +87,7 @@ const generalLimiter = rateLimit({
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
-	handler: (req: any, res: any) => {
+	handler: (req: Request, res: Response) => {
 		console.log('General rate limit hit for IP:', req.ip, 'Path:', req.path);
 		res.status(429).json({
 			success: false,
@@ -108,7 +107,7 @@ const authLimiter = rateLimit({
 		message: "Too many authentication attempts, please try again later.",
 	},
 	skipSuccessfulRequests: true,
-	handler: (req: any, res: any) => {
+	handler: (req: Request, res: Response) => {
 		console.log('Auth rate limit hit for IP:', req.ip, 'Path:', req.path);
 		res.status(429).json({
 			success: false,
@@ -206,33 +205,5 @@ if (process.env.NODE_ENV === "development") {
 		console.warn("⚠️  Email configuration test failed:", err.message);
 	});
 }
-
-const server = app.listen(process.env.PORT || 5000, () => {
-	console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
-});
-
-const io = new Server(server, {
-  cors: {
-    origin: ['http://localhost:5173'],
-    methods: ['GET', 'POST'],
-    credentials: true
-  },
-  path: '/socket.io',
-  transports: ['websocket', 'polling'],
-  pingTimeout: 10000,
-  pingInterval: 5000
-});
-
-io.on('connection', (socket) => {
-  console.info('🔌 Client connected:', socket.id);
-  
-  socket.on('disconnect', (reason) => {
-    console.info('🔌 Client disconnected:', socket.id, reason);
-  });
-
-  socket.on('error', (error) => {
-    console.error('🔌 Socket error:', error);
-  });
-});
 
 export default app;

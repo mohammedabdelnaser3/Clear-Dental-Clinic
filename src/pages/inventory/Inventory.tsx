@@ -1,16 +1,18 @@
 import React from 'react';
 import InventoryDashboard from '../../components/inventory/InventoryDashboard';
-import { useAuth } from '../../hooks/useAuth';
+import { ClinicSelector } from '../../components/clinic';
+import { useClinic } from '../../context';
 
 const Inventory: React.FC = () => {
-  const { user } = useAuth();
-  
-  // Get clinic ID if user is assigned to a specific clinic
-  const clinicId = user?.assignedClinics && user.assignedClinics.length > 0 
-    ? user.assignedClinics[0] 
-    : undefined;
+  const { selectedClinic } = useClinic();
+  const clinicId = selectedClinic?.id; // undefined/null => All Clinics aggregated
 
-  return <InventoryDashboard clinicId={clinicId} />;
+  return (
+    <div className="space-y-4">
+      <ClinicSelector />
+      <InventoryDashboard clinicId={clinicId} />
+    </div>
+  );
 };
 
 export default Inventory;

@@ -61,6 +61,14 @@ const MultiClinicDashboard: React.FC = () => {
     enabled: isAdmin && viewMode === 'performance'
   });
 
+  const performanceRows: ClinicPerformanceMetrics[] = useMemo(() => {
+    const d: any = performanceData;
+    if (Array.isArray(performanceData)) return performanceData;
+    if (d?.clinics && Array.isArray(d.clinics)) return d.clinics;
+    if (d?.metrics && Array.isArray(d.metrics)) return d.metrics;
+    return [];
+  }, [performanceData]);
+
   // Fetch available clinics for filtering
   const { data: availableClinics } = useQuery({
     queryKey: ['clinics'],
@@ -96,6 +104,13 @@ const MultiClinicDashboard: React.FC = () => {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  }, []);
+
+  const formatAddress = useCallback((address: unknown) => {
+    if (!address) return '';
+    if (typeof address === 'string') return address;
+    const addrObj = address as { street?: string; city?: string; state?: string; zipCode?: string };
+    return [addrObj.street, addrObj.city, addrObj.state, addrObj.zipCode].filter(Boolean).join(', ');
   }, []);
 
   const getStatusColor = useCallback((status: string) => {
@@ -358,7 +373,9 @@ const MultiClinicDashboard: React.FC = () => {
                         <h3 className="text-lg font-semibold text-gray-900">
                           {clinicData.clinic.name}
                         </h3>
-                        <p className="text-sm text-gray-600">{clinicData.clinic.address}</p>
+                        <p className="text-sm text-gray-600">
+                          {formatAddress(clinicData.clinic.address)}
+                        </p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -469,7 +486,7 @@ const MultiClinicDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {performanceData?.map((clinic) => (
+                      {performanceRows.map((clinic) => (
                         <tr key={clinic.clinicId} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">

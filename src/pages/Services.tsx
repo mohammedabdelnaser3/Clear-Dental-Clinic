@@ -1,329 +1,373 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card } from '../components/ui';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Button, Badge } from '../components/ui';
+import ServicesSection from '../components/homepage/ServicesSection';
+import { servicesService } from '../services/servicesService';
+import type { Service, ServiceCategory } from '../types/services';
+import {
+  Search,
+  Grid,
+  List,
+  TrendingUp,
+  Sparkles,
+  Calendar,
+  Phone,
+  MessageCircle
+} from 'lucide-react';
 
 const Services: React.FC = () => {
-  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // State for filters and view
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [selectedLocation, setSelectedLocation] = useState(searchParams.get('location') || '');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<'name' | 'rating' | 'price' | 'popular'>('popular');
+  
+  // Get data from service
+  const [_services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [stats, setStats] = useState(servicesService.getServiceStats());
+  const [loading, setLoading] = useState(true);
+
+  // Load data on component mount
+  useEffect(() => {
+    setLoading(true);
+    try {
+      const allServices = servicesService.getAllServices();
+      const allCategories = servicesService.getAllCategories();
+      
+      setServices(allServices);
+      setCategories(allCategories);
+      setStats(servicesService.getServiceStats());
+    } catch (error) {
+      console.error('Error loading services:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Update URL params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedCategory !== 'all') params.set('category', selectedCategory);
+    if (searchTerm) params.set('search', searchTerm);
+    if (selectedLocation) params.set('location', selectedLocation);
+    
+    setSearchParams(params);
+  }, [selectedCategory, searchTerm, selectedLocation, setSearchParams]);
+
+  // Filter and sort services
+  const filteredAndSortedServices = React.useMemo(() => {
+    const filtered = servicesService.filterServices({
+      category: selectedCategory,
+      searchTerm,
+      location: selectedLocation
+    });
+
+    // Sort services
+    switch (sortBy) {
+      case 'name':
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'price':
+        // Simple price sorting (would need more sophisticated logic for real pricing)
+        filtered.sort((a, b) => {
+          const priceA = parseInt(a.price.replace(/[^0-9]/g, '')) || 0;
+          const priceB = parseInt(b.price.replace(/[^0-9]/g, '')) || 0;
+          return priceA - priceB;
+        });
+        break;
+      case 'popular':
+      default:
+        filtered.sort((a, b) => {
+          if (a.isPopular && !b.isPopular) return -1;
+          if (!a.isPopular && b.isPopular) return 1;
+          return b.rating - a.rating;
+        });
+        break;
+    }
+
+    return filtered;
+  }, [selectedCategory, searchTerm, selectedLocation, sortBy]);
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+  };
+
+  const handleLocationChange = (location: string) => {
+    setSelectedLocation(location);
+  };
+
+  const clearAllFilters = () => {
+    setSelectedCategory('all');
+    setSearchTerm('');
+    setSelectedLocation('');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="py-12 md:py-16 mb-12">
-        <div className="container mx-auto px-4 max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('services.hero.title')}</h1>
-        <p className="text-lg text-gray-600 mb-8">
-          {t('services.hero.description')}
-        </p>
-        </div>
-      </section>
-
-      {/* Main Services Section */}
-      <section className="py-12 mb-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-            <div className="flex flex-col">
-              <div className="bg-blue-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold mb-4">{t('services.mainServices.appointment.title')}</h2>
-              <p className="text-gray-600 mb-4">
-                {t('services.mainServices.appointment.description')}
-              </p>
-              <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>{t('services.mainServices.appointment.features.0')}</li>
-                <li>{t('services.mainServices.appointment.features.1')}</li>
-                <li>{t('services.mainServices.appointment.features.2')}</li>
-                <li>{t('services.mainServices.appointment.features.3')}</li>
-                <li>{t('services.mainServices.appointment.features.4')}</li>
-              </ul>
-              <div className="mt-auto">
-                <Link to="/register">
-                  <Button variant="outline">{t('services.learnMore')}</Button>
-                </Link>
-              </div>
-            </div>
+      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Our Dental Services
+            </h1>
+            <p className="text-xl mb-8 opacity-90">
+              Comprehensive dental care with modern technology and expert professionals
+            </p>
             
-            <div className="flex flex-col">
-              <div className="bg-green-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">{stats.totalServices}</div>
+                <div className="text-blue-200">Services</div>
               </div>
-              <h2 className="text-2xl font-bold mb-4">{t('services.mainServices.patient.title')}</h2>
-              <p className="text-gray-600 mb-4">
-                {t('services.mainServices.patient.description')}
-              </p>
-              <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>{t('services.mainServices.patient.features.0')}</li>
-                <li>{t('services.mainServices.patient.features.1')}</li>
-                <li>{t('services.mainServices.patient.features.2')}</li>
-                <li>{t('services.mainServices.patient.features.3')}</li>
-                <li>{t('services.mainServices.patient.features.4')}</li>
-              </ul>
-              <div className="mt-auto">
-                <Link to="/register">
-                  <Button variant="outline">{t('services.learnMore')}</Button>
-                </Link>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">{stats.averageRating}</div>
+                <div className="text-blue-200">Avg Rating</div>
               </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="flex flex-col">
-              <div className="bg-purple-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">{stats.totalReviews}</div>
+                <div className="text-blue-200">Reviews</div>
               </div>
-              <h2 className="text-2xl font-bold mb-4">{t('services.mainServices.reporting.title')}</h2>
-              <p className="text-gray-600 mb-4">
-                {t('services.mainServices.reporting.description')}
-              </p>
-              <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>{t('services.mainServices.reporting.features.0')}</li>
-                <li>{t('services.mainServices.reporting.features.1')}</li>
-                <li>{t('services.mainServices.reporting.features.2')}</li>
-                <li>{t('services.mainServices.reporting.features.3')}</li>
-                <li>{t('services.mainServices.reporting.features.4')}</li>
-              </ul>
-              <div className="mt-auto">
-                <Link to="/register">
-                  <Button variant="outline">{t('services.learnMore')}</Button>
-                </Link>
-              </div>
-            </div>
-            
-            <div className="flex flex-col">
-              <div className="bg-red-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold mb-4">{t('services.mainServices.billing.title')}</h2>
-              <p className="text-gray-600 mb-4">
-                {t('services.mainServices.billing.description')}
-              </p>
-              <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>{t('services.mainServices.billing.features.0')}</li>
-                <li>{t('services.mainServices.billing.features.1')}</li>
-                <li>{t('services.mainServices.billing.features.2')}</li>
-                <li>{t('services.mainServices.billing.features.3')}</li>
-                <li>{t('services.mainServices.billing.features.4')}</li>
-              </ul>
-              <div className="mt-auto">
-                <Link to="/register">
-                  <Button variant="outline">{t('services.learnMore')}</Button>
-                </Link>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">2</div>
+                <div className="text-blue-200">Locations</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Additional Services */}
-      <section className="py-12 bg-gray-50 rounded-xl mb-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('services.additionalServices.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('services.additionalServices.telemedicine.title')}</h3>
-                <p className="text-gray-600 mb-4">
-                  {t('services.additionalServices.telemedicine.description')}
-                </p>
-                <Link to="/register">
-                  <Button variant="link" className="text-blue-600 hover:text-blue-800 p-0">
-                    {t('services.learnMoreLink')}
-                  </Button>
-                </Link>
+      {/* Filters and Controls */}
+      <section className="bg-white border-b sticky top-0 z-40 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Search and Filters */}
+            <div className="flex flex-col md:flex-row gap-4 flex-1">
+              {/* Search */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search services..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
-            </Card>
-            
-            <Card>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('additionalServices.multiClinic.title')}</h3>
-                <p className="text-gray-600 mb-4">
-                  {t('additionalServices.multiClinic.description')}
-                </p>
-                <Link to="/register">
-                  <Button variant="link" className="text-blue-600 hover:text-blue-800 p-0">
-                    {t('services.learnMoreLink')}
-                  </Button>
-                </Link>
+
+              {/* Category Filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Location Filter */}
+              <select
+                value={selectedLocation}
+                onChange={(e) => handleLocationChange(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All Locations</option>
+                <option value="Fayoum">Fayoum</option>
+                <option value="Attsa">Attsa</option>
+              </select>
+            </div>
+
+            {/* View Controls */}
+            <div className="flex items-center gap-4">
+              {/* Sort */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="name">Name A-Z</option>
+                <option value="rating">Highest Rated</option>
+                <option value="price">Price Low-High</option>
+              </select>
+
+              {/* View Mode Toggle */}
+              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  <Grid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
               </div>
-            </Card>
-            
-            <Card>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('services.additionalServices.customIntegrations.title')}</h3>
-                <p className="text-gray-600 mb-4">
-                  {t('services.additionalServices.customIntegrations.description')}
-                </p>
-                <Link to="/register">
-                  <Button variant="link" className="text-blue-600 hover:text-blue-800 p-0">
-                    {t('services.learnMoreLink')}
-                  </Button>
-                </Link>
-              </div>
-            </Card>
+            </div>
           </div>
+
+          {/* Active Filters */}
+          {(selectedCategory !== 'all' || searchTerm || selectedLocation) && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {selectedCategory !== 'all' && (
+                <Badge className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2">
+                  {categories.find(cat => cat.id === selectedCategory)?.name}
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className="hover:bg-blue-200 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {searchTerm && (
+                <Badge className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full flex items-center gap-2">
+                  Search: "{searchTerm}"
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="hover:bg-gray-200 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {selectedLocation && (
+                <Badge className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2">
+                  Location: {selectedLocation}
+                  <button
+                    onClick={() => setSelectedLocation('')}
+                    className="hover:bg-green-200 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearAllFilters}
+                className="text-xs"
+              >
+                Clear All
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-12 mb-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-6">{t('services.pricing.title')}</h2>
-          <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-            {t('services.pricing.description')}
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="border-2 border-gray-200">
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">{t('services.pricing.plans.basic.title')}</h3>
-                <p className="text-gray-600 mb-6">{t('services.pricing.plans.basic.description')}</p>
-                <p className="text-4xl font-bold mb-6">{t('services.pricing.plans.basic.price')}<span className="text-xl text-gray-600 font-normal">{t('services.pricing.plans.basic.period')}</span></p>
-                <ul className="mb-8 space-y-3">
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>{t('services.pricing.plans.basic.features.0')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>{t('services.pricing.plans.basic.features.1')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Patient records</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Basic reporting</span>
-                  </li>
-                </ul>
-                <Link to="/register">
-                  <Button variant="outline" isFullWidth>Get Started</Button>
-                </Link>
-              </div>
-            </Card>
-            
-            <Card className="border-2 border-blue-500 shadow-lg transform md:-translate-y-4">
-              <div className="bg-blue-500 text-white text-center py-2 text-sm font-semibold">
-                MOST POPULAR
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">Professional</h3>
-                <p className="text-gray-600 mb-6">For growing practices</p>
-                <p className="text-4xl font-bold mb-6">$199<span className="text-xl text-gray-600 font-normal">/month</span></p>
-                <ul className="mb-8 space-y-3">
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Up to 5 providers</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>All Basic features</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Advanced reporting</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Telemedicine</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Priority support</span>
-                  </li>
-                </ul>
-                <Link to="/register">
-                  <Button variant="primary" isFullWidth>Get Started</Button>
-                </Link>
-              </div>
-            </Card>
-            
-            <Card className="border-2 border-gray-200">
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
-                <p className="text-gray-600 mb-6">For large organizations</p>
-                <p className="text-4xl font-bold mb-6">Custom<span className="text-xl text-gray-600 font-normal"></span></p>
-                <ul className="mb-8 space-y-3">
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Unlimited providers</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>All Professional features</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Multi-clinic management</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Custom integrations</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Dedicated account manager</span>
-                  </li>
-                </ul>
-                <Link to="/contact">
-                  <Button variant="outline" isFullWidth>Contact Sales</Button>
-                </Link>
-              </div>
-            </Card>
+      {/* Services Content */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          {/* Results Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {filteredAndSortedServices.length} Services Found
+              </h2>
+              <p className="text-gray-600 mt-1">
+                {selectedCategory !== 'all' && `in ${categories.find(cat => cat.id === selectedCategory)?.name}`}
+                {selectedLocation && ` at ${selectedLocation}`}
+              </p>
+            </div>
+
+            {/* Popular and New Services Quick Links */}
+            <div className="hidden md:flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSortBy('popular');
+                }}
+                className="flex items-center gap-2"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Popular
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSearchTerm('');
+                  // Filter to show only new services
+                }}
+                className="flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                New
+              </Button>
+            </div>
           </div>
+
+          {/* Services Grid/List */}
+          {filteredAndSortedServices.length > 0 ? (
+            <ServicesSection 
+              showFilters={false}
+              showBookingIntegration={true}
+            />
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No services found</h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your search terms or filters to find what you're looking for.
+              </p>
+              <Button onClick={clearAllFilters}>
+                Clear All Filters
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl text-white">
+      {/* Call to Action */}
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Practice?</h2>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Join thousands of healthcare providers who are streamlining their operations with our platform.
+          <h2 className="text-3xl font-bold mb-6">Ready to Book Your Appointment?</h2>
+          <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
+            Our experienced team is ready to provide you with the highest quality dental care.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link to="/register">
-              <Button variant="secondary" size="lg">Start Free Trial</Button>
-            </Link>
-            <Link to="/contact">
-              <Button variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600" size="lg">Schedule Demo</Button>
-            </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4">
+              <Calendar className="w-5 h-5 mr-2" />
+              Book Appointment
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4">
+              <Phone className="w-5 h-5 mr-2" />
+              Call Now: +201017848825
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4">
+              <MessageCircle className="w-5 h-5 mr-2" />
+              WhatsApp
+            </Button>
           </div>
         </div>
       </section>

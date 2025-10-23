@@ -217,26 +217,26 @@ const Patients: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Enhanced Header */}
+      {/* Enhanced Header - Responsive */}
       <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl border-b border-blue-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-            {/* Left Section */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
-                  <Users className="w-8 h-8 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
+            {/* Left Section - Responsive */}
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="relative flex-shrink-0">
+                <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
               </div>
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-white">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">
                   {isPatient ? t('patients.my_profile') : t('patients.patients')}
                 </h1>
-                <p className="text-blue-100/80 text-sm lg:text-base">
+                <p className="text-blue-100/80 text-xs sm:text-sm lg:text-base truncate">
                   {isPatient ? t('patients.view_and_manage_personal_information') : t('patients.manage_patient_records')}
                 </p>
-                <div className="flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
+                <div className="hidden sm:flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
                   <span className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span>System Online</span>
@@ -249,17 +249,17 @@ const Patients: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Section */}
-            <div className="flex items-center space-x-3">
+            {/* Right Section - Responsive */}
+            <div className="flex items-center space-x-2 sm:space-x-3 overflow-x-auto">
               <Button 
                 variant="outline"
                 size="sm"
                 onClick={() => fetchPatients(true)}
                 disabled={refreshing}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 flex-shrink-0"
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? 'Refreshing...' : t('common.refresh')}
+                <RefreshCw className={`w-4 h-4 sm:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{refreshing ? 'Refreshing...' : t('common.refresh')}</span>
               </Button>
               
               {isStaffOrAdmin && (
@@ -268,13 +268,13 @@ const Patients: React.FC = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 flex-shrink-0"
                   >
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filters
+                    <Filter className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Filters</span>
                   </Button>
                   
-                  <div className="flex items-center bg-white/10 rounded-lg p-1">
+                  <div className="hidden md:flex items-center bg-white/10 rounded-lg p-1 flex-shrink-0">
                     <Button
                       variant={viewMode === 'table' ? 'primary' : 'outline'}
                       size="sm"
@@ -293,14 +293,14 @@ const Patients: React.FC = () => {
                     </Button>
                   </div>
                   
-                  <Link to="/patients/new">
+                  <Link to="/patients/new" className="flex-shrink-0">
                     <Button 
                       variant="primary" 
                       size="sm"
                       className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
-                      {t('patients.add_patient')}
+                      <Plus className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">{t('patients.add_patient')}</span>
                     </Button>
                   </Link>
                 </>
@@ -310,10 +310,10 @@ const Patients: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Statistics Cards - Only for staff/admin */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Statistics Cards - Only for staff/admin - Responsive */}
         {isStaffOrAdmin && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <AnalyticsWidget
               title="Total Patients"
               type="metric"
@@ -392,21 +392,106 @@ const Patients: React.FC = () => {
             </div>
           )}
 
-          <div className="p-6">
-            <Table
-              columns={columns}
-              data={paginatedPatients}
-              keyExtractor={(patient) => patient.id}
-              isLoading={loading}
-              emptyMessage={isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
-              onRowClick={handleRowClick}
-              isSelectable={isStaffOrAdmin}
-              selectedIds={selectedPatients}
-              onSelectionChange={handleSelectionChange}
-            />
+          <div className="p-4 sm:p-6">
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-4">
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              ) : paginatedPatients.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  {isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
+                </div>
+              ) : (
+                paginatedPatients.map((patient) => (
+                  <div
+                    key={patient.id}
+                    onClick={() => handleRowClick(patient)}
+                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          {patient.firstName} {patient.lastName}
+                        </h3>
+                        <p className="text-sm text-gray-500 truncate">{patient.email}</p>
+                      </div>
+                      <Badge 
+                        variant={patient.isActive ? 'success' : 'gray'}
+                        className="ml-2 flex-shrink-0"
+                      >
+                        {patient.isActive ? t('patients.active') : t('patients.inactive')}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <span className="truncate">{patient.phone}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z" />
+                        </svg>
+                        <span>{t('patients.age')}: {calculateAge(patient.dateOfBirth.toString())}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="truncate">{t('patients.last_visit')}: {patient.updatedAt ? formatDate(patient.updatedAt.toString()) : t('common.not_applicable')}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-2 pt-3 border-t border-gray-100">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/patients/${patient.id}`);
+                        }}
+                        className="flex-1 min-h-[44px]"
+                      >
+                        {t('patients.view')}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/patients/${patient.id}/edit`);
+                        }}
+                        className="flex-1 min-h-[44px]"
+                      >
+                        {t('patients.edit')}
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+              <Table
+                columns={columns}
+                data={paginatedPatients}
+                keyExtractor={(patient) => patient.id}
+                isLoading={loading}
+                emptyMessage={isPatient ? t('patients.noProfileFound') : t('patients.noPatientsFound')}
+                onRowClick={handleRowClick}
+                isSelectable={isStaffOrAdmin}
+                selectedIds={selectedPatients}
+                onSelectionChange={handleSelectionChange}
+              />
+            </div>
 
             {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
+              <div className="mt-4 sm:mt-6 flex justify-center">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}

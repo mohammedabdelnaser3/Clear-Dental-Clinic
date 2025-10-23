@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, Badge } from '../components/ui';
+import HeroSection from '../components/homepage/HeroSection';
+import ServicesSection from '../components/homepage/ServicesSection';
 import {
   Phone,
   MapPin,
@@ -20,11 +22,14 @@ import {
   ArrowRight,
   Heart,
   Zap,
-  PlayCircle
+
 } from 'lucide-react';
 
 import { getUsersByRole } from '../services/userService';
 import type { User as UserType } from '../types';
+import { useNavigate } from 'react-router-dom'
+import { useSectionImpression } from '../hooks/useSectionImpression'
+import { trackEvent } from '../utils/analytics'
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -102,7 +107,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const services = [
+  const _services = [
     {
       icon: <Zap className="w-8 h-8" />,
       title: 'Laser Dental Treatment',
@@ -197,6 +202,16 @@ const Home: React.FC = () => {
   ];
 
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+  const navigate = useNavigate()
+  const statsRef = useSectionImpression('home.stats')
+  const newPatientRef = useSectionImpression('home.new_patient')
+  const clinicsRef = useSectionImpression('home.clinics')
+  const testimonialsRef = useSectionImpression('home.testimonials')
+  const teamRef = useSectionImpression('home.team')
+  const whyUsRef = useSectionImpression('home.why_us')
+  const newsletterRef = useSectionImpression('home.newsletter')
+  const footerRef = useSectionImpression('home.footer')
+  const [newsletterEmail, setNewsletterEmail] = useState('')
 
   const handleNextTestimonial = () => {
     setCurrentTestimonialIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
@@ -210,108 +225,11 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-20 md:py-32 overflow-hidden" role="banner">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
-
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-400 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-indigo-400 rounded-full opacity-20 animate-pulse delay-1000"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="lg:w-1/2 text-center lg:text-left">
-              <div className="inline-flex items-center bg-blue-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                <Heart className="w-4 h-4 text-red-400 mr-2" />
-                <span className="text-blue-100 text-sm font-medium">Serving Fayoum & Attsa communities since 2015</span>
-              </div>
-
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                Advanced Dental Care
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200">
-                  With Laser Technology
-                </span>
-              </h1>
-
-              <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed max-w-2xl">
-                Experience exceptional dental care at Clear Dental Centers with state-of-the-art laser technology, expert specialists, and personalized treatment plans.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  Book Appointment
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-                <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-blue-700 px-8 py-4 text-lg font-semibold backdrop-blur-sm">
-                  <PlayCircle className="w-5 h-5 mr-2" />
-                  Watch Our Story
-                </Button>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-6 text-sm text-blue-100">
-                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                  <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                  HIPAA Compliant
-                </div>
-                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                  <Shield className="w-4 h-4 text-blue-300 mr-2" />
-                  ADA Certified
-                </div>
-                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                  <Award className="w-4 h-4 text-yellow-400 mr-2" />
-                  15+ Years Experience
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:w-1/2 flex justify-center">
-              <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-3xl blur-2xl opacity-30 animate-pulse"></div>
-                <img
-                  src="/images/image1.jpg"
-                  alt="Modern dental office with happy patient"
-                  className="relative rounded-3xl shadow-2xl max-w-full h-auto transform hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjMwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOUNBM0FGIiBmb250LXNpemU9IjI0Ij5EZW50YWwgT2ZmaWNlPC90ZXh0Pgo8L3N2Zz4K';
-                  }}
-                />
-
-                {/* Floating Stats Cards */}
-                <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl backdrop-blur-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
-                      ))}
-                    </div>
-                    <div>
-                      <div className="text-lg font-bold text-gray-900">4.9/5</div>
-                      <div className="text-xs text-gray-600">2,500+ Reviews</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute -top-6 -right-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4 rounded-2xl shadow-xl">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">24/7</div>
-                    <div className="text-xs opacity-90">Emergency Care</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Hero Section */}
+      <HeroSection />
 
       {/* Quick Stats Section */}
-      <section className="py-16 bg-white" role="region" aria-label="Practice statistics">
+      <section className="py-16 bg-white" role="region" aria-label="Practice statistics" ref={statsRef}>
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
@@ -335,7 +253,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* New Patient CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-indigo-50" role="region" aria-label="New patient information">
+      <section className="py-16 bg-gradient-to-r from-blue-50 to-indigo-50" role="region" aria-label="New patient information" ref={newPatientRef}>
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -359,7 +277,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6">
                   Quick 2-minute signup to access our patient portal and manage your care.
                 </p>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full" onClick={() => { trackEvent('cta_card_click', { card: 'sign_up' }); navigate('/register') }}>
                   Sign Up Free
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -373,7 +291,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6">
                   Choose your preferred time slot with our easy online booking system.
                 </p>
-                <Button className="bg-green-600 hover:bg-green-700 text-white w-full">
+                <Button className="bg-green-600 hover:bg-green-700 text-white w-full" onClick={() => { trackEvent('cta_card_click', { card: 'schedule_now' }); navigate('/appointments/create') }}>
                   Schedule Now
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -387,7 +305,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6">
                   Receive personalized care from our experienced dental professionals.
                 </p>
-                <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white w-full">
+                <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white w-full" onClick={() => { trackEvent('cta_card_click', { card: 'learn_more' }); navigate('/services') }}>
                   Learn More
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -419,7 +337,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Clinic Locations */}
-      <section className="py-20 bg-white" role="region" aria-label="Clinic locations">
+      <section className="py-20 bg-white" role="region" aria-label="Clinic locations" ref={clinicsRef}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-green-100 text-green-800 px-4 py-2 rounded-full mb-4">
@@ -601,7 +519,7 @@ const Home: React.FC = () => {
             <p className="text-gray-600 mb-4">
               <strong>Both locations offer:</strong> Free parking • Wheelchair accessible • Modern equipment • Sterilized environment
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-4">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-4" onClick={() => { trackEvent('clinic_cta_click', { action: 'book_either_location' }); navigate('/appointments/create') }}>
               <Calendar className="w-5 h-5 mr-2" />
               Book at Either Location
             </Button>
@@ -609,71 +527,15 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Dental Services Section */}
-      <section className="py-20 bg-white" role="region" aria-label="Dental services">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full mb-4">
-              Our Services
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Comprehensive Dental Care
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From routine cleanings to advanced procedures, we offer complete dental solutions using the latest technology and techniques.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {services.map((service, index) => (
-              <Card key={index} className="group p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-gradient-to-br from-white to-gray-50">
-                <div className="relative mb-6 overflow-hidden rounded-2xl">
-                  <img
-                    src={`/images/service-${index + 1}.jpg`}
-                    alt={service.title}
-                    className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOUNBM0FGIiBmb250LXNpemU9IjE4Ij5TZXJ2aWNlICR7aW5kZXggKyAxfTwvdGV4dD4KPC9zdmc+`;
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-
-                <div className="flex items-center justify-center w-14 h-14 mb-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl text-white group-hover:scale-110 transition-transform duration-300">
-                  {service.icon}
-                </div>
-
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {service.description}
-                </p>
-                <Button variant="outline" className="group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300">
-                  Learn More
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 mb-6">
-              View All Services
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <div className="flex justify-center">
-              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-6 py-3 rounded-full text-lg font-medium">
-                ✨ New Patient Special: 20% Off First Visit
-              </Badge>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Dental Services Section */}
+      <ServicesSection 
+        showFilters={false} 
+        maxServices={6} 
+        showBookingIntegration={true}
+      />
 
       {/* Patient Testimonials Section */}
-      <section className="py-16 bg-white" role="region" aria-label="Patient testimonials">
+      <section className="py-16 bg-white" role="region" aria-label="Patient testimonials" ref={testimonialsRef}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -719,21 +581,21 @@ const Home: React.FC = () => {
               {testimonials.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentTestimonialIndex(index)}
+                  onClick={() => { trackEvent('testimonial_dot_click', { index }); setCurrentTestimonialIndex(index) }}
                   className={`w-3 h-3 rounded-full ${currentTestimonialIndex === index ? 'bg-blue-600' : 'bg-gray-300'} transition-colors`}
                   aria-label={`View testimonial ${index + 1}`}
                 />
               ))}
             </div>
             <button
-              onClick={handlePrevTestimonial}
+              onClick={() => { trackEvent('testimonial_nav', { direction: 'prev' }); handlePrevTestimonial() }}
               className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
               aria-label="Previous testimonial"
             >
               ←
             </button>
             <button
-              onClick={handleNextTestimonial}
+              onClick={() => { trackEvent('testimonial_nav', { direction: 'next' }); handleNextTestimonial() }}
               className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
               aria-label="Next testimonial"
             >
@@ -744,7 +606,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Meet Our Team Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50" role="region" aria-label="Meet our team">
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50" role="region" aria-label="Meet our team" ref={teamRef}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full mb-4">
@@ -827,7 +689,7 @@ const Home: React.FC = () => {
             <p className="text-gray-600 mb-6">
               Both doctors are available at both locations. Schedule your appointment at your preferred clinic.
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4" onClick={() => { trackEvent('team_cta_click'); navigate('/about') }}>
               <Users className="w-5 h-5 mr-2" />
               Meet Our Full Team
             </Button>
@@ -836,7 +698,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 md:py-24 bg-white" role="region" aria-label="Why choose us">
+      <section className="py-16 md:py-24 bg-white" role="region" aria-label="Why choose us" ref={whyUsRef}>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Badge className="bg-purple-100 text-purple-800 px-4 py-2 rounded-full mb-4">
@@ -935,7 +797,7 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4" onClick={() => { trackEvent('why_us_cta_click'); navigate('/services') }}>
               <Calendar className="w-5 h-5 mr-2" />
               Experience the Difference
             </Button>
@@ -944,7 +806,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Newsletter & Contact Section */}
-      <section className="py-16 bg-blue-600 text-white" role="region" aria-label="Newsletter signup">
+      <section className="py-16 bg-blue-600 text-white" role="region" aria-label="Newsletter signup" ref={newsletterRef}>
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">

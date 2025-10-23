@@ -199,6 +199,24 @@ class WebSocketService {
   public sendSystemAnnouncement(announcement: any) {
     this.broadcastToAll('system-announcement', announcement);
   }
+
+  // Homepage content announcements
+  public broadcastSystemAnnouncement(message: string) {
+    this.broadcastToAll('system-announcement', {
+      title: 'System Update',
+      message,
+      type: 'system',
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  public broadcastHomepageUpdated(sectionKey: string, blocks: any[]) {
+    this.broadcastToAll('homepage-updated', {
+      sectionKey,
+      blocks,
+      timestamp: new Date().toISOString()
+    });
+  }
 }
 
 export default WebSocketService;

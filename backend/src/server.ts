@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import app from './app';
+import { initWebSocket } from './utils/websocketInstance';
 
 // Load environment variables
 dotenv.config(); // Trigger restart
@@ -12,6 +13,9 @@ const mongoose = require('mongoose');
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
+
+// Initialize WebSocketService
+initWebSocket(server);
 
 // Handle server errors
 server.on('error', (error: NodeJS.ErrnoException) => {

@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-10-10T00:38:41.886Z",
+  "tests": [
+    {
+      "name": "ARIA Labels and Roles",
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "name": "Keyboard Navigation",
+      "status": "fail",
+      "issues": [
+        "src/pages/dentist/DentistProfile.tsx: Missing keyboard event handlers"
+      ]
+    },
+    {
+      "name": "Touch Targets",
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "name": "Form Labels",
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "name": "Skip Links",
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "name": "Semantic HTML",
+      "status": "pass",
+      "issues": []
+    }
+  ]
+}

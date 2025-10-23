@@ -138,7 +138,7 @@ export const ReportsDashboard: React.FC = () => {
       window.URL.revokeObjectURL(url);
       
       toast.success(t('reports.exportSuccess'));
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error(t('reports.errors.exportFailed'));
     }
   };

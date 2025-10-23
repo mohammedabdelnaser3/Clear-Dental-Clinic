@@ -43,18 +43,22 @@ interface MedicationListProps {
   selectionMode?: boolean;
   showFilters?: boolean;
   viewMode?: 'grid' | 'list';
+  initialSearchTerm?: string;
+  recentMedications?: Medication[];
 }
 
 export const MedicationList: React.FC<MedicationListProps> = ({
   onSelectMedication,
-  selectionMode = false
+  selectionMode = false,
+  initialSearchTerm = '',
+  recentMedications = []
 }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -136,36 +140,25 @@ export const MedicationList: React.FC<MedicationListProps> = ({
   };
 
   const handleDeleteMedication = async (medicationId: string) => {
-    if (!window.confirm(t('medicationList.deleteConfirmation'))) {
+    if (!window.confirm(t('medicationList.confirmDelete'))) {
       return;
     }
 
     try {
       await medicationService.deleteMedication(medicationId);
       toast.success(t('medicationList.deleteSuccess'));
-      fetchMedications();
-    } catch (_error) {
+      fetchMedications(true);
+    } catch (error) {
       toast.error(t('medicationList.deleteError'));
-      console.error('Error deleting medication:', _error);
+      console.error('Error deleting medication:', error);
     }
   };
 
   const handleMedicationSaved = () => {
     setIsModalOpen(false);
     setEditingMedication(null);
-    fetchMedications();
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      antibiotic: 'bg-blue-100 text-blue-800',
-      painkiller: 'bg-red-100 text-red-800',
-      'anti-inflammatory': 'bg-orange-100 text-orange-800',
-      anesthetic: 'bg-purple-100 text-purple-800',
-      antiseptic: 'bg-green-100 text-green-800',
-      other: 'bg-gray-100 text-gray-800'
-    };
-    return colors[category as keyof typeof colors] || colors.other;
+    fetchMedications(true);
+    toast.success(t('medicationList.saveSuccess'));
   };
 
   const getCategoryGradient = (category: string) => {
@@ -178,6 +171,18 @@ export const MedicationList: React.FC<MedicationListProps> = ({
       other: 'from-gray-500 to-gray-600'
     };
     return gradients[category as keyof typeof gradients] || gradients.other;
+  };
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      antibiotic: 'bg-blue-100 text-blue-800',
+      painkiller: 'bg-red-100 text-red-800',
+      'anti-inflammatory': 'bg-orange-100 text-orange-800',
+      anesthetic: 'bg-purple-100 text-purple-800',
+      antiseptic: 'bg-green-100 text-green-800',
+      other: 'bg-gray-100 text-gray-800'
+    };
+    return colors[category as keyof typeof colors] || colors.other;
   };
 
   const canManageMedications = user?.role === 'dentist' || user?.role === 'admin' || user?.role === 'super_admin';
@@ -193,8 +198,29 @@ export const MedicationList: React.FC<MedicationListProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Recent Medications Section - Only show in selection mode */}
+      {selectionMode && recentMedications && recentMedications.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-md font-medium text-gray-700 mb-3">
+            {t('medicationList.recentlyPrescribed')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {recentMedications.slice(0, 6).map((medication) => (
+              <div 
+                key={medication.id}
+                className="p-3 border border-blue-200 rounded-md bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors"
+                onClick={() => onSelectMedication && onSelectMedication(medication)}
+              >
+                <div className="font-medium text-blue-700">{medication.name}</div>
+                <div className="text-sm text-blue-600">{medication.dosage} • {medication.frequency}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       {/* Enhanced Header */}
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow-sm">
         <div className="flex items-center space-x-4">
           <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
             <Pill className="w-6 h-6 text-white" />
@@ -217,7 +243,7 @@ export const MedicationList: React.FC<MedicationListProps> = ({
                 size="sm"
                 onClick={() => fetchMedications(true)}
                 disabled={refreshing}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 transition-all duration-200 hover:bg-blue-50 hover:border-blue-300"
               >
                 <Search className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                 {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -247,7 +273,7 @@ export const MedicationList: React.FC<MedicationListProps> = ({
 
       {/* Filters */}
       {!isPatient && (
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -256,7 +282,8 @@ export const MedicationList: React.FC<MedicationListProps> = ({
                 placeholder={t('medicationList.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearch}
-                className="pl-10"
+                className="pl-10 border-gray-200 focus:border-green-500 focus:ring-green-500 transition-colors"
+                aria-label={t('medicationList.searchPlaceholder')}
               />
             </div>
           </div>
@@ -265,8 +292,22 @@ export const MedicationList: React.FC<MedicationListProps> = ({
               value={categoryFilter}
               onChange={(e) => handleCategoryFilter(e.target.value)}
               options={categories}
+              className="border-gray-200 focus:border-green-500 focus:ring-green-500 transition-colors"
+              aria-label={t('medicationList.filterByCategory')}
             />
           </div>
+          {searchTerm && (
+            <div className="flex items-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setSearchTerm('')}
+                className="text-gray-500 border-gray-200 hover:bg-gray-50"
+              >
+                Clear
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -305,7 +346,7 @@ export const MedicationList: React.FC<MedicationListProps> = ({
       )}
 
       {/* Medications Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {medications.length === 0 && !loading ? (
           <div className="col-span-full text-center py-12">
             <div className="text-gray-400 mb-4">
@@ -322,8 +363,19 @@ export const MedicationList: React.FC<MedicationListProps> = ({
           </div>
         ) : (
           medications.map((medication) => (
-          <Card key={medication.id} className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 group">
-            <div className="p-6 space-y-4">
+          <Card 
+            key={medication.id} 
+            className={`relative border-l-4 ${selectionMode ? 'hover:border-l-green-500 cursor-pointer' : ''} border-l-${getCategoryColor(medication.category).split(' ')[0].replace('bg-', '')} shadow-lg hover:shadow-xl transition-all duration-300 group`}
+            {...(selectionMode ? { onClick: () => onSelectMedication?.(medication) } : {})}
+          >
+            {selectionMode && (
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center group-hover:border-green-500 transition-colors">
+                  <div className="w-3 h-3 rounded-full bg-green-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+              </div>
+            )}
+            <div className="p-6 space-y-5">
               {/* Header */}
               <div className="flex justify-between items-start">
                 <div className="flex items-center space-x-3">
@@ -358,42 +410,53 @@ export const MedicationList: React.FC<MedicationListProps> = ({
               </div>
 
               {/* Dosage Info */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('medicationList.dosage')}:</span>
-                  <span className="font-medium">{medication.dosage}</span>
+              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium uppercase text-gray-500">{t('medicationList.dosage')}</span>
+                  <p className="font-medium text-gray-900">{medication.dosage}</p>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('medicationList.frequency')}:</span>
-                  <span className="font-medium">{medication.frequency}</span>
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium uppercase text-gray-500">{t('medicationList.frequency')}</span>
+                  <p className="font-medium text-gray-900">{medication.frequency}</p>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('medicationList.duration')}:</span>
-                  <span className="font-medium">{medication.duration}</span>
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium uppercase text-gray-500">{t('medicationList.duration')}</span>
+                  <p className="font-medium text-gray-900">{medication.duration}</p>
+                </div>
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium uppercase text-gray-500">{t('medicationList.status')}</span>
+                  <div className="flex items-center gap-2">
+                    <div className={`h-2.5 w-2.5 rounded-full ${
+                      medication.isActive ? 'bg-green-500' : 'bg-red-500'
+                    }`} />
+                    <span className="text-sm font-medium text-gray-700">
+                      {medication.isActive ? t('medicationList.active') : t('medicationList.inactive')}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Instructions */}
               {medication.instructions && (
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">{t('medicationList.instructions')}:</p>
-                  <p className="text-sm text-gray-800">{medication.instructions}</p>
+                <div className="bg-blue-50 p-4 rounded-lg border-l-2 border-blue-300">
+                  <p className="text-xs font-medium uppercase text-blue-700 mb-2">{t('medicationList.instructions')}</p>
+                  <p className="text-sm text-blue-900">{medication.instructions}</p>
                 </div>
               )}
 
               {/* Side Effects */}
               {medication.sideEffects && Array.isArray(medication.sideEffects) && medication.sideEffects.length > 0 && (
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">{t('medicationList.sideEffects')}:</p>
-                  <div className="flex flex-wrap gap-1">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs font-medium uppercase text-gray-500 mb-2">{t('medicationList.sideEffects')}</p>
+                  <div className="flex flex-wrap gap-2">
                     {medication.sideEffects.slice(0, 3).map((effect, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge key={index} variant="secondary" className="text-xs bg-red-50 text-red-700 border border-red-200 px-3 py-1">
                         {effect}
                       </Badge>
                     ))}
                     {medication.sideEffects.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        {t('medicationList.moreItems', { count: medication.sideEffects.length - 3 })}
+                      <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 px-3 py-1">
+                        +{medication.sideEffects.length - 3}
                       </Badge>
                     )}
                   </div>
@@ -404,9 +467,14 @@ export const MedicationList: React.FC<MedicationListProps> = ({
               <div className="flex justify-between items-center pt-4 border-t">
                 {selectionMode ? (
                   <Button
-                    onClick={() => onSelectMedication?.(medication)}
-                    className="w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectMedication?.(medication);
+                    }}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex items-center justify-center gap-2"
+                    aria-label={t('medicationList.selectMedication', { name: medication.name })}
                   >
+                    <CheckCircle className="w-4 h-4" />
                     {t('medicationList.select')}
                   </Button>
                 ) : (
@@ -425,6 +493,8 @@ export const MedicationList: React.FC<MedicationListProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditMedication(medication)}
+                          className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                          aria-label={t('medicationList.editMedication', { name: medication.name })}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -432,7 +502,8 @@ export const MedicationList: React.FC<MedicationListProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => handleDeleteMedication(medication.id)}
-                          className="text-red-600 hover:text-red-700"
+                          className="border-red-200 text-red-600 hover:bg-red-50"
+                          aria-label={t('medicationList.deleteMedication', { name: medication.name })}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

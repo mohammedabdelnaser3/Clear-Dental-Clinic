@@ -13,7 +13,9 @@ export default [
       '*.config.ts',
       'backend/dist/**',
       'backend/*.js',
-      '*.js'
+      '*.js',
+      '*.cjs',
+      'backend/*.cjs'
     ],
   },
   ...tseslint.configs.recommended,

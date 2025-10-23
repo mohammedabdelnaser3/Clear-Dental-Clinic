@@ -226,42 +226,42 @@ const UnifiedAppointmentDashboard: React.FC = () => {
   const renderAppointmentCard = (appointment: Appointment) => (
     <div
       key={appointment._id}
-      className={`bg-white rounded-lg shadow-sm border-l-4 p-4 mb-3 hover:shadow-md transition-shadow ${
+      className={`bg-white rounded-lg shadow-sm border-l-4 p-3 sm:p-4 mb-3 hover:shadow-md transition-shadow ${
         appointment.emergency ? 'border-red-500' : 'border-blue-500'
       }`}
     >
-      <div className="flex justify-between items-start">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+        <div className="flex-1 min-w-0">
           {/* Patient Info */}
-          <div className="flex items-center mb-2">
-            <User className="w-5 h-5 text-gray-400 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
               {appointment.patientId.firstName} {appointment.patientId.lastName}
             </h3>
             {appointment.emergency && (
-              <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 whitespace-nowrap">
                 EMERGENCY
               </span>
             )}
           </div>
 
           {/* Appointment Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-            <div className="flex items-center text-sm text-gray-600">
-              <Clock className="w-4 h-4 mr-2" />
-              <span>{format(parseISO(appointment.date), 'MMM dd, yyyy')} at {appointment.timeSlot} ({appointment.duration} min)</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{format(parseISO(appointment.date), 'MMM dd, yyyy')} at {appointment.timeSlot} ({appointment.duration} min)</span>
             </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <MapPin className="w-4 h-4 mr-2" />
-              <span>{appointment.clinicId.name}</span>
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{appointment.clinicId.name}</span>
             </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Phone className="w-4 h-4 mr-2" />
-              <span>{appointment.patientId.phone}</span>
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{appointment.patientId.phone}</span>
             </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Mail className="w-4 h-4 mr-2" />
-              <span>{appointment.patientId.email}</span>
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{appointment.patientId.email}</span>
             </div>
           </div>
 
@@ -295,36 +295,36 @@ const UnifiedAppointmentDashboard: React.FC = () => {
 
         {/* Action Buttons */}
         {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
-          <div className="flex flex-col gap-2 ml-4">
+          <div className="flex sm:flex-col gap-2 sm:ml-4 w-full sm:w-auto">
             <button
               onClick={() => {
                 setSelectedAppointment(appointment);
                 setShowQuickEdit(true);
               }}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors min-h-[44px] sm:min-h-0"
               title="Quick Edit"
             >
-              <Edit2 className="w-5 h-5" />
+              <Edit2 className="w-5 h-5 mx-auto" />
             </button>
             <button
               onClick={() => {
                 setSelectedAppointment(appointment);
                 setShowReschedule(true);
               }}
-              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors min-h-[44px] sm:min-h-0"
               title="Reschedule"
             >
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="w-5 h-5 mx-auto" />
             </button>
             <button
               onClick={() => {
                 setSelectedAppointment(appointment);
                 setShowCancelConfirm(true);
               }}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[44px] sm:min-h-0"
               title="Cancel"
             >
-              <Trash2 className="w-5 h-5" />
+              <Trash2 className="w-5 h-5 mx-auto" />
             </button>
           </div>
         )}
@@ -341,82 +341,82 @@ const UnifiedAppointmentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             {isAdmin ? 'All Appointments' : 'My Appointments'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             {isAdmin ? 'Manage all appointments across all clinics' : 'View and manage your appointments across all assigned clinics'}
           </p>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <p className="text-sm text-gray-600 mb-1">Total Appointments</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalAppointments || 0}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">Total Appointments</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.totalAppointments || 0}</p>
             </div>
             {!isAdmin && (
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <p className="text-sm text-gray-600 mb-1">Clinics</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.clinicsCount || 0}</p>
+              <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">Clinics</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.clinicsCount || 0}</p>
               </div>
             )}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <p className="text-sm text-gray-600 mb-1">Today</p>
-              <p className="text-2xl font-bold text-green-600">{stats.todayCount || stats.todayAppointments || 0}</p>
+            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">Today</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.todayCount || stats.todayAppointments || 0}</p>
             </div>
             {isAdmin && stats.byStatus && (
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <p className="text-sm text-gray-600 mb-1">Confirmed</p>
-                <p className="text-2xl font-bold text-green-600">{stats.byStatus.confirmed || 0}</p>
+              <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">Confirmed</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.byStatus.confirmed || 0}</p>
               </div>
             )}
           </div>
         )}
 
         {/* Toolbar */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             {/* View Mode Toggles */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
                   viewMode === 'list'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <List className="w-5 h-5 inline mr-2" />
-                List
+                <List className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+                <span className="text-sm sm:text-base">List</span>
               </button>
               <button
                 onClick={() => setViewMode('calendar')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
                   viewMode === 'calendar'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <Calendar className="w-5 h-5 inline mr-2" />
-                Calendar
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+                <span className="text-sm sm:text-base">Calendar</span>
               </button>
               {!isAdmin && (
                 <button
                   onClick={() => setViewMode('grouped')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
                     viewMode === 'grouped'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  <MapPin className="w-5 h-5 inline mr-2" />
-                  By Clinic
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+                  <span className="text-sm sm:text-base">By Clinic</span>
                 </button>
               )}
             </div>
@@ -424,10 +424,10 @@ const UnifiedAppointmentDashboard: React.FC = () => {
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              className="px-3 sm:px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 w-full sm:w-auto"
             >
-              <Filter className="w-5 h-5 inline mr-2" />
-              Filters
+              <Filter className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+              <span className="text-sm sm:text-base">Filters</span>
               {(filters.clinicId || filters.patientName || filters.status) && (
                 <span className="ml-2 px-2 py-0.5 text-xs bg-blue-600 text-white rounded-full">
                   Active

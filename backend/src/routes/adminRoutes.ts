@@ -20,6 +20,13 @@ import {
   createMongoIdValidation,
   validatePagination
 } from '../middleware/validation';
+import {
+  getHomepageContentBlocks,
+  createHomepageContentBlock,
+  updateHomepageContentBlock,
+  deleteHomepageContentBlock,
+  publishHomepageContentBlock
+} from '../controllers/homepageContentController';
 
 const router = Router();
 
@@ -122,4 +129,16 @@ router.get('/clinics/performance', [
     .withMessage('Invalid metrics parameter')
 ], handleValidationErrors, getClinicPerformanceMetrics);
 
+// Homepage content management routes
+router.get('/homepage/blocks', handleValidationErrors, getHomepageContentBlocks);
+router.post('/homepage/blocks', handleValidationErrors, createHomepageContentBlock);
+router.put('/homepage/blocks/:id', [
+  ...createMongoIdValidation('id')
+], handleValidationErrors, updateHomepageContentBlock);
+router.delete('/homepage/blocks/:id', [
+  ...createMongoIdValidation('id')
+], handleValidationErrors, deleteHomepageContentBlock);
+router.post('/homepage/blocks/:id/publish', [
+  ...createMongoIdValidation('id')
+], handleValidationErrors, publishHomepageContentBlock);
 export default router;

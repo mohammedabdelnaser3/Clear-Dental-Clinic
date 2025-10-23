@@ -18,9 +18,8 @@ export default defineConfig({
     host: true,
     // Improve hot module replacement
     hmr: {
-      port: 5173,
-      overlay: true,
-      clientPort: 5173
+      // Allow WebSocket to work with any port
+      overlay: true
     },
     // Increase timeout for slow connections
     watch: {

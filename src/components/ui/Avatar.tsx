@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ResponsiveImage from './ResponsiveImage';
 
 interface AvatarProps {
   src?: string;
@@ -7,6 +8,18 @@ interface AvatarProps {
   fallback?: string;
   className?: string;
   onClick?: () => void;
+  // Responsive image sources for different sizes
+  sources?: {
+    small?: string;
+    medium?: string;
+    large?: string;
+    webp?: {
+      small?: string;
+      medium?: string;
+      large?: string;
+    };
+  };
+  loading?: 'lazy' | 'eager';
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -15,8 +28,11 @@ const Avatar: React.FC<AvatarProps> = ({
   size = 'md',
   fallback,
   className = '',
-  onClick
+  onClick,
+  sources,
+  loading = 'lazy'
 }) => {
+  const [imageError, setImageError] = useState(false);
   const sizeClasses = {
     sm: 'w-8 h-8 text-sm',
     md: 'w-12 h-12 text-base',
@@ -48,17 +64,21 @@ const Avatar: React.FC<AvatarProps> = ({
       .slice(0, 2);
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div className={baseClasses} onClick={handleClick}>
-      {src ? (
-        <img
+      {src && !imageError ? (
+        <ResponsiveImage
           src={src}
           alt={alt}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Hide image on error and show fallback
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
+          sources={sources}
+          loading={loading}
+          onError={handleImageError}
+          className="w-full h-full object-cover rounded-full"
+          sizes="(max-width: 768px) 64px, (max-width: 1024px) 96px, 128px"
         />
       ) : (
         <span className="select-none">

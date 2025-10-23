@@ -86,7 +86,7 @@ export const safeConsole = {
   log: (...args: any[]) => {
     try {
       originalConsole.log(...args);
-    } catch (error) {
+    } catch (_error) {
       // Fallback if console.log fails
     }
   },
@@ -94,7 +94,7 @@ export const safeConsole = {
   warn: (...args: any[]) => {
     try {
       originalConsole.warn(...args);
-    } catch (error) {
+    } catch (_error) {
       // Fallback if console.warn fails
     }
   },
@@ -102,7 +102,7 @@ export const safeConsole = {
   error: (...args: any[]) => {
     try {
       originalConsole.error(...args);
-    } catch (error) {
+    } catch (_error) {
       // Fallback if console.error fails
     }
   },
@@ -111,7 +111,7 @@ export const safeConsole = {
     if (import.meta.env.DEV) {
       try {
         originalConsole.log('🐛', ...args);
-      } catch (error) {
+      } catch (_error) {
         // Fallback if console.log fails
       }
     }
@@ -121,7 +121,7 @@ export const safeConsole = {
     if (import.meta.env.DEV) {
       try {
         originalConsole.log(`🔍 API ${method.toUpperCase()}:`, url, data ? { data } : '');
-      } catch (error) {
+      } catch (_error) {
         // Fallback if console.log fails
       }
     }
@@ -146,7 +146,7 @@ export const reportError = (error: Error, context?: string) => {
     
     // For now, just log silently
     safeConsole.error('Production error:', error.message);
-  } catch (reportingError) {
+  } catch (_reportingError) {
     // Silently fail if error reporting fails
   }
 };

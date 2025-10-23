@@ -170,7 +170,7 @@ export const apiService = {
         success: true,
         data: response.data,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         message: 'Failed to fetch data',
@@ -238,7 +238,7 @@ export const apiService = {
         success: true,
         data: response.data,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         message: 'Failed to update resource',
@@ -264,7 +264,7 @@ export const apiService = {
         success: true,
         data: response.data,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         message: 'Failed to update resource',
@@ -290,7 +290,7 @@ export const apiService = {
         success: true,
         data: response.data,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         message: 'Failed to delete resource',
@@ -329,7 +329,7 @@ export const apiService = {
         success: true,
         data: response.data,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         message: 'Failed to upload file',

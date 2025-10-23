@@ -22,6 +22,9 @@ export { default as Patients } from './patient/Patients';
 export { default as PatientDetail } from './patient/PatientDetail';
 export { default as PatientForm } from './patient/PatientForm';
 
+// Dentist Pages
+export { default as DentistProfile } from './dentist/DentistProfile';
+
 // Appointment Pages
 export { default as Appointments } from './appointment/Appointments';
 export { default as AppointmentDetail } from './appointment/AppointmentDetail';

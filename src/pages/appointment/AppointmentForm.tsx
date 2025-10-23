@@ -873,7 +873,7 @@ const AppointmentForm: React.FC = () => {
 
   const validateCurrentStep = async (): Promise<boolean> => {
     // Create a copy of formData to ensure we have the latest data
-    let currentFormData = { ...formData };
+    const currentFormData = { ...formData };
     
     // For patient users, patient ID should already be set by fetchInitialData
     // If not set, there was an error during initialization

@@ -6,7 +6,7 @@ import Clinic from '../models/Clinic';
 
 config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 
+const MONGODB_URI = process.env.MONGODB_URI ||
   'mongodb+srv://mohamedabdelnasser0123:pyyd9JSaA2wTUYzT@cluster0.ohipm4r.mongodb.net/smartclinic?retryWrites=true&w=majority&appName=Cluster0';
 
 /**
@@ -29,7 +29,7 @@ const seedMultiBranchData = async () => {
     // If you want fresh data, uncomment the lines below:
     // await Clinic.deleteMany({});
     // await User.deleteMany({ role: 'dentist' });
-    
+
     console.log('✅ Cleared existing schedules');
 
     // =====================================================

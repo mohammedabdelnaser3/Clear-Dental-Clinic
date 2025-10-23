@@ -206,7 +206,7 @@ export const PrescriptionDetails: React.FC<PrescriptionDetailsProps> = ({
           </h4>
           <div className="space-y-4">
             {prescription.medications.map((med, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={med.medication._id || `med-${index}`} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h5 className="font-medium text-gray-900">{med.medication.name}</h5>
@@ -253,8 +253,8 @@ export const PrescriptionDetails: React.FC<PrescriptionDetailsProps> = ({
           
           {prescription.refills.length > 0 ? (
             <div className="space-y-3">
-              {prescription.refills.map((refill, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-3">
+              {prescription.refills.map((refill, _index) => (
+                <div key={`refill-${refill.refillNumber}-${refill.date}`} className="border border-gray-200 rounded-lg p-3">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-gray-900">

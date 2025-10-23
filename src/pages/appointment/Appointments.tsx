@@ -7,6 +7,7 @@ import { patientService } from '../../services/patientService';
 import { useAuth } from '../../hooks/useAuth';
 import type { Appointment, AppointmentStatus } from '../../types';
 import { toast } from 'react-hot-toast';
+import i18n from '../../i18n';
 
 interface AppointmentWithNames extends Appointment {
   patientName?: string;
@@ -15,7 +16,7 @@ interface AppointmentWithNames extends Appointment {
 }
 
 const Appointments: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -369,7 +370,7 @@ const Appointments: React.FC = () => {
         const isCompleteLoading = actionLoading[`complete-${appointment.id}`];
         
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <Button 
               variant="outline" 
               size="sm"
@@ -378,7 +379,7 @@ const Appointments: React.FC = () => {
                 navigate(`/appointments/${appointment.id}`);
               }}
               aria-label={t('appointments.viewDetails', { patient: appointment.patientName })}
-              className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-300 text-indigo-700 hover:from-indigo-500/20 hover:to-purple-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+              className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-300 text-indigo-700 hover:from-indigo-500/20 hover:to-purple-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105 min-h-[44px] touch-manipulation"
             >
               <span className="font-medium">{t('appointments.view')}</span>
             </Button>
@@ -393,7 +394,7 @@ const Appointments: React.FC = () => {
                   }}
                   disabled={isCompleteLoading || isCancelLoading}
                   aria-label={t('appointments.completeAppointment', { patient: appointment.patientName })}
-                  className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border-emerald-400 text-emerald-700 hover:from-emerald-500/20 hover:to-green-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+                  className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border-emerald-400 text-emerald-700 hover:from-emerald-500/20 hover:to-green-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105 disabled:transform-none min-h-[44px] touch-manipulation"
                 >
                   {isCompleteLoading ? (
                     <div className="flex items-center space-x-2">
@@ -407,7 +408,7 @@ const Appointments: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-400 text-red-700 hover:from-red-500/20 hover:to-pink-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+                  className="bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-400 text-red-700 hover:from-red-500/20 hover:to-pink-500/20 font-medium shadow-sm transition-all duration-200 transform hover:scale-105 disabled:transform-none min-h-[44px] touch-manipulation"
                   onClick={(e) => {
                     e.stopPropagation();
                     showCancelConfirmation([appointment.id]);
@@ -432,23 +433,121 @@ const Appointments: React.FC = () => {
     },
   ];
 
+  // Mobile card view component
+  const MobileAppointmentCard = ({ appointment }: { appointment: AppointmentWithNames }) => {
+    const isCancelLoading = actionLoading[`cancel-${appointment.id}`];
+    const isCompleteLoading = actionLoading[`complete-${appointment.id}`];
+    
+    return (
+      <div 
+        className="bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-4 hover:shadow-lg transition-shadow cursor-pointer"
+        onClick={() => handleRowClick(appointment)}
+      >
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 text-lg">{appointment.patientName || t('appointments.unknownPatient')}</h3>
+            <p className="text-sm text-gray-500">{appointment.serviceType}</p>
+          </div>
+          {getStatusBadge(appointment.status)}
+        </div>
+        
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center text-sm text-gray-600">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+            <span>{formatDate(appointment.date)}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+            <span>{formatTime(appointment.timeSlot)} ({appointment.duration} min)</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+            <span>{appointment.dentistName || t('appointments.unknownDentist')}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-6a1 1 0 00-1-1H9a1 1 0 00-1 1v6a1 1 0 01-1 1H4a1 1 0 110-2V4z" clipRule="evenodd" />
+            </svg>
+            <span>{appointment.clinicName}</span>
+          </div>
+        </div>
+        
+        <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/appointments/${appointment.id}`);
+            }}
+            className="w-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-300 text-indigo-700 hover:from-indigo-500/20 hover:to-purple-500/20 font-medium shadow-sm min-h-[44px] touch-manipulation"
+          >
+            {t('appointments.view')}
+          </Button>
+          {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showCompleteConfirmation([appointment.id]);
+                }}
+                disabled={isCompleteLoading || isCancelLoading}
+                className="flex-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border-emerald-400 text-emerald-700 hover:from-emerald-500/20 hover:to-green-500/20 font-medium shadow-sm min-h-[44px] touch-manipulation"
+              >
+                {isCompleteLoading ? (
+                  <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  t('appointments.complete')
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-1 bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-400 text-red-700 hover:from-red-500/20 hover:to-pink-500/20 font-medium shadow-sm min-h-[44px] touch-manipulation"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showCancelConfirmation([appointment.id]);
+                }}
+                disabled={isCompleteLoading || isCancelLoading}
+              >
+                {isCancelLoading ? (
+                  <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  t('appointments.cancel')
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header Section with Enhanced Gradient */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-8 px-6 rounded-b-3xl shadow-lg mb-8">
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-6 sm:py-8 px-4 sm:px-6 rounded-b-3xl shadow-lg mb-6 sm:mb-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
                 {t('appointments.title')}
               </h1>
-              <p className="text-blue-100 text-lg">
+              <p className="text-blue-100 text-base sm:text-lg">
                 {user?.role === 'dentist' 
                   ? t('appointments.descriptionDoctor') || 'Your scheduled appointments'
                   : t('appointments.description')
                 }
               </p>
-              <div className="flex items-center space-x-4 text-sm">
+              <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                 <div className="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
@@ -473,11 +572,11 @@ const Appointments: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="mt-6 md:mt-0">
+            <div className="mt-4 md:mt-0">
             <Link to="/appointments/create">
               <Button 
                 variant="primary"
-                className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-bold"
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-bold min-h-[44px] touch-manipulation"
                 size="lg"
               >
                 <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -491,7 +590,7 @@ const Appointments: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
       <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
         {/* Enhanced Search and Filter Section */}
@@ -594,17 +693,41 @@ const Appointments: React.FC = () => {
           )}
         </div>
 
-        <Table
-          columns={columns}
-          data={displayAppointments}
-          keyExtractor={(appointment) => appointment.id}
-          isLoading={isLoading}
-          emptyMessage={t('appointments.noAppointmentsFound')}
-          onRowClick={handleRowClick}
-          isSelectable
-          selectedIds={selectedAppointments}
-          onSelectionChange={(selectedIds) => setSelectedAppointments(selectedIds as string[])}
-        />
+        {/* Mobile Card View (< 768px) */}
+        <div className="block md:hidden">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : displayAppointments.length === 0 ? (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">{t('appointments.noAppointments')}</h3>
+              <p className="mt-1 text-sm text-gray-500">{t('appointments.noAppointmentsDesc')}</p>
+            </div>
+          ) : (
+            displayAppointments.map((appointment) => (
+              <MobileAppointmentCard key={appointment.id} appointment={appointment} />
+            ))
+          )}
+        </div>
+        
+        {/* Desktop Table View (>= 768px) */}
+        <div className="hidden md:block overflow-x-auto">
+          <Table
+            columns={columns}
+            data={displayAppointments}
+            keyExtractor={(appointment) => appointment.id}
+            isLoading={isLoading}
+            emptyMessage={t('appointments.noAppointmentsFound')}
+            onRowClick={handleRowClick}
+            isSelectable
+            selectedIds={selectedAppointments}
+            onSelectionChange={(selectedIds) => setSelectedAppointments(selectedIds as string[])}
+          />
+        </div>
 
         {totalPages > 1 && (
           <div className="mt-6 flex justify-center">

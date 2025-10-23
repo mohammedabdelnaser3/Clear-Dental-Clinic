@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import { setTimeout } from "timers/promises";
 
 export const connectDB = async (): Promise<void> => {
@@ -8,7 +8,7 @@ export const connectDB = async (): Promise<void> => {
 			process.env.MONGODB_URI ||
 			"mongodb+srv://mohamedabdelnasser0123:pyyd9JSaA2wTUYzT@cluster0.ohipm4r.mongodb.net/smartclinic?retryWrites=true&w=majority&appName=Cluster0";
 
-		const options = {} as any; // Using any to avoid type issues with mongoose connection options
+		const options: ConnectOptions = {};
 
 		// Add retry logic
 		let retryCount = 0;

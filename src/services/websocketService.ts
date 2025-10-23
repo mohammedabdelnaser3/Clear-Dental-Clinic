@@ -25,7 +25,7 @@ class WebSocketService {
         forceNew: true,
         path: '/socket.io',
         auth: {
-          token: '' // TODO: Replace with actual token retrieval logic if needed
+          token: (typeof window !== 'undefined' ? (localStorage.getItem('token') || '') : '')
         }
       });
 

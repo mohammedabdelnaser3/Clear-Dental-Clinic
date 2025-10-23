@@ -17,3 +17,4 @@ export { default as InventoryItem } from './InventoryItem';
 export { default as StockMovement } from './StockMovement';
 export { default as PatientFile } from './PatientFile';
 export { default as PatientReport } from './PatientReport';
+export { default as HomepageContentBlock } from './HomepageContentBlock';

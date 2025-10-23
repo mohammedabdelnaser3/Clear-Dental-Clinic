@@ -399,21 +399,21 @@ const ClinicDashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl border-b border-blue-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 lg:gap-0">
             {/* Left Section */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
-                  <Stethoscope className="w-8 h-8 text-white" />
+            <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+              <div className="relative flex-shrink-0">
+                <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                  <Stethoscope className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
               </div>
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-white">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">
                   {user?.role === 'dentist' ? 'Doctor Dashboard' : t('navigation.dashboard')}
                 </h1>
-                <p className="text-blue-100/80 text-sm lg:text-base">
+                <p className="text-blue-100/80 text-xs sm:text-sm lg:text-base truncate">
                   {user?.role === 'dentist'
                     ? `Welcome back, Dr. ${user?.firstName || 'Doctor'}${selectedClinic ? ` - ${selectedClinic.name}` : ''}`
                     : selectedClinic
@@ -423,7 +423,7 @@ const ClinicDashboard: React.FC = () => {
                         : t('dashboard.welcome_select_clinic', { name: user?.firstName || 'User' })
                   }
                 </p>
-                <div className="flex items-center space-x-4 mt-2 text-xs text-blue-200/70">
+                <div className="hidden sm:flex items-center space-x-2 sm:space-x-4 mt-2 text-xs text-blue-200/70">
                   <span className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span>System Online</span>
@@ -443,34 +443,34 @@ const ClinicDashboard: React.FC = () => {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <Button 
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
                 disabled={isLoading || refreshing}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 min-h-[44px] sm:min-h-0"
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading || refreshing ? 'animate-spin' : ''}`} />
-                {isLoading || refreshing ? 'Refreshing...' : t('dashboard.refresh')}
+                <RefreshCw className={`w-4 h-4 mr-2 flex-shrink-0 ${isLoading || refreshing ? 'animate-spin' : ''}`} />
+                <span className="truncate">{isLoading || refreshing ? 'Refreshing...' : t('dashboard.refresh')}</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => console.log('Export clicked')}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                className="hidden sm:flex bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
               >
                 <Download className="w-4 h-4 mr-2" />
                 {t('dashboard.export')}
               </Button>
-              <Link to="/appointments/create">
+              <Link to="/appointments/create" className="w-full sm:w-auto">
                 <Button 
                   variant="primary" 
                   size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 min-h-[44px] sm:min-h-0"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t('appointments.newAppointment')}
+                  <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{t('appointments.newAppointment')}</span>
                 </Button>
               </Link>
             </div>
@@ -478,7 +478,7 @@ const ClinicDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl shadow-sm">
@@ -706,19 +706,19 @@ const ClinicDashboard: React.FC = () => {
         )}
 
         {/* Quick Actions Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-blue-600" />
-              {user?.role === 'dentist' ? 'Doctor Quick Actions' : 'Quick Actions'}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+              <span className="truncate">{user?.role === 'dentist' ? 'Doctor Quick Actions' : 'Quick Actions'}</span>
             </h2>
             {user?.role === 'dentist' && (
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 Access your most used tools quickly
               </div>
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {quickActions.map((action, index) => (
               <QuickActionCard
                 key={index}
@@ -734,7 +734,7 @@ const ClinicDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Recent Activity */}
           <div className="lg:col-span-2">
             <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50">

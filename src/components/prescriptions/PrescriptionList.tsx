@@ -313,7 +313,7 @@ export const PrescriptionList: React.FC<PrescriptionListProps> = ({ patientId })
                 <p className="text-sm text-gray-600 mb-2">{t('prescriptionList.card.medications')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {prescription.medications.map((med, index) => (
-                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                    <div key={med.medication._id || `med-${index}`} className="bg-gray-50 p-3 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Pill className="h-4 w-4 text-blue-600" />
                         <span className="font-medium text-sm">{med.medication.name}</span>

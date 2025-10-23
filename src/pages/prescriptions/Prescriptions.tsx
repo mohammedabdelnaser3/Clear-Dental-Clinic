@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Card, Button, Input, Select, Badge } from '../../components/ui';
+import { Card, Button, Input, Select, Badge, Modal } from '../../components/ui';
 import { AnalyticsWidget } from '../../components/dashboard';
 import { useAuth } from '../../hooks/useAuth';
 import { prescriptionService } from '../../services/prescriptionService';
+import { PrescriptionForm } from '../../components/prescriptions/PrescriptionForm';
+import { useClinic } from '../../hooks/useClinic';
 import {
   FileText,
   Clock,
@@ -125,13 +127,13 @@ const Prescriptions: React.FC = () => {
       const prescriptionsArray = Array.isArray(prescriptionsData) ? prescriptionsData : [];
       const stats = {
         totalPrescriptions: prescriptionsArray.length || 0,
-        activePrescriptions: prescriptionsArray.filter((p: PatientPrescription) => 
+        activePrescriptions: prescriptionsArray.filter((p: PatientPrescription) =>
           p?.status === 'active' && p?.expiryDate && new Date(p.expiryDate) > new Date()
         ).length || 0,
-        expiredPrescriptions: prescriptionsArray.filter((p: PatientPrescription) => 
+        expiredPrescriptions: prescriptionsArray.filter((p: PatientPrescription) =>
           p?.status === 'expired' || (p?.expiryDate && new Date(p.expiryDate) <= new Date())
         ).length || 0,
-        pendingRefills: prescriptionsArray.filter((p: PatientPrescription) => 
+        pendingRefills: prescriptionsArray.filter((p: PatientPrescription) =>
           p?.status === 'active' && typeof p?.currentRefills === 'number' && typeof p?.maxRefills === 'number' && p.currentRefills < p.maxRefills
         ).length || 0
       };
@@ -156,7 +158,7 @@ const Prescriptions: React.FC = () => {
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(prescription =>
-        prescription.medications.some(med => 
+        prescription.medications.some(med =>
           med.medication.name.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
         prescription.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -168,7 +170,7 @@ const Prescriptions: React.FC = () => {
     // Apply status filter
     if (statusFilter !== 'all') {
       if (statusFilter === 'expired') {
-        filtered = filtered.filter(p => 
+        filtered = filtered.filter(p =>
           p.status === 'expired' || new Date(p.expiryDate) <= new Date()
         );
       } else {
@@ -192,7 +194,7 @@ const Prescriptions: React.FC = () => {
         });
         break;
       case 'dentist_name':
-        filtered.sort((a, b) => 
+        filtered.sort((a, b) =>
           `${a.dentist.firstName} ${a.dentist.lastName}`.localeCompare(
             `${b.dentist.firstName} ${b.dentist.lastName}`
           )
@@ -216,11 +218,11 @@ const Prescriptions: React.FC = () => {
 
   const getStatusBadge = useCallback((prescription: PatientPrescription) => {
     const isExpired = new Date(prescription.expiryDate) <= new Date();
-    
+
     if (isExpired || prescription.status === 'expired') {
       return <Badge variant="gray" size="sm">{t('prescriptions.status.expired')}</Badge>;
     }
-    
+
     switch (prescription.status) {
       case 'active':
         return <Badge variant="success" size="sm">{t('prescriptions.status.active')}</Badge>;
@@ -247,13 +249,13 @@ const Prescriptions: React.FC = () => {
     const activePrescriptions = Number(prescriptionStats.activePrescriptions) || 0;
     const expiredPrescriptions = Number(prescriptionStats.expiredPrescriptions) || 0;
     const pendingRefills = Number(prescriptionStats.pendingRefills) || 0;
-    
-    const activePercentage = totalPrescriptions > 0 
-      ? Math.round((activePrescriptions / totalPrescriptions) * 100) 
+
+    const activePercentage = totalPrescriptions > 0
+      ? Math.round((activePrescriptions / totalPrescriptions) * 100)
       : 0;
-    
-    const expiredPercentage = totalPrescriptions > 0 
-      ? Math.round((expiredPrescriptions / totalPrescriptions) * 100) 
+
+    const expiredPercentage = totalPrescriptions > 0
+      ? Math.round((expiredPrescriptions / totalPrescriptions) * 100)
       : 0;
 
     return {
@@ -344,7 +346,7 @@ const Prescriptions: React.FC = () => {
           </body>
         </html>
       `;
-      
+
       printWindow.document.write(printContent);
       printWindow.document.close();
       printWindow.print();
@@ -373,10 +375,10 @@ const Prescriptions: React.FC = () => {
     };
 
     const dataStr = JSON.stringify(prescriptionData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
     const exportFileDefaultName = `prescription_${prescription._id}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -395,7 +397,7 @@ const Prescriptions: React.FC = () => {
                 <div className="h-4 bg-gray-300 rounded w-96"></div>
               </div>
             </div>
-            
+
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg shadow-lg p-6">
@@ -411,7 +413,7 @@ const Prescriptions: React.FC = () => {
                 <div className="h-10 bg-gray-300 rounded w-32"></div>
                 <div className="h-10 bg-gray-300 rounded w-32"></div>
               </div>
-              
+
               <div className="space-y-4">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="border border-gray-200 rounded-lg p-4">
@@ -473,44 +475,48 @@ const Prescriptions: React.FC = () => {
 
             {/* Right Section */}
             <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? t('prescriptions.header.refreshing') : t('prescriptions.header.refresh')}
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {t('prescriptions.header.filters')}
-              </Button>
-              
-              <Link to="/appointments/create">
-                <Button 
-                  variant="primary" 
+              {[
+                <Button
+                  key="refresh"
+                  variant="outline"
                   size="sm"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  {refreshing ? t('prescriptions.header.refreshing') : t('prescriptions.header.refresh')}
+                </Button>,
+
+                <Button
+                  key="filters"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                >
+                  <Filter className="w-4 h-4 mr-2" />
+                  {t('prescriptions.header.filters')}
+                </Button>,
+
+                <Button
+                  key="create-prescription"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setShowPrescriptionModal(true)}
                   className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  {t('prescriptions.header.newAppointment')}
+                  {t('prescriptions.header.createPrescription', 'Create Prescription')}
                 </Button>
-              </Link>
+              ]}
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700">
             <div className="flex">
@@ -581,7 +587,7 @@ const Prescriptions: React.FC = () => {
                   <p className="text-sm text-gray-600">{t('prescriptions.searchAndFilter.subtitle')}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -594,7 +600,7 @@ const Prescriptions: React.FC = () => {
                 </Button>
               </div>
             </div>
-            
+
             <div className="mt-6 space-y-4">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
@@ -637,7 +643,7 @@ const Prescriptions: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               {/* Results Summary */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                 <div className="text-sm text-gray-600">
@@ -662,7 +668,7 @@ const Prescriptions: React.FC = () => {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {searchTerm || statusFilter !== 'all' 
+                  {searchTerm || statusFilter !== 'all'
                     ? t('prescriptions.emptyState.noMatchingPrescriptions')
                     : t('prescriptions.emptyState.noPrescriptions')
                   }
@@ -684,8 +690,8 @@ const Prescriptions: React.FC = () => {
             ) : (
               <div className="space-y-4">
                 {filteredPrescriptions.map((prescription) => (
-                  <div key={prescription._id} 
-                       className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-200 hover:border-blue-200">
+                  <div key={prescription._id}
+                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-200 hover:border-blue-200">
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4">
                       <div className="flex-1 mb-4 lg:mb-0">
                         <div className="flex items-start justify-between mb-3">
@@ -694,9 +700,9 @@ const Prescriptions: React.FC = () => {
                               {getMedicationSummary(prescription.medications)}
                             </h3>
                             <p className="text-sm text-gray-600">
-                              {t('prescriptions.card.prescribedBy', { 
-                                firstName: prescription.dentist.firstName, 
-                                lastName: prescription.dentist.lastName 
+                              {t('prescriptions.card.prescribedBy', {
+                                firstName: prescription.dentist.firstName,
+                                lastName: prescription.dentist.lastName
                               })}
                             </p>
                             <p className="text-sm text-gray-600">
@@ -723,9 +729,9 @@ const Prescriptions: React.FC = () => {
                             <span className="font-medium text-gray-700">{t('prescriptions.card.refills')}:</span>
                             <br />
                             <span className="text-gray-600">
-                              {t('prescriptions.card.refillsCount', { 
-                                current: prescription.currentRefills, 
-                                max: prescription.maxRefills 
+                              {t('prescriptions.card.refillsCount', {
+                                current: prescription.currentRefills,
+                                max: prescription.maxRefills
                               })}
                             </span>
                           </div>
@@ -740,45 +746,47 @@ const Prescriptions: React.FC = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 lg:ml-6">
-                        <Button
-                          key={`view-${prescription._id}`}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewPrescription(prescription)}
-                          className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          {t('prescriptions.actions.view')}
-                        </Button>
+                        {[
+                          <Button
+                            key="view"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewPrescription(prescription)}
+                            className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                          >
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            {t('prescriptions.actions.view')}
+                          </Button>,
 
-                        <Button
-                          key={`print-${prescription._id}`}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handlePrintPrescription(prescription)}
-                          className="text-green-600 border-green-200 hover:bg-green-50"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                          </svg>
-                          {t('prescriptions.actions.print')}
-                        </Button>
+                          <Button
+                            key="print"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrintPrescription(prescription)}
+                            className="text-green-600 border-green-200 hover:bg-green-50"
+                          >
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            {t('prescriptions.actions.print')}
+                          </Button>,
 
-                        <Button
-                          key={`download-${prescription._id}`}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadPrescription(prescription)}
-                          className="text-purple-600 border-purple-200 hover:bg-purple-50"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          {t('prescriptions.actions.download')}
-                        </Button>
+                          <Button
+                            key="download"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownloadPrescription(prescription)}
+                            className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                          >
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {t('prescriptions.actions.download')}
+                          </Button>
+                        ]}
                       </div>
                     </div>
                   </div>
@@ -828,9 +836,9 @@ const Prescriptions: React.FC = () => {
                       </div>
                       <div>
                         <span className="font-medium text-gray-700">{t('prescriptions.modal.prescribedBy')}:</span>
-                        <p className="text-gray-900">{t('prescriptions.modal.doctorName', { 
-                          firstName: selectedPrescription.dentist.firstName, 
-                          lastName: selectedPrescription.dentist.lastName 
+                        <p className="text-gray-900">{t('prescriptions.modal.doctorName', {
+                          firstName: selectedPrescription.dentist.firstName,
+                          lastName: selectedPrescription.dentist.lastName
                         })}</p>
                       </div>
                       <div>
@@ -855,7 +863,7 @@ const Prescriptions: React.FC = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">{t('prescriptions.modal.medications')}</h3>
                     <div className="space-y-4">
                       {selectedPrescription.medications.map((med, index) => (
-                        <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div key={med.medication._id || `med-${index}`} className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <h4 className="font-semibold text-gray-900 mb-2">{med.medication.name}</h4>
                           <div className="grid md:grid-cols-2 gap-3 text-sm">
                             <div>
@@ -919,29 +927,53 @@ const Prescriptions: React.FC = () => {
 
                   {/* Action Buttons */}
                   <div className="flex justify-end space-x-3 pt-6 border-t">
-                    <Button
-                      variant="outline"
-                      onClick={() => handlePrintPrescription(selectedPrescription)}
-                    >
-                      {t('prescriptions.modal.print')}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleDownloadPrescription(selectedPrescription)}
-                    >
-                      {t('prescriptions.modal.download')}
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={() => setShowPrescriptionModal(false)}
-                    >
-                      {t('prescriptions.modal.close')}
-                    </Button>
+                    {[
+                      <Button
+                        key="modal-print"
+                        variant="outline"
+                        onClick={() => handlePrintPrescription(selectedPrescription)}
+                      >
+                        {t('prescriptions.modal.print')}
+                      </Button>,
+                      <Button
+                        key="modal-download"
+                        variant="outline"
+                        onClick={() => handleDownloadPrescription(selectedPrescription)}
+                      >
+                        {t('prescriptions.modal.download')}
+                      </Button>,
+                      <Button
+                        key="modal-close"
+                        variant="primary"
+                        onClick={() => setShowPrescriptionModal(false)}
+                      >
+                        {t('prescriptions.modal.close')}
+                      </Button>
+                    ]}
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Create Prescription Modal */}
+        {showPrescriptionModal && (
+          <Modal
+            isOpen={showPrescriptionModal}
+            onClose={() => setShowPrescriptionModal(false)}
+            title={t('prescriptions.modal.createPrescription', 'Create Prescription')}
+            size="xl"
+          >
+            <PrescriptionForm
+              patientId={user?.id || ''}
+              onSave={() => {
+                setShowPrescriptionModal(false);
+                fetchPatientPrescriptions();
+              }}
+              onCancel={() => setShowPrescriptionModal(false)}
+            />
+          </Modal>
         )}
       </div>
     </div>

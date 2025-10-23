@@ -58,7 +58,7 @@ export const validateUserToken = async (): Promise<TokenValidationResult> => {
         expiresAt: new Date(tokenPayload.exp * 1000),
         user
       };
-    } catch (decodeError) {
+    } catch (_decodeError) {
       // If token is malformed, remove it
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
@@ -106,7 +106,7 @@ export const checkUserPermission = (user: User | null, requiredRole?: string, re
 // Update user profile
 export const updateProfile = async (profileData: UpdateProfileData): Promise<User> => {
   try {
-    const response = await api.put<ApiResponse<{ user: User }>>('/auth/profile', profileData);
+    const response = await api.put<ApiResponse<{ user: User }>>('/api/v1/auth/profile', profileData);
     if (!response.data?.data?.user) {
       throw new Error('Invalid response from server');
     }
@@ -117,13 +117,39 @@ export const updateProfile = async (profileData: UpdateProfileData): Promise<Use
   }
 };
 
-// Upload profile image
+// Upload profile image with optimization
 export const uploadProfileImage = async (file: File): Promise<{ profileImage: string }> => {
   try {
-    const formData = new FormData();
-    formData.append('profileImage', file);
+    // Import image optimization utilities dynamically to avoid bundle bloat
+    const { optimizeProfileImage, validateImageFile } = await import('../utils/imageOptimization');
     
-    const response = await api.post<ApiResponse<{ profileImage: string }>>('/users/profile-image', formData, {
+    // Validate the image file
+    const validation = validateImageFile(file, {
+      maxSizeMB: 5,
+      allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    });
+    
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+    
+    // Optimize the image for better performance
+    let optimizedFile = file;
+    try {
+      const profileImageSet = await optimizeProfileImage(file);
+      // Use the medium size for upload (good balance of quality and size)
+      optimizedFile = profileImageSet.medium.file;
+      
+      console.log(`Image optimized: ${file.size} bytes → ${optimizedFile.size} bytes (${profileImageSet.medium.compressionRatio.toFixed(1)}% reduction)`);
+    } catch (optimizationError) {
+      console.warn('Image optimization failed, using original:', optimizationError);
+      // Continue with original file if optimization fails
+    }
+    
+    const formData = new FormData();
+    formData.append('profileImage', optimizedFile);
+    
+    const response = await api.post<ApiResponse<{ profileImage: string }>>('/api/v1/users/profile-image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -188,7 +214,7 @@ export const getUsersByRole = async (role: string, params?: {
       };
     } else {
       // Use general users endpoint for other roles
-      const response = await api.get<PaginatedResponse<User>>('/users', {
+      const response = await api.get<PaginatedResponse<User>>('/api/v1/users', {
         params: {
           role,
           ...params

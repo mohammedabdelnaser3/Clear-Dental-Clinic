@@ -25,13 +25,13 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((
 
   return (
     <div className={`flex items-start ${containerClassName}`}>
-      <div className="flex items-center h-5">
+      <div className="flex items-center h-6 sm:h-5">
         <input
           ref={ref}
           id={checkboxId}
           type="checkbox"
           className={`
-            h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500
+            h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer
             ${hasError ? 'border-red-300 focus:ring-red-500' : ''}
             ${className}
           `}
@@ -42,17 +42,17 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((
       </div>
       <div className="ml-3 text-sm">
         {label && (
-          <label htmlFor={checkboxId} className="font-medium text-gray-700">
+          <label htmlFor={checkboxId} className="font-medium text-gray-700 cursor-pointer select-none">
             {label}
           </label>
         )}
         {helperText && !hasError && (
-          <p className="text-gray-500" id={`${checkboxId}-description`}>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5" id={`${checkboxId}-description`}>
             {helperText}
           </p>
         )}
         {hasError && (
-          <p className="text-red-600" id={`${checkboxId}-error`}>
+          <p className="text-xs sm:text-sm text-red-600 mt-0.5" id={`${checkboxId}-error`}>
             {error}
           </p>
         )}

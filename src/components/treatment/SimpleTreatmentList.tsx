@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Plus, Eye, Calendar, User, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button, Input, Select, Card, Badge } from '../ui';
+import { Search, Plus, Eye, Calendar, User, Clock, CheckCircle, AlertCircle, Edit } from 'lucide-react';
+import { Button, Input, Select, Card, Badge, Modal } from '../ui';
 import { useAuth } from '../../hooks/useAuth';
 import { treatmentService, type TreatmentRecord } from '../../services/treatmentService';
+import { TreatmentForm } from './TreatmentForm';
 import toast from 'react-hot-toast';
 import { format as formatDate } from 'date-fns';
 
@@ -22,6 +23,9 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showTreatmentForm, setShowTreatmentForm] = useState(false);
+  const [selectedTreatment, setSelectedTreatment] = useState<TreatmentRecord | null>(null);
+  const [showTreatmentDetails, setShowTreatmentDetails] = useState(false);
 
   const statusOptions = [
     { value: 'all', label: t('treatments.status.all') },
@@ -87,6 +91,37 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
 
   const canManageRecords = user?.role === 'dentist' || user?.role === 'admin' || user?.role === 'staff';
 
+  const handleCreateTreatment = () => {
+    setSelectedTreatment(null);
+    setShowTreatmentForm(true);
+  };
+
+  const handleEditTreatment = (treatment: TreatmentRecord) => {
+    setSelectedTreatment(treatment);
+    setShowTreatmentForm(true);
+  };
+
+  const handleViewTreatment = (treatment: TreatmentRecord) => {
+    setSelectedTreatment(treatment);
+    setShowTreatmentDetails(true);
+  };
+
+  const handleTreatmentSaved = () => {
+    setShowTreatmentForm(false);
+    setSelectedTreatment(null);
+    fetchTreatmentRecords();
+  };
+
+  const handleCloseTreatmentForm = () => {
+    setShowTreatmentForm(false);
+    setSelectedTreatment(null);
+  };
+
+  const handleCloseTreatmentDetails = () => {
+    setShowTreatmentDetails(false);
+    setSelectedTreatment(null);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -97,6 +132,7 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
   }
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -107,7 +143,7 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
           <p className="text-gray-600">{t('treatments.subtitle')}</p>
         </div>
         {canManageRecords && (
-          <Button onClick={() => toast('Treatment form will be implemented soon')}>
+          <Button onClick={handleCreateTreatment}>
             <Plus className="h-4 w-4 mr-2" />
             {t('treatments.addRecord')}
           </Button>
@@ -174,10 +210,19 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => toast('Treatment details will be implemented soon')}
+                    onClick={() => handleViewTreatment(record)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
+                  {canManageRecords && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditTreatment(record)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -229,7 +274,7 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
             }
           </p>
           {canManageRecords && (
-            <Button onClick={() => toast('Treatment form will be implemented soon')}>
+            <Button onClick={handleCreateTreatment}>
               <Plus className="h-4 w-4 mr-2" />
               {t('treatments.createFirstRecord')}
             </Button>
@@ -237,5 +282,122 @@ export const SimpleTreatmentList: React.FC<SimpleTreatmentListProps> = ({
         </div>
       )}
     </div>
-  );
-};
+
+    {/* Treatment Form Modal */}
+    <Modal
+      isOpen={showTreatmentForm}
+      onClose={handleCloseTreatmentForm}
+      title={selectedTreatment ? t('treatments.editRecord') : t('treatments.createRecord')}
+      size="xl"
+    >
+      <TreatmentForm
+        treatment={selectedTreatment}
+        patientId={patientId}
+        onSave={handleTreatmentSaved}
+        onCancel={handleCloseTreatmentForm}
+      />
+    </Modal>
+
+    {/* Treatment Details Modal */}
+    <Modal
+      isOpen={showTreatmentDetails}
+      onClose={handleCloseTreatmentDetails}
+      title={t('treatments.viewRecord')}
+      size="lg"
+    >
+      {selectedTreatment && (
+        <div className="space-y-6">
+          {/* Treatment Header */}
+          <div className="border-b pb-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="text-xl font-semibold text-gray-900">
+                {selectedTreatment.treatment}
+              </h3>
+              <Badge className={getStatusColor(selectedTreatment.status)}>
+                <div className="flex items-center gap-1">
+                  {getStatusIcon(selectedTreatment.status)}
+                  {t(`treatments.status.${selectedTreatment.status}`)}
+                </div>
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-gray-400" />
+                <span className="font-medium">{t('treatments.patient')}:</span>
+                <span>{selectedTreatment.patient.firstName} {selectedTreatment.patient.lastName}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <span className="font-medium">{t('treatments.startDate')}:</span>
+                <span>{formatDate(new Date(selectedTreatment.startDate), 'MMM dd, yyyy')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Treatment Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.procedure')}</h4>
+              <p className="text-gray-600">{selectedTreatment.procedure}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.dentist')}</h4>
+              <p className="text-gray-600">
+                Dr. {selectedTreatment.dentist.firstName} {selectedTreatment.dentist.lastName}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.diagnosis')}</h4>
+              <p className="text-gray-600">{selectedTreatment.diagnosis}</p>
+            </div>
+            {selectedTreatment.cost && (
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.cost')}</h4>
+                <p className="text-lg font-semibold text-green-600">
+                  {t('common.currency')}{selectedTreatment.cost.toFixed(2)}
+                </p>
+              </div>
+            )}
+            {selectedTreatment.duration && (
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.duration')}</h4>
+                <p className="text-gray-600">{selectedTreatment.duration} {t('treatments.minutes')}</p>
+              </div>
+            )}
+            {selectedTreatment.endDate && (
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.endDate')}</h4>
+                <p className="text-gray-600">{formatDate(new Date(selectedTreatment.endDate), 'MMM dd, yyyy')}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Notes */}
+          {selectedTreatment.notes && (
+            <div className="border-t pt-4">
+              <h4 className="font-semibold text-gray-900 mb-2">{t('treatments.notes')}</h4>
+              <p className="text-gray-600 whitespace-pre-wrap">{selectedTreatment.notes}</p>
+            </div>
+          )}
+
+          {/* Actions */}
+          {canManageRecords && (
+            <div className="border-t pt-4 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowTreatmentDetails(false);
+                  handleEditTreatment(selectedTreatment);
+                }}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {t('treatments.editRecord')}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </Modal>
+    </>
+    );
+}

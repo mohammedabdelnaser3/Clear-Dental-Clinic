@@ -38,11 +38,11 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>((
   return (
     <div className={containerClassName}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
           {label}
         </label>
       )}
-      <div className={`${inline ? 'flex flex-wrap gap-4' : 'space-y-2'}`}>
+      <div className={`${inline ? 'flex flex-wrap gap-4 sm:gap-6' : 'space-y-3 sm:space-y-2'}`}>
         {options.map((option, index) => {
           const optionId = `${groupId}-${index}`;
           return (
@@ -55,15 +55,21 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>((
                 value={option.value}
                 disabled={option.disabled}
                 className={`
-                  h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500
+                  h-5 w-5 sm:h-4 sm:w-4 border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer
                   ${hasError ? 'border-red-300 focus:ring-red-500' : ''}
+                  ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}
                   ${className}
                 `}
                 aria-invalid={hasError ? 'true' : 'false'}
                 aria-describedby={hasError ? `${groupId}-error` : helperText ? `${groupId}-description` : undefined}
                 {...rest}
               />
-              <label htmlFor={optionId} className="ml-3 block text-sm font-medium text-gray-700">
+              <label 
+                htmlFor={optionId} 
+                className={`ml-3 block text-sm font-medium text-gray-700 cursor-pointer select-none ${
+                  option.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
                 {option.label}
               </label>
             </div>
@@ -71,12 +77,12 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>((
         })}
       </div>
       {helperText && !hasError && (
-        <p className="mt-1 text-sm text-gray-500" id={`${groupId}-description`}>
+        <p className="mt-1.5 text-xs sm:text-sm text-gray-500" id={`${groupId}-description`}>
           {helperText}
         </p>
       )}
       {hasError && (
-        <p className="mt-1 text-sm text-red-600" id={`${groupId}-error`}>
+        <p className="mt-1.5 text-xs sm:text-sm text-red-600" id={`${groupId}-error`}>
           {error}
         </p>
       )}

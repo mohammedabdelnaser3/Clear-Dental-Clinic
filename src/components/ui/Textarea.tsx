@@ -29,7 +29,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
   return (
     <div className={`${fullWidth ? 'w-full' : ''} ${containerClassName}`}>
       {label && (
-        <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-1.5">
           {label}
         </label>
       )}
@@ -39,7 +39,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
           id={textareaId}
           rows={rows}
           className={`
-            block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+            block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+            text-base sm:text-sm py-2.5 px-3 sm:py-2
             ${hasError ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}
             ${fullWidth ? 'w-full' : ''}
             ${className}
@@ -50,12 +51,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
         />
       </div>
       {helperText && !hasError && (
-        <p className="mt-1 text-sm text-gray-500" id={`${textareaId}-description`}>
+        <p className="mt-1.5 text-xs sm:text-sm text-gray-500" id={`${textareaId}-description`}>
           {helperText}
         </p>
       )}
       {hasError && (
-        <p className="mt-1 text-sm text-red-600" id={`${textareaId}-error`}>
+        <p className="mt-1.5 text-xs sm:text-sm text-red-600" id={`${textareaId}-error`}>
           {error}
         </p>
       )}

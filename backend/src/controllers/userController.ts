@@ -67,11 +67,23 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 // Get user by ID
 export const getUserById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+  console.log('getUserById called with ID:', id);
 
   const user = await User.findById(id)
     .populate('assignedClinics', 'name address phone')
     .populate('preferredClinicId', 'name address phone')
     .select('-password');
+
+  console.log('User found:', user ? 'Yes' : 'No');
+  if (user) {
+    console.log('User data:', {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role
+    });
+  }
 
   if (!user) {
     throw createNotFoundError('User');
@@ -79,7 +91,7 @@ export const getUserById = catchAsync(async (req: Request, res: Response) => {
 
   res.json({
     success: true,
-    data: { user }
+    data: user
   });
 });
 
@@ -318,31 +330,120 @@ export const setPreferredClinic = catchAsync(async (req: AuthenticatedRequest, r
   });
 });
 
+// Get user's assigned clinics
+export const getUserClinics = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id).populate('assignedClinics', 'name address phone email');
+  if (!user) {
+    throw createNotFoundError('User');
+  }
+
+  // Transform the clinic data to match the expected frontend format
+  const clinics = user.assignedClinics.map((clinic: any) => ({
+    id: clinic._id,
+    clinicId: clinic._id,
+    name: clinic.name,
+    clinicName: clinic.name,
+    branchName: clinic.branchName || null,
+    address: clinic.address || {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: ''
+    },
+    phone: clinic.phone || '',
+    email: clinic.email || '',
+    isPrimary: user.preferredClinicId?.toString() === clinic._id.toString()
+  }));
+
+  res.json({
+    success: true,
+    data: clinics,
+    message: clinics.length > 0 ? undefined : 'No clinics assigned to this user'
+  });
+});
+
+// Get user's availability schedule
+export const getUserAvailability = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw createNotFoundError('User');
+  }
+
+  // For now, return empty availability since we don't have a specific availability model
+  // In a real application, you would fetch from a UserAvailability or Schedule model
+  const availability = [];
+
+  res.json({
+    success: true,
+    data: availability,
+    message: 'User availability retrieved successfully'
+  });
+});
+
+// Update user's availability schedule
+export const updateUserAvailability = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { availability } = req.body;
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw createNotFoundError('User');
+  }
+
+  // For now, just return the provided availability since we don't have a specific availability model
+  // In a real application, you would save to a UserAvailability or Schedule model
+  
+  res.json({
+    success: true,
+    data: availability || [],
+    message: 'User availability updated successfully'
+  });
+});
+
 // Upload profile image
 export const uploadUserProfileImage = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  console.log('Upload profile image called');
+  console.log('File received:', req.file ? 'Yes' : 'No');
+  console.log('User:', req.user ? req.user._id : 'No user');
+
   if (!req.file) {
+    console.log('No file in request');
     throw createValidationError('file', 'Profile image is required');
   }
 
   const user = await User.findById(req.user._id);
   if (!user) {
+    console.log('User not found:', req.user._id);
     throw createNotFoundError('User');
   }
 
-  // Upload image to cloud storage
-  const uploadResult = await uploadProfileImage(req.file, user._id.toString());
+  console.log('Uploading file:', req.file.originalname, 'Size:', req.file.size);
 
-  // Update user profile image
-  user.profileImage = uploadResult.secure_url;
-  await user.save();
+  try {
+    // Upload image to cloud storage
+    const uploadResult = await uploadProfileImage(req.file, user._id.toString());
+    console.log('Upload successful:', uploadResult.secure_url);
 
-  res.json({
-    success: true,
-    message: 'Profile image uploaded successfully',
-    data: {
-      profileImage: uploadResult.secure_url
-    }
-  });
+    // Update user profile image
+    user.profileImage = uploadResult.secure_url;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile image uploaded successfully',
+      data: {
+        profileImage: uploadResult.secure_url
+      }
+    });
+  } catch (uploadError) {
+    console.error('Upload error:', uploadError);
+    throw uploadError;
+  }
 });
 
 // Get user statistics (admin only)

@@ -57,24 +57,24 @@ const Modal: React.FC<ModalProps> = ({
   const getSizeClasses = (): string => {
     switch (size) {
       case 'sm':
-        return 'max-w-sm';
+        return 'max-w-full sm:max-w-sm mx-2 sm:mx-auto';
       case 'md':
-        return 'max-w-md';
+        return 'max-w-full sm:max-w-md mx-2 sm:mx-auto';
       case 'lg':
-        return 'max-w-lg';
+        return 'max-w-full sm:max-w-lg mx-2 sm:mx-auto';
       case 'xl':
-        return 'max-w-xl';
+        return 'max-w-full sm:max-w-xl mx-2 sm:mx-auto';
       case 'full':
-        return 'max-w-full m-4';
+        return 'max-w-full m-2 sm:m-4';
       default:
-        return 'max-w-md';
+        return 'max-w-full sm:max-w-md mx-2 sm:mx-auto';
     }
   };
 
   return (
     <Fragment>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50 p-4"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50 p-0 sm:p-4"
         onClick={handleBackdropClick}
         aria-modal="true"
         role="dialog"
@@ -82,20 +82,20 @@ const Modal: React.FC<ModalProps> = ({
       >
         <div
           ref={modalRef}
-          className={`relative rounded-lg bg-white shadow-xl ${getSizeClasses()} w-full ${className}`}
+          className={`relative rounded-t-lg sm:rounded-lg bg-white shadow-xl ${getSizeClasses()} w-full max-h-[90vh] sm:max-h-[85vh] flex flex-col ${className}`}
         >
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className="flex items-center justify-between rounded-t-lg border-b border-gray-200 px-6 py-4">
+            <div className="flex items-center justify-between rounded-t-lg border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 flex-shrink-0">
               {title && (
-                <h3 className="text-lg font-medium text-gray-900" id="modal-title">
+                <h3 className="text-base sm:text-lg font-medium text-gray-900" id="modal-title">
                   {title}
                 </h3>
               )}
               {showCloseButton && (
                 <button
                   type="button"
-                  className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   onClick={onClose}
                   aria-label="Close"
                 >
@@ -121,11 +121,11 @@ const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Body */}
-          <div className="px-6 py-4">{children}</div>
+          <div className="px-4 py-3 sm:px-6 sm:py-4 overflow-y-auto flex-1">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex justify-end rounded-b-lg border-t border-gray-200 px-6 py-4">
+            <div className="flex justify-end rounded-b-lg border-t border-gray-200 px-4 py-3 sm:px-6 sm:py-4 flex-shrink-0">
               {footer}
             </div>
           )}

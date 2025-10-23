@@ -75,7 +75,39 @@ export const getPatientById = async (id: string): Promise<Patient> => {
 // Create a new patient
 export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>): Promise<Patient> => {
   try {
-    const response = await api.post<ApiResponse<any>>('/api/v1/patients', patientData);
+    // Check for preferredClinicId first - this is required by the backend
+    if (!patientData.preferredClinicId) {
+      throw new Error('Preferred clinic is required');
+    }
+
+    // Format phone number to match the expected format (add + prefix if missing)
+    let formattedPhone = patientData.phone;
+    if (formattedPhone && !formattedPhone.startsWith('+')) {
+      formattedPhone = '+' + formattedPhone;
+    }
+
+    // Ensure all required fields are present and properly formatted
+    const formattedData = {
+      firstName: patientData.firstName,
+      lastName: patientData.lastName,
+      email: patientData.email,
+      phone: formattedPhone, // Use the formatted phone number
+      dateOfBirth: patientData.dateOfBirth,
+      gender: patientData.gender || 'male',
+      address: patientData.address || {},
+      emergencyContact: patientData.emergencyContact || {},
+      medicalHistory: patientData.medicalHistory || {
+        allergies: [],
+        medications: [],
+        conditions: [],
+        notes: ''
+      },
+      // Ensure preferredClinicId is always included and is a valid ObjectId
+      preferredClinicId: patientData.preferredClinicId,
+      status: 'active'
+    };
+    
+    const response = await api.post<ApiResponse<any>>('/api/v1/patients', formattedData);
     return transformPatientData(response.data.data);
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to create patient';

@@ -157,7 +157,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       {patientSummary.allergies.length > 0 ? (
                         <ul className="space-y-1">
                           {patientSummary.allergies.map((allergy, idx) => (
-                            <li key={idx} className="text-sm text-red-800">• {allergy}</li>
+                            <li key={`allergy-${allergy}-${idx}`} className="text-sm text-red-800">• {allergy}</li>
                           ))}
                         </ul>
                       ) : (
@@ -174,7 +174,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       {patientSummary.currentMedications.length > 0 ? (
                         <div className="space-y-2 max-h-32 overflow-y-auto">
                           {patientSummary.currentMedications.map((med, idx) => (
-                            <div key={idx} className="text-sm text-blue-800">
+                            <div key={`current-med-${med.name}-${idx}`} className="text-sm text-blue-800">
                               <p className="font-medium">{med.name}</p>
                               <p className="text-xs">{med.dosage} - {med.frequency}</p>
                             </div>
@@ -194,7 +194,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       {patientSummary.medicalConditions.length > 0 ? (
                         <ul className="space-y-1">
                           {patientSummary.medicalConditions.map((condition, idx) => (
-                            <li key={idx} className="text-sm text-yellow-800">• {condition}</li>
+                            <li key={`condition-${condition}-${idx}`} className="text-sm text-yellow-800">• {condition}</li>
                           ))}
                         </ul>
                       ) : (
@@ -254,7 +254,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       </h3>
                       <div className="space-y-3">
                         {safetyCheck.errors.map((error, idx) => (
-                          <div key={idx} className="p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                          <div key={`error-${error.type}-${idx}`} className="p-4 bg-red-50 border-2 border-red-300 rounded-lg">
                             <div className="flex items-start">
                               <XCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
                               <div className="flex-1">
@@ -280,7 +280,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       </h3>
                       <div className="space-y-3">
                         {safetyCheck.warnings.map((warning, idx) => (
-                          <div key={idx} className={`p-4 border rounded-lg ${getSeverityColor(warning.severity)}`}>
+                          <div key={`warning-${warning.severity}-${idx}`} className={`p-4 border rounded-lg ${getSeverityColor(warning.severity)}`}>
                             <div className="flex items-start">
                               {getSeverityIcon(warning.severity)}
                               <div className="flex-1 ml-3">
@@ -342,7 +342,7 @@ const MedicationSafetyModal: React.FC<MedicationSafetyModalProps> = ({
                       </h4>
                       <ul className="space-y-1">
                         {safetyCheck.recommendations.map((rec, idx) => (
-                          <li key={idx} className="text-sm text-blue-800">• {rec}</li>
+                          <li key={`rec-${rec.substring(0, 20)}-${idx}`} className="text-sm text-blue-800">• {rec}</li>
                         ))}
                       </ul>
                     </div>

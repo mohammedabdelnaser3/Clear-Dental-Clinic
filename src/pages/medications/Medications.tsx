@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card } from '../../components/ui';
+import { Button, Card, Modal, CardButton } from '../../components/ui';
 import { AnalyticsWidget } from '../../components/dashboard';
 import { MedicationList } from '../../components/medications/MedicationList';
+import { MedicationForm } from '../../components/medications/MedicationForm';
 import { useAuth } from '../../hooks/useAuth';
 import { medicationService } from '../../services/medicationService';
 import {
@@ -42,6 +43,8 @@ const Medications: React.FC = () => {
     popularMedications: []
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [isAddMedicationModalOpen, setIsAddMedicationModalOpen] = useState(false);
+  const [refreshMedicationList, setRefreshMedicationList] = useState(0);
 
   const isPatient = user?.role === 'patient';
   const canManageMedications = user?.role === 'dentist' || user?.role === 'admin' || user?.role === 'super_admin';
@@ -130,7 +133,8 @@ const Medications: React.FC = () => {
                 size="sm"
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-200 focus:ring-2 focus:ring-white/30 focus:outline-none"
+                aria-label={refreshing ? 'Refreshing medications' : 'Refresh medication list'}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                 {refreshing ? 'Refreshing...' : t('common.refresh')}
@@ -142,7 +146,9 @@ const Medications: React.FC = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-200 focus:ring-2 focus:ring-white/30 focus:outline-none"
+                    aria-label={showFilters ? 'Hide filters' : 'Show filters'}
+                    aria-expanded={showFilters}
                   >
                     <Filter className="w-4 h-4 mr-2" />
                     Filters
@@ -151,7 +157,12 @@ const Medications: React.FC = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+                    onClick={() => {
+                      // TODO: Implement export functionality
+                      console.log('Export medications');
+                    }}
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-200 focus:ring-2 focus:ring-white/30 focus:outline-none"
+                    aria-label="Export medication data"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export
@@ -160,7 +171,11 @@ const Medications: React.FC = () => {
                   <Button 
                     variant="primary" 
                     size="sm"
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    onClick={() => {
+                      setIsAddMedicationModalOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-green-300 focus:outline-none"
+                    aria-label="Add new medication"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Medication
@@ -220,51 +235,114 @@ const Medications: React.FC = () => {
         {/* Quick Actions - Only for staff/admin */}
         {canManageMedications && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group">
+            <CardButton 
+              className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group focus:ring-2 focus:ring-blue-300 focus:outline-none"
+              onClick={() => {
+                // TODO: Implement interaction checker
+                console.log('Open interaction checker');
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  console.log('Open interaction checker');
+                }
+              }}
+              aria-label="Open drug interaction checker"
+            >
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl group-hover:scale-110 transition-transform">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Interaction Checker</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Interaction Checker</h3>
                   <p className="text-sm text-gray-600">Check drug interactions</p>
                 </div>
               </div>
-            </Card>
+              </CardButton>
             
-            <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group">
+            <CardButton 
+              className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group focus:ring-2 focus:ring-green-300 focus:outline-none"
+              onClick={() => {
+                // TODO: Implement usage analytics
+                console.log('Open usage analytics');
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  console.log('Open usage analytics');
+                }
+              }}
+              aria-label="View medication usage analytics"
+            >
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl group-hover:scale-110 transition-transform">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Usage Analytics</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors">Usage Analytics</h3>
                   <p className="text-sm text-gray-600">View medication trends</p>
                 </div>
               </div>
-            </Card>
+              </CardButton>
             
-            <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group">
+            <CardButton 
+              className="p-6 border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 cursor-pointer group focus:ring-2 focus:ring-purple-300 focus:outline-none"
+              onClick={() => {
+                // TODO: Implement quick prescribe
+                console.log('Open quick prescribe');
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  console.log('Open quick prescribe');
+                }
+              }}
+              aria-label="Open quick prescription creator"
+            >
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl group-hover:scale-110 transition-transform">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Quick Prescribe</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">Quick Prescribe</h3>
                   <p className="text-sm text-gray-600">Fast prescription creation</p>
                 </div>
               </div>
-            </Card>
-          </div>
+              </CardButton>
+            </div>
         )}
 
         {/* Main Content */}
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50">
           <div className="p-6">
-            <MedicationList />
+            <MedicationList key={refreshMedicationList} />
           </div>
         </Card>
       </div>
+
+      {/* Add Medication Modal */}
+      <Modal
+        isOpen={isAddMedicationModalOpen}
+        onClose={() => setIsAddMedicationModalOpen(false)}
+        title={t('medicationForm.createMedication')}
+        size="xl"
+      >
+        <MedicationForm
+          medication={null}
+          onSave={() => {
+            setIsAddMedicationModalOpen(false);
+            setRefreshMedicationList(prev => prev + 1);
+            fetchStats(); // Refresh stats after adding medication
+          }}
+          onCancel={() => setIsAddMedicationModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 };
