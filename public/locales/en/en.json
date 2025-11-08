@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "title":"Dashboard",
     "viewDetails": "View Details",
     "selectClinicMessage": "Select a Clinic",
     "welcome_clinic": "Welcome back, {name} to {clinicName}",
@@ -41,14 +42,17 @@
   "navigation": {
     "dashboard": "Dashboard"
   },
-  "reports": {
-    "generate": "Generate Reports"
-  },
   "dashboard.Appointments": "Appointments",
   "dashboard.Prescriptions": "Prescriptions",
   "dashboard.Billing": "Billing",
   "dashboard.Reports": "Reports",
   "appointments": {
+    "status": {
+      "title": "Status",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "scheduled": "Scheduled"
+    },
     "services": {
       "consultation": "Consultation",
       "consultationDesc": "Initial consultation and examination",
@@ -85,7 +89,6 @@
     "dateTime": "Date & Time",
     "service": "Service",
     "dentist": "Dentist",
-    "status": "Status",
     "actions": "Actions",
     "unknownPatient": "Unknown Patient",
     "unknownDentist": "Unknown Dentist",
@@ -267,14 +270,14 @@
     "noShowConfirmTitle": "Mark as No-Show",
     "noShowConfirmMessage": "Are you sure you want to mark this appointment as no-show?",
     "yesNoShow": "Yes, Mark as No-Show",
-  "appointments": {
-    "scheduled": "Scheduled",
-    "confirmed": "Confirmed",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "noShow": "No-Show",
-    "urgent": "Urgent"
+    "appointments": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No-Show",
+      "urgent": "Urgent"
     }
   },
   "medicationList": {
@@ -330,7 +333,6 @@
     "saveSuccess": "Medication saved successfully",
     "confirmDelete": "Are you sure you want to delete this medication? This action cannot be undone."
   },
-  
   "appointmentForm": {
     "title_new": "Book a New Appointment",
     "title_edit": "Edit Appointment",
@@ -424,6 +426,11 @@
     "creatingAppointment": "Creating your appointment..."
   },
   "common": {
+    "loadingProfile": "Loading profile...",
+    "loadingSettings": "Loading settings...",
+    "ofTotal": "of total",
+    "refresh": "Refresh",
+    "add": "Add",
     "currency": "$",
     "separator": "•",
     "doctor": "Dr. {firstName} {lastName}",
@@ -443,6 +450,10 @@
     "loading": "Loading...",
     "change": "Change",
     "placeholders": {
+      "email": "Enter your email",
+      "phone": "Enter your phone number",
+      "age": "Enter your age",
+      "password": "Enter your password",
       "selectClinic": "Choose a clinic..."
     }
   },
@@ -515,6 +526,7 @@
     "preferred_clinic_required": "Preferred clinic is required"
   },
   "prescriptions": {
+    "prescriptions": "prescriptions",
     "create": "Create Prescription",
     "header": {
       "title": "My Prescriptions",
@@ -673,33 +685,32 @@
     "errorSaving": "Failed to save medication",
     "nameRequired": "Medication name is required",
     "categoryRequired": "Category is required",
-  "billing": {
-    "title": "Billing",
-    "description": "View and manage your billing information and payment history",
-    "list": {
-      "noBills": "No Bills Found",
-      "noBillsDescription": "No billing records are available. Contact support if you believe this is an error.",
-      "searchPlaceholder": "Search bills by ID, date, or service...",
-      "filterByStatus": "Filter by Status",
-      "sortByDate": "Sort by Date",
-      "sortByAmount": "Sort by Amount",
-      "sortByStatus": "Sort by Status",
-      "status": {
-        "all": "All",
-        "paid": "Paid",
-        "pending": "Pending",
-        "overdue": "Overdue",
-        "cancelled": "Cancelled"
-      },
-      "invoiceId": "Invoice ID",
-      "date": "Date",
-      "service": "Service",
-      "amount": "Amount",
-      
-      "actions": {
-        "view": "View",
-        "pay": "Pay Now",
-        "download": "Download Invoice"
+    "billing": {
+      "title": "Billing",
+      "description": "View and manage your billing information and payment history",
+      "list": {
+        "noBills": "No Bills Found",
+        "noBillsDescription": "No billing records are available. Contact support if you believe this is an error.",
+        "searchPlaceholder": "Search bills by ID, date, or service...",
+        "filterByStatus": "Filter by Status",
+        "sortByDate": "Sort by Date",
+        "sortByAmount": "Sort by Amount",
+        "sortByStatus": "Sort by Status",
+        "status": {
+          "all": "All",
+          "paid": "Paid",
+          "pending": "Pending",
+          "overdue": "Overdue",
+          "cancelled": "Cancelled"
+        },
+        "invoiceId": "Invoice ID",
+        "date": "Date",
+        "service": "Service",
+        "amount": "Amount",
+        "actions": {
+          "view": "View",
+          "pay": "Pay Now",
+          "download": "Download Invoice"
         }
       }
     }
@@ -831,5 +842,602 @@
     "error": "Failed to process payment",
     "amountRequired": "Payment amount is required",
     "paymentMethodRequired": "Payment method is required"
+  },
+  "inventory": {
+    "dashboardTitle": "Inventory Dashboard",
+    "title": "Inventory",
+    "subtitle": "Manage and track clinic inventory",
+    "loading": "Loading inventory data...",
+    "noDashboardData": "No inventory data available",
+    "noClinicSelected": "Please select a clinic",
+    "errors": {
+      "fetchFailed": "Failed to load inventory data",
+      "noClinicSelected": "Please select a clinic to add an item"
+    },
+    "addItem": "Add Item",
+    "addNewItem": "Add New Item",
+    "generateReport": "Generate Report",
+    "totalItems": "Total Items",
+    "totalValue": "Total Value",
+    "lowStockItems": "Low Stock Items",
+    "expiringItems": "Expiring Items",
+    "lowStockAlert": "Low Stock Alert",
+    "expiringItemsAlert": "Expiring Items Alert",
+    "recentMovements": "Recent Stock Movements",
+    "recentInventoryMovement": "Recent Inventory Movement",
+    "stockByCategory": "Stock by Category",
+    "stockSummaryByCategory": "Stock Summary by Category",
+    "noLowStockItems": "No low stock items found",
+    "noRecentMovements": "No recent stock movements",
+    "noStockSummary": "No stock summary available",
+    "viewAllLowStock": "View All Low Stock",
+    "items": "Items",
+    "itemsLowStock": "Items Low Stock",
+    "expiringSoon": "Expiring Soon",
+    "more": "more",
+    "expired": "Expired",
+    "daysLeft": "days left",
+    "item": "Item",
+    "type": "Type",
+    "quantity": "Quantity",
+    "date": "Date",
+    "notes": "Notes",
+    "itemName": "Item Name",
+    "itemNamePlaceholder": "e.g., Paracetamol 500mg",
+    "sku": "SKU",
+    "skuPlaceholder": "e.g., MED-PARA-500",
+    "category": "Category",
+    "unit": "Unit",
+    "unitPlaceholder": "e.g., tablets, bottles, boxes",
+    "currentStock": "Current Stock",
+    "minimumStock": "Minimum Stock",
+    "costPrice": "Cost Price",
+    "sellingPrice": "Selling Price",
+    "maximumStock": "Maximum Stock",
+    "barcode": "Barcode",
+    "barcodeOptional": "Barcode (Optional)",
+    "location": "Location",
+    "locationPlaceholder": "e.g., Pharmacy Shelf A",
+    "expiryDate": "Expiry Date",
+    "expiryDateOptional": "Expiry Date (Optional)",
+    "batchNumber": "Batch Number",
+    "batchNumberOptional": "Batch Number (Optional)",
+    "description": "Description",
+    "descriptionPlaceholder": "Any additional details about the item",
+    "itemCreated": "Item created successfully",
+    "reportGenerated": "Report generated successfully",
+    "categories": {
+      "medications": "Medications",
+      "supplies": "Supplies",
+      "equipment": "Equipment",
+      "vaccines": "Vaccines"
+    },
+    "movementType": {
+      "in": "In",
+      "out": "Out",
+      "adjustment": "Adjustment"
+    },
+    "reportFormat": "Report Format",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "generate": "Generate"
+  },
+  "clinic": {
+    "selectClinic": "Select Clinic",
+    "clinic": "Clinic",
+    "loading": "Loading clinics...",
+    "error": "Failed to load clinics",
+    "allClinics": "All Clinics"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "View and manage clinic and patient reports",
+    "fetchingReportsError": "Failed to fetch patient reports",
+    "views": {
+      "dashboard": {
+        "name": "Dashboard",
+        "description": "Comprehensive overview of clinic performance metrics",
+        "metrics": {
+          "totalRevenue": "Total Revenue",
+          "totalAppointments": "Total Appointments",
+          "totalPatients": "Total Patients",
+          "activeDentists": "Active Dentists",
+          "currentlyActive": "Currently Active"
+        },
+        "sections": {
+          "revenueAnalytics": "Revenue Analytics",
+          "appointmentAnalytics": "Appointment Analytics",
+          "treatmentAnalytics": "Treatment Analytics",
+          "dentistPerformance": "Dentist Performance"
+        },
+        "charts": {
+          "revenueOverTime": "Revenue Over Time",
+          "paymentMethods": "Payment Methods Distribution",
+          "treatmentsByType": "Treatments by Type",
+          "treatmentRevenue": "Treatment Revenue"
+        },
+        "revenue": "Revenue",
+        "fromLastPeriod": "vs Last Period"
+      },
+      "appointments": {
+        "name": "Appointments Report",
+        "description": "Detailed analysis of appointment statistics and trends"
+      },
+      "revenue": {
+        "name": "Revenue Report",
+        "description": "Financial performance and revenue breakdown"
+      },
+      "patients": {
+        "name": "Patients Report",
+        "description": "Patient demographics and engagement metrics"
+      },
+      "custom": {
+        "name": "Custom Reports",
+        "description": "Create and view custom-generated reports",
+        "title": "Custom Reports",
+        "comingSoon": "Custom Reports Coming Soon",
+        "comingSoonDescription": "This feature is under development and will be available soon"
+      },
+      "patient": {
+        "title": "Patient Reports",
+        "description": "View your personal health and visit reports",
+        "noReports": "No Reports Available",
+        "noReportsDescription": "No patient reports have been generated yet",
+        "reportDate": "Report Date",
+        "viewReport": "View Report",
+        "metrics": {
+          "totalPatients": "Total Patients",
+          "newPatients": "New Patients",
+          "returningPatients": "Returning Patients",
+          "retentionRate": "Retention Rate",
+          "averageVisits": "Average Visits"
+        },
+        "demographics": {
+          "title": "Patient Demographics",
+          "ageDistribution": "Age Distribution",
+          "genderDistribution": "Gender Distribution",
+          "locationDistribution": "Location Distribution",
+          "ageGroups": {
+            "0-18": "0-18 Years",
+            "19-35": "19-35 Years",
+            "36-50": "36-50 Years",
+            "51-65": "51-65 Years",
+            "65+": "65+ Years"
+          },
+          "genders": {
+            "Male": "Male",
+            "Female": "Female"
+          },
+          "locations": {
+            "Local": "Local",
+            "Regional": "Regional"
+          }
+        },
+        "monthlyTrends": {
+          "title": "Monthly Patient Trends",
+          "highestNewPatients": "Highest New Patients",
+          "highestReturningPatients": "Highest Returning Patients",
+          "growthRate": "Growth Rate"
+        },
+        "topConditions": {
+          "title": "Top Patient Conditions",
+          "condition": "Condition",
+          "patients": "Patients",
+          "percentage": "Percentage",
+          "conditions": {
+            "Hypertension": "Hypertension",
+            "Diabetes": "Diabetes",
+            "Arthritis": "Arthritis",
+            "Asthma": "Asthma",
+            "Migraine": "Migraine"
+          }
+        },
+        "chartPlaceholder": {
+          "ageGroup": "Age Group Chart Placeholder",
+          "gender": "Gender Chart Placeholder",
+          "location": "Location Chart Placeholder",
+          "monthlyTrends": "Monthly Trends Chart Placeholder",
+          "conditions": "Conditions Chart Placeholder"
+        },
+        "dateRanges": {
+          "today": "Today",
+          "yesterday": "Yesterday",
+          "thisWeek": "This Week",
+          "lastWeek": "Last Week",
+          "thisMonth": "This Month",
+          "lastMonth": "Last Month",
+          "last30days": "Last 30 Days",
+          "last90days": "Last 90 Days",
+          "thisYear": "This Year",
+          "lastYear": "Last Year"
+        },
+        "exportCsv": "Export CSV",
+        "print": "Print"
+      }
+    },
+    "periods": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "filters": {
+      "title": "Filters"
+    },
+    "export": {
+      "pdf": "Export PDF",
+      "csv": "Export CSV",
+      "xlsx": "Export Excel"
+    },
+    "errors": {
+      "fetchFailed": "Failed to load report data",
+      "exportFailed": "Failed to export report"
+    },
+    "exportSuccess": "Report exported successfully",
+    "patient": {
+      "title": "Patient Demographics Report",
+      "metrics": {
+        "totalPatients": "Total Patients",
+        "newPatients": "New Patients",
+        "returningPatients": "Returning Patients",
+        "retentionRate": "Retention Rate",
+        "averageVisits": "Average Visits"
+      },
+      "demographics": {
+        "title": "Patient Demographics",
+        "ageDistribution": "Age Distribution",
+        "genderDistribution": "Gender Distribution",
+        "locationDistribution": "Location Distribution",
+        "ageGroups": {
+          "0-18": "0-18 Years",
+          "19-35": "19-35 Years",
+          "36-50": "36-50 Years",
+          "51-65": "51-65 Years",
+          "65+": "65+ Years"
+        },
+        "genders": {
+          "Male": "Male",
+          "Female": "Female"
+        },
+        "locations": {
+          "Local": "Local",
+          "Regional": "Regional"
+        }
+      },
+      "monthlyTrends": {
+        "title": "Monthly Patient Trends",
+        "highestNewPatients": "Highest New Patients",
+        "highestReturningPatients": "Highest Returning Patients",
+        "growthRate": "Growth Rate"
+      },
+      "topConditions": {
+        "title": "Top Patient Conditions",
+        "condition": "Condition",
+        "patients": "Patients",
+        "percentage": "Percentage",
+        "conditions": {
+          "Hypertension": "Hypertension",
+          "Diabetes": "Diabetes",
+          "Arthritis": "Arthritis",
+          "Asthma": "Asthma",
+          "Migraine": "Migraine"
+        }
+      },
+      "chartPlaceholder": {
+        "ageGroup": "Age Group Chart Placeholder",
+        "gender": "Gender Chart Placeholder",
+        "location": "Location Chart Placeholder",
+        "monthlyTrends": "Monthly Trends Chart Placeholder",
+        "conditions": "Conditions Chart Placeholder"
+      },
+      "dateRanges": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This Week",
+        "lastWeek": "Last Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "last30days": "Last 30 Days",
+        "last90days": "Last 90 Days",
+        "thisYear": "This Year",
+        "lastYear": "Last Year"
+      },
+      "exportCsv": "Export CSV",
+      "print": "Print"
+    },
+    "common": {
+      "ofTotal": "of total"
+    },
+    "generate": "Generate Reports",
+    "dashboard": {
+      "title": "Reports Dashboard",
+      "subtitle": "Analyze clinic performance and trends",
+      "metrics": {
+        "totalRevenue": "Total Revenue",
+        "totalAppointments": "Total Appointments",
+        "totalPatients": "Total Patients",
+        "activeDentists": "Active Dentists",
+        "currentlyActive": "Currently Active"
+      },
+      "sections": {
+        "revenueAnalytics": "Revenue Analytics",
+        "appointmentAnalytics": "Appointment Analytics",
+        "treatmentAnalytics": "Treatment Analytics",
+        "dentistPerformance": "Dentist Performance"
+      },
+      "charts": {
+        "revenueOverTime": "Revenue Over Time",
+        "paymentMethods": "Payment Methods Distribution",
+        "treatmentsByType": "Treatments by Type",
+        "treatmentRevenue": "Treatment Revenue"
+      },
+      "revenue": "Revenue",
+      "fromLastPeriod": "vs Last Period"
+    }
+  },
+  "reportsDashboard": {
+    "title": "Reports Dashboard",
+    "searchPlaceholder": "Search reports...",
+    "recentlyViewed": "Recently Viewed Reports",
+    "allReports": "All Reports",
+    "favorites": "Favorite Reports",
+    "lastViewed": "Last Viewed",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "days ago",
+    "createCustomReport": "Create Custom Report",
+    "customReport": "Custom Report",
+    "addFavorite": "Add Favorite",
+    "appointmentReports": {
+      "title": "Appointment Reports",
+      "description": "View detailed statistics and trends for appointments"
+    },
+    "patientDemographics": {
+      "title": "Patient Demographics",
+      "description": "Analyze patient demographics and engagement metrics"
+    },
+    "billingAndRevenue": {
+      "title": "Billing and Revenue",
+      "description": "Track financial performance and revenue details"
+    },
+    "doctorPerformance": {
+      "title": "Doctor Performance",
+      "description": "Monitor dentist performance and productivity"
+    },
+    "inventoryAndSupplies": {
+      "title": "Inventory and Supplies",
+      "description": "Review inventory levels and supply usage"
+    },
+    "customReports": {
+      "title": "Custom Reports",
+      "description": "Create and view custom-generated reports"
+    },
+    "weeklyAppointmentSummary": "Weekly Appointment Summary",
+    "monthlyRevenueAnalysis": "Monthly Revenue Analysis"
+  },
+  "staff_scheduling": {
+    "title": "Staff Scheduling",
+    "description": "Manage staff schedules across clinics",
+    "add_schedule": "Add Schedule",
+    "clinic": "Clinic",
+    "select_clinic": "Select Clinic",
+    "staff_member": "Staff Member",
+    "all_staff": "All Staff",
+    "shift_type": "Shift Type",
+    "all_shifts": "All Shifts",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "night": "Night",
+    "full_day": "Full Day",
+    "status": "Status",
+    "all_status": "All Statuses",
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "no_show": "No Show",
+    "view_mode": "View Mode",
+    "calendar": "Calendar",
+    "list": "List",
+    "schedule_list": "Schedule List",
+    "date": "Date",
+    "time": "Time",
+    "actions": "Actions",
+    "create_schedule": "Create Schedule",
+    "edit_schedule": "Edit Schedule",
+    "delete_confirmation": "Are you sure you want to delete this schedule?",
+    "loading": "Loading schedules...",
+    "no_schedules": "No schedules found",
+    "no_clinic_selected": "Please select a clinic to view schedules",
+    "no_staff_available": "No staff available for the selected clinic"
+  },
+  "treatments": {
+    "title": "Treatments",
+    "pageDescription": "View and manage treatment records for patients",
+    "totalRecords": "Total Records",
+    "stats": {
+      "totalTreatments": "Total Treatments",
+      "completed": "Completed Treatments",
+      "inProgress": "In Progress Treatments",
+      "planned": "Planned Treatments",
+      "totalRevenue": "Total Revenue",
+      "averageCost": "Average Cost"
+    },
+    "quickActions": "Quick Actions",
+    "viewAppointments": "View Appointments",
+    "viewPatients": "View Patients",
+    "viewPrescriptions": "View Prescriptions",
+    "loading": "Loading treatment data..."
+  },
+  "multiClinicDashboard": {
+    "header": {
+      "title": "Multi-Clinic Dashboard",
+      "subtitle": "Monitor and manage performance across all clinics"
+    },
+    "viewModes": {
+      "overview": "Overview",
+      "performance": "Performance",
+      "schedules": "Schedules"
+    },
+    "filters": {
+      "title": "Filters",
+      "refresh": "Refresh",
+      "selectClinics": "Select Clinics",
+      "periods": {
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "last90Days": "Last 90 Days",
+        "lastYear": "Last Year"
+      }
+    },
+    "overview": {
+      "stats": {
+        "totalPatients": "Total Patients",
+        "new": "New",
+        "appointments": "Appointments",
+        "totalRevenue": "Total Revenue",
+        "staffSchedules": "Staff Schedules",
+        "activeClinics": "Active Clinics"
+      },
+      "clinicCard": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "patients": "Patients",
+        "appointments": "Appointments",
+        "revenue": "Revenue",
+        "staff": "Staff",
+        "staffUtilization": "Staff Utilization",
+        "hours": "hours",
+        "shifts": "shifts"
+      }
+    },
+    "performance": {
+      "title": "Clinic Performance Comparison",
+      "clinic": "Clinic",
+      "completionRate": "Completion Rate",
+      "revenue": "Revenue",
+      "collectionRate": "Collection Rate",
+      "staffProductivity": "Staff Productivity"
+    },
+    "schedules": {
+      "title": "Staff Schedule Overview",
+      "scheduleStatus": "Schedule Status",
+      "statuses": {
+        "completed": "Completed",
+        "paid": "Paid",
+        "cancelled": "Cancelled",
+        "overdue": "Overdue",
+        "scheduled": "Scheduled",
+        "pending": "Pending"
+      },
+      "shiftTypes": {
+        "title": "Shift Types",
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening",
+        "night": "Night",
+        "full-day": "Full Day"
+      }
+    },
+    "errors": {
+      "accessDenied": {
+        "title": "Access Denied",
+        "message": "You do not have permission to view this dashboard"
+      },
+      "loading": {
+        "title": "Error Loading Data",
+        "message": "Failed to load dashboard data",
+        "retryButton": "Try Again"
+      }
+    },
+    "loading": {
+      "message": "Loading dashboard data..."
+    },
+    "success": {
+      "refresh": "Dashboard refreshed successfully"
+    }
+  },
+  "login": {
+    "title": "Sign In",
+    "or": "or",
+    "createAccount": "Create an account",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "signIn": "Sign In",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters"
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "description": "Enter your email address to receive a password reset link",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "common.placeholders.email",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "error": "Failed to send reset link. Please try again",
+    "sendResetLink": "Send Reset Link",
+    "successTitle": "Reset Link Sent",
+    "successDescription": "A password reset link has been sent to {email}",
+    "backToLogin": "Back to Sign In",
+    "returnToLogin": "Return to Sign In"
+  },
+  "register": {
+    "title": "Create Account",
+    "or": "or",
+    "signIn": "Sign in to your account",
+    "firstName": "First Name",
+    "firstNameRequired": "First name is required",
+    "firstNameInvalid": "First name must contain only letters and spaces",
+    "firstNameLength": "First name must be between 2 and 50 characters",
+    "lastName": "Last Name",
+    "lastNameRequired": "Last name is required",
+    "lastNameInvalid": "Last name must contain only letters and spaces",
+    "lastNameLength": "Last name must be between 2 and 50 characters",
+    "email": "Email Address",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "phoneNumber": "Phone Number",
+    "phoneNumberRequired": "Phone number is required",
+    "gender": "Gender",
+    "genderRequired": "Please select a gender",
+    "male": "Male",
+    "female": "Female",
+    "age": "Age",
+    "ageInvalid": "Please enter a valid age (1-120)",
+    "password": "Password",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordInvalid": "Password must include uppercase, lowercase, number, and special character",
+    "confirmPassword": "Confirm Password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "createAccount": "Create Account",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "registrationSuccess": "Account created successfully! Please sign in."
+  },
+  "resetPassword": {
+    "title": "Reset Your Password",
+    "description": "Enter a new password for your account",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidToken": "Invalid or missing reset token",
+    "genericError": "Failed to reset password. Please try again",
+    "resetPasswordButton": "Reset Password",
+    "successTitle": "Password Reset Successful",
+    "successDescription": "Your password has been reset. You will be redirected to the login page shortly.",
+    "passwordResetSuccessMessage": "Your password has been successfully reset. Please sign in with your new password.",
+    "backToLogin": "Back to Sign In"
+  },
+  "auth": {
+    "login": "login",
+    "signUp": "sign up",
+    "signOut": "sign out"
   }
 }

@@ -6,9 +6,6 @@ import { initWebSocket } from './utils/websocketInstance';
 dotenv.config(); // Trigger restart
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
-// Check database connection state
-const mongoose = require('mongoose');
-
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);

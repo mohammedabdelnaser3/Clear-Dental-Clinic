@@ -60,7 +60,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
         setPage(pageNum);
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to fetch notifications:', error);
+      }
       toast.error('Failed to load notifications');
     } finally {
       setLoading(false);
@@ -74,7 +76,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
         prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
       );
     } catch (error) {
-      console.error('Failed to mark as read:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to mark as read:', error);
+      }
     }
   };
 
@@ -84,7 +88,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       toast.success('All notifications marked as read');
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to mark all as read:', error);
+      }
       toast.error('Failed to mark all as read');
     }
   };
@@ -95,7 +101,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
       setNotifications(prev => prev.filter(n => n._id !== notificationId));
       toast.success('Notification deleted');
     } catch (error) {
-      console.error('Failed to delete notification:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to delete notification:', error);
+      }
       toast.error('Failed to delete notification');
     }
   };

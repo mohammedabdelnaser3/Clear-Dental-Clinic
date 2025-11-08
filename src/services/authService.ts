@@ -67,7 +67,9 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthUser
     const result = { ...user, token };
     return result;
       } catch (_error: any) {
-      console.error('Full error:', _error.response?.data, _error.stack);
+      if (import.meta.env.DEV) {
+        console.error('Full error:', _error.response?.data, _error.stack);
+      }
       const errorMessage = _error.response?.data?.message || _error.message || 'Login failed';
     throw new Error(errorMessage);
   }
@@ -99,7 +101,9 @@ export const logoutUser = async (): Promise<void> => {
   try {
     await api.post('/api/v1/auth/logout');
   } catch (_error: unknown) {
-    console.error('Logout error:', _error);
+    if (import.meta.env.DEV) {
+      console.error('Logout error:', _error);
+    }
   } finally {
     // Always remove token
     localStorage.removeItem('token');

@@ -392,6 +392,24 @@ class BillingService {
     return response;
   }
 
+  // Get billing statistics for dashboard
+  async getBillingStats(filters: {
+    startDate?: string;
+    endDate?: string;
+    clinic?: string;
+  } = {}) {
+    const params = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value.toString());
+      }
+    });
+
+    const response = await api.get(`${this.baseURL}/stats?${params.toString()}`);
+    return response;
+  }
+
   // Get billing trends
   async getBillingTrends(filters: {
     startDate?: string;

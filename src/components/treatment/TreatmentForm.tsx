@@ -114,7 +114,9 @@ export const TreatmentForm: React.FC<TreatmentFormProps> = ({
           }
         }
       } catch (error) {
-        console.error('Error fetching form data:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching form data:', error);
+        }
         toast.error(t('treatmentForm.errors.fetchDataFailed'));
       }
     };
@@ -133,7 +135,9 @@ export const TreatmentForm: React.FC<TreatmentFormProps> = ({
             setAppointments(response.data || []);
           }
         } catch (error) {
-          console.error('Error fetching appointments:', error);
+          if (import.meta.env.DEV) {
+            console.error('Error fetching appointments:', error);
+          }
         }
       }
     };
@@ -195,7 +199,9 @@ export const TreatmentForm: React.FC<TreatmentFormProps> = ({
         onSave();
       }
     } catch (error: any) {
-      console.error('Error saving treatment:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error saving treatment:', error);
+      }
       toast.error(error.message || t('treatmentForm.errors.saveFailed'));
     } finally {
       setLoading(false);

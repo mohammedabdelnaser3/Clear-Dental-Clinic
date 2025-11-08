@@ -11,7 +11,16 @@ export default {
     '^react-i18next$': '<rootDir>/node_modules/react-i18next'
   },
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        resolveJsonModule: true,
+        module: 'esnext',
+        target: 'es2020'
+      }
+    }],
     '^.+\\.(js|jsx)$': 'babel-jest'
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -27,17 +36,5 @@ export default {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        jsx: 'react-jsx',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        resolveJsonModule: true,
-        module: 'esnext',
-        target: 'es2020'
-      }
-    }
-  }
+  extensionsToTreatAsEsm: ['.ts', '.tsx']
 };

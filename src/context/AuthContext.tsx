@@ -51,14 +51,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           return true;
         }
       } catch (refreshErr) {
-        console.error('Token refresh failed:', refreshErr);
+        // Log refresh error for debugging but don't expose to user
+        if (import.meta.env.DEV) {
+          console.error('Token refresh failed:', refreshErr);
+        }
       }
       
       // If refresh also fails, clear everything
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       setUser(null);
-      console.error('Token validation failed:', err);
+      
+      // Log validation error for debugging
+      if (import.meta.env.DEV) {
+        console.error('Token validation failed:', err);
+      }
+      
       return false;
     }
   }, []);
@@ -79,11 +87,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           await validateAndSetUser(token);
         }
       } catch (err) {
-        console.error('Failed to initialize auth:', err);
+        // Log initialization error for debugging
+        if (import.meta.env.DEV) {
+          console.error('Failed to initialize auth:', err);
+        }
         // Clear tokens on initialization failure
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         setUser(null);
+        // Set error state for user feedback
+        setError('Failed to initialize authentication. Please refresh the page.');
       } finally {
         setLoading(false);
         setIsInitialized(true);
@@ -163,7 +176,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(true);
       await logoutUser();
     } catch (err: unknown) {
-      console.error('Logout error:', err);
+      // Log logout error for debugging only
+      if (import.meta.env.DEV) {
+        console.error('Logout error:', err);
+      }
     } finally {
       // Always clear tokens and user state, even if logout request fails
       localStorage.removeItem('token');
@@ -203,7 +219,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await validateAndSetUser(token);
       }
     } catch (err) {
-      console.error('Failed to refresh user:', err);
+      // Log refresh error for debugging only
+      if (import.meta.env.DEV) {
+        console.error('Failed to refresh user:', err);
+      }
       // If refresh fails, try to get a new token
       const refreshResult = await refreshToken();
       if (refreshResult?.token) {

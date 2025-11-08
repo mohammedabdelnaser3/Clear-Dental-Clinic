@@ -52,7 +52,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ className =
     try {
       await markAsRead(notificationId);
     } catch (err: any) {
-      console.error('Error marking notification as read:', err);
+      if (import.meta.env.DEV) {
+        console.error('Error marking notification as read:', err);
+      }
     }
   };
 
@@ -60,7 +62,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ className =
     try {
       await markAllAsRead();
     } catch (err: any) {
-      console.error('Error marking all notifications as read:', err);
+      if (import.meta.env.DEV) {
+        console.error('Error marking all notifications as read:', err);
+      }
     }
   };
 
@@ -68,7 +72,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ className =
     try {
       await deleteNotification(notificationId);
     } catch (err: any) {
-      console.error('Error deleting notification:', err);
+      if (import.meta.env.DEV) {
+        console.error('Error deleting notification:', err);
+      }
     }
   };
 

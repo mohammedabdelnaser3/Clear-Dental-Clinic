@@ -41,32 +41,19 @@
 
 
   "scripts": {
-
-
     "dev": "vite",
-
-
     "build": "tsc -b && vite build",
-
-
     "lint": "eslint .",
-
-
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
-
-
     "test": "jest",
-
-
     "test:watch": "jest --watch",
-
-
     "test:coverage": "jest --coverage",
-
-
-    "check:translations": "node check-translation-coverage.cjs"
-
-
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "check:translations": "node check-translation-coverage.cjs",
+    "check:all": "npm run lint && npm test && npm run build",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit"
   },
 
 

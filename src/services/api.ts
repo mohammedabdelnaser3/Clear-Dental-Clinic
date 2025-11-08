@@ -38,7 +38,9 @@ api.interceptors.request.use(
       
       // Check if clinicId is an object (which would cause the 400 error)
       if (typeof config.params.clinicId === 'object') {
-        console.error('❌ FOUND OBJECT CLINIC ID - FIXING:', config.params.clinicId);
+        if (import.meta.env.DEV) {
+          console.error('❌ FOUND OBJECT CLINIC ID - FIXING:', config.params.clinicId);
+        }
         // Try to extract the ID if it's an object
         if (config.params.clinicId && config.params.clinicId.id) {
           config.params.clinicId = config.params.clinicId.id;
@@ -111,11 +113,13 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       // Network error - no response received
-      console.error('Network error details:', {
-        message: error.message,
-        code: error.code,
-        errno: (error as any).errno
-      });
+      if (import.meta.env.DEV) {
+        console.error('Network error details:', {
+          message: error.message,
+          code: error.code,
+          errno: (error as any).errno
+        });
+      }
       
       // Handle ERR_ABORTED errors silently without showing toast messages
       if (error.code === 'ERR_ABORTED') {
@@ -132,7 +136,9 @@ api.interceptors.response.use(
         toast.error('Network error. Please check your connection.');
       }
     } else {
-      console.error('Unexpected error:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error:', error);
+      }
       toast.error('An unexpected error occurred.');
     }
     
@@ -206,14 +212,16 @@ export const apiService = {
         data: response.data,
       };
     } catch (error: any) {
-      console.error('POST request failed:', {
-        url,
-        error: error.message,
-        code: error.code,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data
-      });
+      if (import.meta.env.DEV) {
+        console.error('POST request failed:', {
+          url,
+          error: error.message,
+          code: error.code,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data
+        });
+      }
       
       // Re-throw the error to be handled by the calling function
       throw error;

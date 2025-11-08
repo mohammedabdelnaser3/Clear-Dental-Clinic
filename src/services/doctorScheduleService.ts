@@ -219,7 +219,9 @@ export const getAvailableDoctorsForDay = async (
       message: 'Available doctors retrieved successfully'
     };
   } catch (error: any) {
-    console.error('Error getting available doctors:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error getting available doctors:', error);
+    }
     return {
       success: false,
       data: [],

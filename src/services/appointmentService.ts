@@ -217,7 +217,9 @@ class AppointmentService {
       
       // Validate date format
       if (!/^\d{4}-\d{2}-\d{2}$/.test(params.date)) {
-        console.error('Invalid date format:', params.date);
+        if (import.meta.env.DEV) {
+          console.error('Invalid date format:', params.date);
+        }
         // Return empty array instead of throwing error
         return [];
       }
@@ -458,7 +460,9 @@ class AppointmentService {
       
       // Validate date format
       if (!/^\d{4}-\d{2}-\d{2}$/.test(params.date)) {
-        console.error('Invalid date format:', params.date);
+        if (import.meta.env.DEV) {
+          console.error('Invalid date format:', params.date);
+        }
         return null;
       }
       
@@ -503,13 +507,17 @@ class AppointmentService {
       
       // Validate date format (YYYY-MM-DD)
       if (!/^\d{4}-\d{2}-\d{2}$/.test(params.date)) {
-        console.error('Invalid date format:', params.date);
+        if (import.meta.env.DEV) {
+          console.error('Invalid date format:', params.date);
+        }
         throw new Error('Invalid date format. Expected YYYY-MM-DD');
       }
       
       // Validate time slot format (HH:mm)
       if (!/^\d{2}:\d{2}$/.test(params.timeSlot)) {
-        console.error('Invalid time slot format:', params.timeSlot);
+        if (import.meta.env.DEV) {
+          console.error('Invalid time slot format:', params.timeSlot);
+        }
         throw new Error('Invalid time slot format. Expected HH:mm');
       }
       
@@ -570,13 +578,17 @@ class AppointmentService {
     try {
       // Validate parameters
       if (!date || !clinicId) {
-        console.error('Missing required parameters for booked slots:', { date, clinicId });
+        if (import.meta.env.DEV) {
+          console.error('Missing required parameters for booked slots:', { date, clinicId });
+        }
         return [];
       }
 
       // Validate date format
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        console.error('Invalid date format:', date);
+        if (import.meta.env.DEV) {
+          console.error('Invalid date format:', date);
+        }
         return [];
       }
 

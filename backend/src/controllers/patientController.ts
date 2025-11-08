@@ -91,8 +91,16 @@ export const createPatient = asyncHandler(async (req: Request, res: Response) =>
     medicalHistory,
     allergies,
     currentMedications,
-    insuranceInfo
+    insuranceInfo,
+    preferredClinicId,
+    createdBy,
+    status
   } = req.body;
+
+  // Validate required fields
+  if (!preferredClinicId) {
+    throw new AppError('Preferred clinic is required', 400);
+  }
 
   // Check if patient already exists
   const existingPatient = await (Patient as any).findOne({ 
@@ -116,7 +124,10 @@ export const createPatient = asyncHandler(async (req: Request, res: Response) =>
     allergies,
     currentMedications,
     insuranceInfo,
-    status: 'active'
+    preferredClinicId,
+    createdBy,
+    status: status || 'active',
+    isActive: true
   });
 
   res.status(201).json({

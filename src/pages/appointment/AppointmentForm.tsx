@@ -313,7 +313,10 @@ const AppointmentForm: React.FC = () => {
     
     // Validate date format
     if (!/^\d{4}-\d{2}-\d{2}$/.test(formData.date)) {
-      console.error('Invalid date format:', formData.date);
+      if (import.meta.env.DEV) {
+        console.error('Invalid date format:', formData.date);
+      }
+      setFieldErrors((prev: Record<string, string>) => ({ ...prev, date: 'Invalid date format' }));
       return;
     }
     
@@ -421,7 +424,11 @@ const AppointmentForm: React.FC = () => {
             setFormData(parsedData);
           }
         } catch (e) {
-          console.error('Error parsing saved form data', e);
+          if (import.meta.env.DEV) {
+            console.error('Error parsing saved form data', e);
+          }
+          // Clear invalid saved data
+          localStorage.removeItem('appointmentFormData');
         }
       }
       
@@ -1101,7 +1108,9 @@ const AppointmentForm: React.FC = () => {
       const validation = validateAppointmentData(appointmentData);
       if (!validation.isValid) {
         const errorMessage = validation.errors.join('; ');
-        console.error('Client-side validation failed:', validation.errors);
+        if (import.meta.env.DEV) {
+          console.error('Client-side validation failed:', validation.errors);
+        }
         toast.error(`Validation failed: ${errorMessage}`);
         setIsLoading(false);
         return;

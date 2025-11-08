@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Search, Plus, Eye, Edit, Trash2, DollarSign, Calendar, User, CreditCard } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -6,9 +6,10 @@ import Select  from '../ui/Select';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import Modal from '../ui/Modal';
-import { BillingForm } from './BillingForm';
-import { BillingDetails } from './BillingDetails';
-import { PaymentForm } from './PaymentForm';
+import PaymentStatusIndicator from './PaymentStatusIndicator';
+const BillingFormLazy = React.lazy(() => import('./BillingForm').then(m => ({ default: m.BillingForm })));
+const BillingDetailsLazy = React.lazy(() => import('./BillingDetails').then(m => ({ default: m.BillingDetails })));
+const PaymentFormLazy = React.lazy(() => import('./PaymentForm').then(m => ({ default: m.PaymentForm })));
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { billingService } from '../../services/billingService';
@@ -89,11 +90,11 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
   const [paymentRecord, setPaymentRecord] = useState<BillingRecord | null>(null);
 
   const statusOptions = [
-    { value: 'all', label: t('billingList.allStatus') },
-    { value: 'pending', label: t('billingList.pending') },
-    { value: 'partial', label: t('billingList.partial') },
-    { value: 'paid', label: t('billingList.paid') },
-    { value: 'overdue', label: t('billingList.overdue') }
+    { value: 'all', label: t('billing.list.allStatus') },
+    { value: 'pending', label: t('billing.list.pending') },
+    { value: 'partial', label: t('billing.list.partial') },
+    { value: 'paid', label: t('billing.list.paid') },
+    { value: 'overdue', label: t('billing.list.overdue') }
   ];
 
   const fetchBillingRecords = async () => {
@@ -122,8 +123,10 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
       setBillingRecords(Array.isArray(billingRecordsData) ? billingRecordsData : []);
       setTotalPages(typeof totalPagesData === 'number' ? totalPagesData : 1);
     } catch (_error) {
-      toast.error(t('billingList.fetchError'));
-      console.error('Error fetching billing records:', _error);
+      toast.error(t('billing.list.fetchError'));
+      if (import.meta.env.DEV) {
+        console.error('Error fetching billing records:', _error);
+      }
     } finally {
       setLoading(false);
     }
@@ -164,17 +167,19 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
   };
 
   const handleDeleteRecord = async (recordId: string) => {
-    if (!window.confirm(t('billingList.deleteConfirmation'))) {
+    if (!window.confirm(t('billing.list.deleteConfirmation'))) {
       return;
     }
 
     try {
       await billingService.deleteBillingRecord(recordId);
-      toast.success(t('billingList.deleteSuccess'));
+      toast.success(t('billing.list.deleteSuccess'));
       fetchBillingRecords();
     } catch (_error) {
-      toast.error(t('billingList.deleteError'));
-      console.error('Error deleting billing record:', _error);
+      toast.error(t('billing.list.deleteError'));
+      if (import.meta.env.DEV) {
+        console.error('Error deleting billing record:', _error);
+      }
     }
   };
 
@@ -219,12 +224,12 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">
-          {patientId ? t('billingList.patientBilling') : t('billingList.title')}
+          {patientId ? t('billing.list.patientBilling') : t('billing.list.title')}
         </h2>
         {canManageBilling && (
           <Button onClick={handleAddRecord} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            {t('billingList.newInvoice')}
+            {t('billing.list.newInvoice')}
           </Button>
         )}
       </div>
@@ -236,7 +241,7 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder={t('billingList.searchPlaceholder')}
+              placeholder={t('billing.list.searchPlaceholder')}
               value={searchTerm}
               onChange={handleSearch}
               className="pl-10"
@@ -262,14 +267,21 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {t('billingList.invoice')} #{record.invoiceNumber}
+                      {t('billing.list.invoice')} #{record.invoiceNumber}
                     </h3>
                     <Badge className={getStatusColor(record.paymentStatus)}>
                       {t(`billingList.${record.paymentStatus}`)}
                     </Badge>
+                    <PaymentStatusIndicator
+                      status={record.paymentStatus}
+                      amount={record.paidAmount}
+                      totalAmount={record.totalAmount}
+                      size="sm"
+                      showProgress
+                    />
                     {isOverdue(record.dueDate, record.paymentStatus) && (
                       <Badge className="bg-red-100 text-red-800">
-                        {t('billingList.overdue')}
+                        {t('billing.list.overdue')}
                       </Badge>
                     )}
                   </div>
@@ -281,7 +293,7 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
                   )}
                   <div className="flex items-center gap-1 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
-                    {t('billingList.dueDateLabel')}: {format(new Date(record.dueDate), 'MMM dd, yyyy')}
+                    {t('billing.list.dueDateLabel')}: {format(new Date(record.dueDate), 'MMM dd, yyyy')}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -327,25 +339,25 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
               {/* Amount Summary */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">{t('billingList.totalAmount')}</p>
+                  <p className="text-sm text-gray-600">{t('billing.list.totalAmount')}</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {t('common.currency')}{record.totalAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-sm text-gray-600">{t('billingList.paidAmount')}</p>
+                  <p className="text-sm text-gray-600">{t('billing.list.paidAmount')}</p>
                   <p className="text-lg font-semibold text-green-600">
                     {t('common.currency')}{record.paidAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <p className="text-sm text-gray-600">{t('billingList.balance')}</p>
+                  <p className="text-sm text-gray-600">{t('billing.list.balance')}</p>
                   <p className="text-lg font-semibold text-red-600">
                     {t('common.currency')}{record.balanceAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">{t('billingList.items')}</p>
+                  <p className="text-sm text-gray-600">{t('billing.list.items')}</p>
                   <p className="text-lg font-semibold text-blue-600">
                     {record.items.length}
                   </p>
@@ -354,7 +366,7 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
 
               {/* Items Preview */}
               <div>
-                <p className="text-sm text-gray-600 mb-2">{t('billingList.items')}:</p>
+                <p className="text-sm text-gray-600 mb-2">{t('billing.list.items')}:</p>
                 <div className="space-y-1">
                   {record.items.slice(0, 3).map((item, index) => (
                     <div key={index} className="flex justify-between text-sm">
@@ -366,7 +378,7 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
                   ))}
                   {record.items.length > 3 && (
                     <p className="text-sm text-gray-500">
-                      +{record.items.length - 3} {t('billingList.moreItems')}
+                      +{record.items.length - 3} {t('billing.list.moreItems')}
                     </p>
                   )}
                 </div>
@@ -386,7 +398,7 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
                   )}
                 </div>
                 {record.paidDate && (
-                  <span>{t('billingList.paidOn')}: {format(new Date(record.paidDate), 'MMM dd, yyyy')}</span>
+                  <span>{t('billing.list.paidOn')}: {format(new Date(record.paidDate), 'MMM dd, yyyy')}</span>
                 )}
               </div>
             </div>
@@ -398,15 +410,15 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
       {billingRecords.length === 0 && (
         <div className="text-center py-12">
           <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('billingList.noRecordsFound')}</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('billing.list.noRecordsFound')}</h3>
           <p className="text-gray-600 mb-4">
             {patientId 
-              ? t('billingList.noPatientRecords')
-              : t('billingList.noFilteredRecords')}
+              ? t('billing.list.noPatientRecords')
+              : t('billing.list.noFilteredRecords')}
           </p>
           {canManageBilling && (
             <Button onClick={handleAddRecord}>
-              {t('billingList.createFirstInvoice')}
+              {t('billing.list.createFirstInvoice')}
             </Button>
           )}
         </div>
@@ -420,17 +432,17 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            {t('billingList.previous')}
+            {t('billing.list.previous')}
           </Button>
           <span className="text-sm text-gray-600">
-            {t('billingList.page')} {currentPage} / {totalPages}
+            {t('billing.list.page')} {currentPage} / {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            {t('billingList.next')}
+            {t('billing.list.next')}
           </Button>
         </div>
       )}
@@ -442,18 +454,20 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
           setIsFormModalOpen(false);
           setEditingRecord(null);
         }}
-        title={editingRecord ? t('billingList.editInvoice') : t('billingList.newInvoice')}
+        title={editingRecord ? t('billing.list.editInvoice') : t('billing.list.newInvoice')}
         size="lg"
       >
-        <BillingForm
-          billingRecord={editingRecord}
-          patientId={patientId}
-          onSave={handleRecordSaved}
-          onCancel={() => {
-            setIsFormModalOpen(false);
-            setEditingRecord(null);
-          }}
-        />
+        <Suspense fallback={<div className="p-4">Loading form...</div>}>
+          <BillingFormLazy
+            billingRecord={editingRecord}
+            patientId={patientId}
+            onSave={handleRecordSaved}
+            onCancel={() => {
+              setIsFormModalOpen(false);
+              setEditingRecord(null);
+            }}
+          />
+        </Suspense>
       </Modal>
 
       {/* Details Modal */}
@@ -463,18 +477,20 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
           setIsDetailsModalOpen(false);
           setViewingRecord(null);
         }}
-        title={t('billingList.invoiceDetails')}
+        title={t('billing.list.invoiceDetails')}
         size="lg"
       >
         {viewingRecord && (
-          <BillingDetails
-            billingRecord={viewingRecord}
-            onClose={() => {
-              setIsDetailsModalOpen(false);
-              setViewingRecord(null);
-            }}
-            onRefresh={fetchBillingRecords}
-          />
+          <Suspense fallback={<div className="p-4">Loading details...</div>}>
+            <BillingDetailsLazy
+              billingRecord={viewingRecord}
+              onClose={() => {
+                setIsDetailsModalOpen(false);
+                setViewingRecord(null);
+              }}
+              onRefresh={fetchBillingRecords}
+            />
+          </Suspense>
         )}
       </Modal>
 
@@ -485,17 +501,19 @@ export const BillingList: React.FC<BillingListProps> = ({ patientId }) => {
           setIsPaymentModalOpen(false);
           setPaymentRecord(null);
         }}
-        title={t('billingList.addPayment')}
+        title={t('billing.list.addPayment')}
       >
         {paymentRecord && (
-          <PaymentForm
-            billingRecord={paymentRecord}
-            onSave={handlePaymentAdded}
-            onCancel={() => {
-              setIsPaymentModalOpen(false);
-              setPaymentRecord(null);
-            }}
-          />
+          <Suspense fallback={<div className="p-4">Loading payment...</div>}>
+            <PaymentFormLazy
+              billingRecord={paymentRecord}
+              onSave={handlePaymentAdded}
+              onCancel={() => {
+                setIsPaymentModalOpen(false);
+                setPaymentRecord(null);
+              }}
+            />
+          </Suspense>
         )}
       </Modal>
     </div>

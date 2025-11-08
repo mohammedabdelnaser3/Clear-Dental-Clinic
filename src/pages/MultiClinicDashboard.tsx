@@ -134,8 +134,8 @@ const MultiClinicDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('errors.accessDenied.title')}</h2>
-          <p className="text-gray-600">{t('errors.accessDenied.message')}</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('multiClinicDashboard.errors.accessDenied.title')}</h2>
+          <p className="text-gray-600">{t('multiClinicDashboard.errors.accessDenied.message')}</p>
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ const MultiClinicDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 text-blue-600 animate-spin mb-4" />
-          <p className="text-gray-600">{t('loading.message')}</p>
+          <p className="text-gray-600">{t('multiClinicDashboard.loading.message')}</p>
         </div>
       </div>
     );
@@ -157,13 +157,13 @@ const MultiClinicDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <XCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('errors.loading.title')}</h2>
-          <p className="text-gray-600 mb-4">{t('errors.loading.message')}</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('multiClinicDashboard.errors.loading.title')}</h2>
+          <p className="text-gray-600 mb-4">{t('multiClinicDashboard.errors.loading.message')}</p>
           <button
             onClick={handleRefresh}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            {t('errors.loading.retryButton')}
+            {t('multiClinicDashboard.errors.loading.retryButton')}
           </button>
         </div>
       </div>
@@ -179,7 +179,7 @@ const MultiClinicDashboard: React.FC = () => {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{t('header.title')}</h1>
               <p className="text-gray-600 mt-1">
-                {t('header.subtitle')}
+                {t('multiClinicDashboard.header.subtitle')}
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -193,7 +193,7 @@ const MultiClinicDashboard: React.FC = () => {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {t('viewModes.overview')}
+                  {t('multiClinicDashboard.viewModes.overview')}
                 </button>
                 <button
                   onClick={() => setViewMode('performance')}
@@ -203,7 +203,7 @@ const MultiClinicDashboard: React.FC = () => {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {t('viewModes.performance')}
+                  {t('multiClinicDashboard.viewModes.performance')}
                 </button>
                 <button
                   onClick={() => setViewMode('schedules')}
@@ -213,7 +213,7 @@ const MultiClinicDashboard: React.FC = () => {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {t('viewModes.schedules')}
+                  {t('multiClinicDashboard.viewModes.schedules')}
                 </button>
               </div>
 
@@ -223,10 +223,10 @@ const MultiClinicDashboard: React.FC = () => {
                 onChange={(e) => handlePeriodChange(e.target.value as '7d' | '30d' | '90d' | '1y')}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="7d">{t('filters.periods.last7Days')}</option>
-                <option value="30d">{t('filters.periods.last30Days')}</option>
-                <option value="90d">{t('filters.periods.last90Days')}</option>
-                <option value="1y">{t('filters.periods.lastYear')}</option>
+                <option value="7d">{t('multiClinicDashboard.filters.periods.last7Days')}</option>
+                <option value="30d">{t('multiClinicDashboard.filters.periods.last30Days')}</option>
+                <option value="90d">{t('multiClinicDashboard.filters.periods.last90Days')}</option>
+                <option value="1y">{t('multiClinicDashboard.filters.periods.lastYear')}</option>
               </select>
 
               {/* Filters */}
@@ -235,7 +235,7 @@ const MultiClinicDashboard: React.FC = () => {
                 className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors"
               >
                 <Filter className="h-4 w-4" />
-                <span className="text-sm">{t('filters.title')}</span>
+                <span className="text-sm">{t('multiClinicDashboard.filters.title')}</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${
                   showFilters ? 'rotate-180' : ''
                 }`} />
@@ -247,7 +247,7 @@ const MultiClinicDashboard: React.FC = () => {
                 className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 <RefreshCw className="h-4 w-4" />
-                <span className="text-sm">{t('filters.refresh')}</span>
+                <span className="text-sm">{t('multiClinicDashboard.filters.refresh')}</span>
               </button>
             </div>
           </div>
@@ -294,12 +294,12 @@ const MultiClinicDashboard: React.FC = () => {
                     <Users className="h-8 w-8 text-blue-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('overview.stats.totalPatients')}</p>
+                    <p className="text-sm font-medium text-gray-600">{t('multiClinicDashboard.overview.stats.totalPatients')}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {dashboardData?.overallStats?.totalPatients?.toLocaleString() || 0}
                     </p>
                     <p className="text-sm text-green-600">
-                      +{dashboardData?.overallStats?.newPatients || 0} {t('overview.stats.new')}
+                      +{dashboardData?.overallStats?.newPatients || 0} {t('multiClinicDashboard.overview.stats.new')}
                     </p>
                   </div>
                 </div>
@@ -311,7 +311,7 @@ const MultiClinicDashboard: React.FC = () => {
                     <Calendar className="h-8 w-8 text-green-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('overview.stats.appointments')}</p>
+                    <p className="text-sm font-medium text-gray-600">{t('multiClinicDashboard.overview.stats.appointments')}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {dashboardData?.overallStats?.totalAppointments?.toLocaleString() || 0}
                     </p>
@@ -325,7 +325,7 @@ const MultiClinicDashboard: React.FC = () => {
                     <DollarSign className="h-8 w-8 text-yellow-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('overview.stats.totalRevenue')}</p>
+                    <p className="text-sm font-medium text-gray-600">{t('multiClinicDashboard.overview.stats.totalRevenue')}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {formatCurrency(dashboardData?.overallStats?.totalRevenue || 0)}
                     </p>
@@ -339,7 +339,7 @@ const MultiClinicDashboard: React.FC = () => {
                     <Clock className="h-8 w-8 text-purple-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('overview.stats.staffSchedules')}</p>
+                    <p className="text-sm font-medium text-gray-600">{t('multiClinicDashboard.overview.stats.staffSchedules')}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {dashboardData?.overallStats?.totalSchedules?.toLocaleString() || 0}
                     </p>
@@ -353,7 +353,7 @@ const MultiClinicDashboard: React.FC = () => {
                     <Building2 className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('overview.stats.activeClinics')}</p>
+                    <p className="text-sm font-medium text-gray-600">{t('multiClinicDashboard.overview.stats.activeClinics')}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {dashboardData?.clinics?.filter(c => c.clinic?.isActive)?.length || 0}
                     </p>
@@ -383,7 +383,7 @@ const MultiClinicDashboard: React.FC = () => {
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {clinicData.clinic.isActive ? t('overview.clinicCard.active') : t('overview.clinicCard.inactive')}
+                          {clinicData.clinic.isActive ? t('multiClinicDashboard.overview.clinicCard.active') : t('overview.clinicCard.inactive')}
                         </span>
                         <button className="text-gray-400 hover:text-gray-600">
                           <Eye className="h-4 w-4" />
@@ -399,22 +399,22 @@ const MultiClinicDashboard: React.FC = () => {
                         <p className="text-2xl font-bold text-blue-600">
                           {clinicData.metrics.patients.total}
                         </p>
-                        <p className="text-sm text-gray-600">{t('overview.clinicCard.patients')}</p>
+                        <p className="text-sm text-gray-600">{t('multiClinicDashboard.overview.clinicCard.patients')}</p>
                         <p className="text-xs text-green-600">
-                          +{clinicData.metrics.patients.new} {t('overview.stats.new')}
+                          +{clinicData.metrics.patients.new} {t('multiClinicDashboard.overview.stats.new')}
                         </p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-green-600">
                           {clinicData.metrics.appointments.total}
                         </p>
-                        <p className="text-sm text-gray-600">{t('overview.clinicCard.appointments')}</p>
+                        <p className="text-sm text-gray-600">{t('multiClinicDashboard.overview.clinicCard.appointments')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-yellow-600">
                           {formatCurrency(clinicData.metrics.billing.totalRevenue)}
                         </p>
-                        <p className="text-sm text-gray-600">{t('overview.clinicCard.revenue')}</p>
+                        <p className="text-sm text-gray-600">{t('multiClinicDashboard.overview.clinicCard.revenue')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-purple-600">

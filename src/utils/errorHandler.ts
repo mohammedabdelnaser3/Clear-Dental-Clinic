@@ -234,11 +234,13 @@ export const withErrorHandling = async <T>(
  * Check if error is a network error
  */
 export const isNetworkError = (error: any): boolean => {
+  if (!error) return false;
   return (
     error.code === 'ERR_NETWORK' ||
     error.code === 'ECONNREFUSED' ||
     error.code === 'ETIMEDOUT' ||
-    error.message?.includes('Network Error')
+    (error.message && error.message.includes('Network Error')) ||
+    false
   );
 };
 

@@ -109,7 +109,11 @@ export const useForm = <T extends Record<string, unknown>>(
       try {
         await onSubmit(values);
       } catch (_error) {
-        console.error('Form submission error:', _error);
+        if (import.meta.env.DEV) {
+          console.error('Form submission error:', _error);
+        }
+        // Re-throw error so parent component can handle it
+        throw _error;
       } finally {
         setIsSubmitting(false);
       }

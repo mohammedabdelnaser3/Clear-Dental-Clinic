@@ -208,7 +208,9 @@ export const getDashboardStats = async (clinicId?: string): Promise<ApiResponse<
       message: 'Dashboard statistics retrieved successfully'
     };
   } catch (error: any) {
-    console.error('Error fetching dashboard stats:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error fetching dashboard stats:', error);
+    }
     return {
       success: false,
       message: error.response?.data?.message || 'Failed to fetch dashboard statistics',
@@ -364,7 +366,9 @@ export const getRecentActivities = async (limit: number = 10, clinicId?: string)
       message: 'Recent activities retrieved successfully'
     };
   } catch (error: any) {
-    console.error('Error fetching recent activities:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error fetching recent activities:', error);
+    }
     return {
       success: false,
       message: error.response?.data?.message || 'Failed to fetch recent activities',
@@ -380,7 +384,9 @@ export const getBillingSummary = async (clinicId?: string): Promise<ApiResponse<
     const response = await api.get('/api/v1/billing/summary', { params });
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching billing summary:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error fetching billing summary:', error);
+    }
     return {
       success: false,
       message: error.response?.data?.message || 'Failed to fetch billing summary',
@@ -396,7 +402,9 @@ export const getOverdueBills = async (clinicId?: string): Promise<ApiResponse<an
     const response = await api.get('/api/v1/billing/overdue', { params });
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching overdue bills:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error fetching overdue bills:', error);
+    }
     return {
       success: false,
       message: error.response?.data?.message || 'Failed to fetch overdue bills',

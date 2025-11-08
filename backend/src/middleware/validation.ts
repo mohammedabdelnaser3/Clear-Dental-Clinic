@@ -212,6 +212,8 @@ export const validatePatientCreation = [
     }),
 
   body('gender')
+    .notEmpty()
+    .withMessage('Gender is required')
     .isIn(['male', 'female', 'other'])
     .withMessage('Invalid gender'),
 

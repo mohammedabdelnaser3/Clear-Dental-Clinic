@@ -16,8 +16,9 @@ const patientSchema = new Schema<IPatient>({
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: false, // Made optional to match interface
     unique: true,
+    sparse: true, // Allow multiple null values
     lowercase: true,
     trim: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email']
@@ -37,6 +38,12 @@ const patientSchema = new Schema<IPatient>({
       },
       message: 'Date of birth must be in the past'
     }
+  },
+  gender: {
+    type: String,
+    required: [true, 'Gender is required'],
+    enum: ['male', 'female', 'other'],
+    lowercase: true
   },
   address: {
     street: {

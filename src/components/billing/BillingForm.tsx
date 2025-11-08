@@ -230,21 +230,22 @@ export const BillingForm: React.FC<BillingFormProps> = ({
 
   // Calculate totals when items or discount change
   useEffect(() => {
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     const subtotal = watchedItems.reduce((sum, item) => {
       const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
       return sum + itemTotal;
     }, 0);
 
-    const taxAmount = (subtotal * taxRate) / 100;
-    const totalAmount = subtotal + taxAmount - (watchedDiscountAmount || 0);
+    const taxAmount = round2((subtotal * taxRate) / 100);
+    const totalAmount = round2(subtotal + taxAmount - (watchedDiscountAmount || 0));
 
-    setValue('subtotal', subtotal);
+    setValue('subtotal', round2(subtotal));
     setValue('taxAmount', taxAmount);
     setValue('totalAmount', Math.max(0, totalAmount));
 
     // Update individual item totals
     watchedItems.forEach((item, index) => {
-      const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
+      const itemTotal = round2((item.quantity || 0) * (item.unitPrice || 0));
       setValue(`items.${index}.total`, itemTotal);
     });
   }, [watchedItems, watchedDiscountAmount, taxRate, setValue]);

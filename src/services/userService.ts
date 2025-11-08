@@ -65,7 +65,9 @@ export const validateUserToken = async (): Promise<TokenValidationResult> => {
       return { isValid: false, isExpired: false };
     }
   } catch (error: any) {
-    console.error('Token validation error:', error);
+    if (import.meta.env.DEV) {
+      console.error('Token validation error:', error);
+    }
     
     // Handle specific error cases
     if (error.response?.status === 401) {
@@ -223,13 +225,15 @@ export const getUsersByRole = async (role: string, params?: {
       return response.data;
     }
   } catch (error: any) {
-    console.error(`Error fetching ${role}s:`, {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      message: error.response?.data?.message,
-      url: error.config?.url,
-      params: error.config?.params
-    });
+    if (import.meta.env.DEV) {
+      console.error(`Error fetching ${role}s:`, {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.response?.data?.message,
+        url: error.config?.url,
+        params: error.config?.params
+      });
+    }
     
     // Handle specific error cases
     if (error.response?.status === 401) {

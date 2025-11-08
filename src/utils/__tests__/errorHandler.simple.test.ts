@@ -98,9 +98,9 @@ describe('Error Handler Utilities', () => {
       });
 
       it('should not identify non-network errors', () => {
-        expect(isNetworkError({ response: { status: 500 } })).toBeFalsy();
+        expect(isNetworkError({ response: { status: 500 } })).toBe(false);
         expect(isNetworkError({ code: 'OTHER_ERROR' })).toBe(false);
-        expect(isNetworkError({})).toBeFalsy();
+        expect(isNetworkError({})).toBe(false);
       });
     });
 

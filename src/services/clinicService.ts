@@ -51,7 +51,9 @@ export const getAllClinics = async (): Promise<ApiResponse<Clinic[]>> => {
       };
     }
   } catch (error: any) {
-    console.error('🏥 getAllClinics: Error:', error);
+    if (import.meta.env.DEV) {
+      console.error('🏥 getAllClinics: Error:', error);
+    }
     return {
       success: false,
       data: [],
@@ -122,7 +124,9 @@ export const getBranches = async (): Promise<ApiResponse<string[]>> => {
         message: 'Branches retrieved successfully'
       };
     } else {
-      console.error('🌱 getBranches: Clinics response failed:', clinicsResponse);
+      if (import.meta.env.DEV) {
+        console.error('🌱 getBranches: Clinics response failed:', clinicsResponse);
+      }
       return {
         success: false,
         data: [],
@@ -130,7 +134,9 @@ export const getBranches = async (): Promise<ApiResponse<string[]>> => {
       };
     }
   } catch (error: any) {
-    console.error('🌱 getBranches: Error:', error);
+    if (import.meta.env.DEV) {
+      console.error('🌱 getBranches: Error:', error);
+    }
     return {
       success: false,
       data: [],

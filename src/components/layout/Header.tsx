@@ -171,7 +171,9 @@ const Header = memo(() => {
       setSelectedClinicById(clinicId);
     } catch (err) {
       setError('Failed to switch clinic. Please try again.');
-      console.error('Clinic change error:', err);
+      if (import.meta.env.DEV) {
+        console.error('Clinic change error:', err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -184,7 +186,9 @@ const Header = memo(() => {
       await logout();
     } catch (err) {
       setError('Logout failed. Please try again.');
-      console.error('Logout error:', err);
+      if (import.meta.env.DEV) {
+        console.error('Logout error:', err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -325,14 +329,14 @@ const Header = memo(() => {
     if (pathSegments.length === 0) return null;
 
     const breadcrumbMap: { [key: string]: string } = {
-      dashboard: t('dashboard'),
-      appointments: t('appointments'),
-      patients: t('patients'),
-      medications: t('medications'),
-      prescriptions: t('prescriptions'),
-      billing: t('billing'),
-      reports: t('reports'),
-      'staff-scheduling': t('staffScheduling'),
+      dashboard: t('dashboard.title'),
+      appointments: t('appointments.title'),
+      patients: t('patients.patients'),
+      medications: t('medications.medications'),
+      prescriptions: t('prescriptions.prescriptions'),
+      billing: t('billing.title'),
+      reports: t('reports.title'),
+      staffScheduling: t('staffScheduling.title'),
       clinics: t('clinics'),
       search: t('search', 'Search'),
       profile: t('profile'),
@@ -479,7 +483,7 @@ const Header = memo(() => {
     {
       path: '/medications',
       icon: 'medication',
-      label: t('medications'),
+      label: t('medications.medications'),
       shortLabel: 'Meds',
       color: 'orange',
       roles: ['dentist', 'admin']
@@ -487,7 +491,7 @@ const Header = memo(() => {
     {
       path: '/prescriptions',
       icon: FileText,
-      label: t('prescriptions'),
+      label: t('prescriptions.prescriptions'),
       shortLabel: 'Scripts',
       color: 'indigo',
       roles: ['dentist', 'staff', 'admin', 'patient']
@@ -498,21 +502,21 @@ const Header = memo(() => {
     {
       path: '/billing',
       icon: CreditCard,
-      label: t('billing'),
+      label: t('billing.title'),
       color: 'emerald',
       roles: ['dentist', 'staff', 'admin']
     },
     {
       path: '/inventory',
       icon: Package,
-      label: t('inventory'),
+      label: t('inventory.title'),
       color: 'cyan',
       roles: ['dentist', 'staff', 'admin']
     },
     {
       path: '/reports',
       icon: BarChart3,
-      label: t('reports'),
+      label: t('reports.title'),
       color: 'pink',
       roles: ['dentist', 'staff', 'admin', 'patient']
     },
@@ -526,7 +530,7 @@ const Header = memo(() => {
     {
       path: '/treatments',
       icon: Stethoscope,
-      label: t('treatments'),
+      label: t('treatments.title'),
       color: 'violet',
       roles: ['dentist', 'staff', 'admin']
     },
@@ -616,7 +620,7 @@ const Header = memo(() => {
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                     </svg>
-                    <span className="hidden xl:inline">{t('medications')}</span>
+                    <span className="hidden xl:inline">{t('medications.medications')}</span>
                     <span className="xl:hidden">Meds</span>
                   </Link>
                 )}
@@ -625,7 +629,7 @@ const Header = memo(() => {
                   className={`inline-flex items-center px-4 xl:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 ${isActive('/prescriptions') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200/50' : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:shadow-md'}`}
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  <span className="hidden xl:inline">{t('prescriptions')}</span>
+                  <span className="hidden xl:inline">{t('prescriptions.prescriptions')}</span>
                   <span className="xl:hidden">Scripts</span>
                 </Link>
 
@@ -728,7 +732,7 @@ const Header = memo(() => {
                 <Link
                   to="/prescriptions"
                   className={`inline-flex items-center p-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 ${isActive('/prescriptions') ? 'bg-blue-100 text-blue-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'}`}
-                  title={t('prescriptions')}
+                  title={t('prescriptions.prescriptions')}
                 >
                   <FileText className="w-5 h-5" />
                 </Link>
@@ -759,7 +763,7 @@ const Header = memo(() => {
                             <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                             </svg>
-                            {t('medications')}
+                            {t('medications.medications')}
                           </Link>
                         )}
                         {_moreNavigationItems.filter(item => _hasAccess(item.roles)).map((item) => (
@@ -1173,7 +1177,7 @@ const Header = memo(() => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                           </svg>
                         </div>
-                        <span className="flex-1">{t('medications')}</span>
+                        <span className="flex-1">{t('medications.medications')}</span>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                       </Link>
                     )}
@@ -1186,7 +1190,7 @@ const Header = memo(() => {
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 mr-4 flex-shrink-0">
                         <FileText className="w-5 h-5 text-indigo-600" />
                       </div>
-                      <span className="flex-1">{t('prescriptions')}</span>
+                      <span className="flex-1">{t('prescriptions.prescriptions')}</span>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </Link>
 
@@ -1199,7 +1203,7 @@ const Header = memo(() => {
                         <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 mr-4 flex-shrink-0">
                           <CreditCard className="w-5 h-5 text-emerald-600" />
                         </div>
-                        <span className="flex-1">{t('billing')}</span>
+                        <span className="flex-1">{t('billing.title')}</span>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                       </Link>
                     )}
@@ -1212,7 +1216,7 @@ const Header = memo(() => {
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-cyan-50 mr-4 flex-shrink-0">
                         <Package className="w-5 h-5 text-cyan-600" />
                       </div>
-                      <span className="flex-1">{t('inventory')}</span>
+                      <span className="flex-1">{t('inventory.title')}</span>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </Link>
 
@@ -1224,7 +1228,7 @@ const Header = memo(() => {
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50 mr-4 flex-shrink-0">
                         <BarChart3 className="w-5 h-5 text-pink-600" />
                       </div>
-                      <span className="flex-1">{t('reports')}</span>
+                      <span className="flex-1">{t('reports.title')}</span>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </Link>
 
@@ -1251,7 +1255,7 @@ const Header = memo(() => {
                         <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-violet-50 mr-4 flex-shrink-0">
                           <Stethoscope className="w-5 h-5 text-violet-600" />
                         </div>
-                        <span className="flex-1">{t('treatments')}</span>
+                        <span className="flex-1">{t('treatments.title')}</span>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                       </Link>
                     )}

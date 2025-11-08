@@ -164,8 +164,10 @@ export const MedicationForm: React.FC<MedicationFormProps> = ({
       
       onSave();
     } catch (_error: any) {
-              toast.error(_error.response?.data?.message || t('medicationForm.errorSave'));
-      console.error('Error saving medication:', _error);
+      toast.error(_error.response?.data?.message || t('medicationForm.errorSave'));
+      if (import.meta.env.DEV) {
+        console.error('Error saving medication:', _error);
+      }
     } finally {
       setLoading(false);
     }

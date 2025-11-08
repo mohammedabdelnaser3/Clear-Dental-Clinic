@@ -360,7 +360,7 @@ const Appointments: React.FC = () => {
       accessor: (appointment: AppointmentWithNames) => appointment.dentistName || t('appointments.unknownDentist'),
     },
     {
-      header: t('appointments.status'),
+      header: t('appointments.status.title'),
       accessor: (appointment: AppointmentWithNames) => getStatusBadge(appointment.status),
     },
     {

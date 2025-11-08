@@ -1,5 +1,20 @@
 import '@testing-library/jest-dom';
 
+// Mock react-hot-toast
+jest.mock('react-hot-toast', () => ({
+  default: {
+    error: jest.fn(),
+    success: jest.fn(),
+    loading: jest.fn(),
+    custom: jest.fn(),
+  },
+  error: jest.fn(),
+  success: jest.fn(),
+  loading: jest.fn(),
+  custom: jest.fn(),
+  Toaster: jest.fn(() => null),
+}));
+
 // Mock import.meta for Vite environment variables
 Object.defineProperty(globalThis, 'import', {
   value: {
