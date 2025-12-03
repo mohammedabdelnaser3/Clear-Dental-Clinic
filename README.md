@@ -46,22 +46,22 @@ Live Demo: _Coming Soon (Deploying on Vercel)_
 ![Login Page](screenshots/login.png)
 
 ### Patient Dashboard (Mobile View)
-![Dashboard Welcome Mobile](screenshots/dashboard-welcome-mobile.png)(screenshots/dashboard-upcoming-mobile.png)(screenshots/dashboard-upcoming-mobile-2.png)
+![Dashboard Welcome Mobile](screenshots/dashboard-welcome-mobile.png)![](screenshots/dashboard-upcoming-mobile.png),![](screenshots/dashboard-upcoming-mobile-2.png)
 
 ### Appointments List (Mobile View)
-![Appointments List Mobile](screenshots/appointments-list-mobile-1.png)(screenshots/appointments-list-mobile-2.png)
+![Appointments List Mobile](screenshots/appointments-list-mobile-1.png)![](screenshots/appointments-list-mobile-2.png)
 
 ### Create Appointment (Mobile View)
-![Create Appointment Clinic Mobile](screenshots/create-appointment-clinic-mobile-1.png)(screenshots/create-appointment-clinic-mobile-2.png)(screenshots/create-appointment-clinic-mobile-3.png)(screenshots/create-appointment-clinic-mobile-4.png)
+![Create Appointment Clinic Mobile](screenshots/create-appointment-clinic-mobile-1.png)![](screenshots/create-appointment-clinic-mobile-2.png)![](screenshots/create-appointment-clinic-mobile-3.png)![](screenshots/create-appointment-clinic-mobile-4.png)
 
 ### Dashboard (Desktop View)
-![Dashboard Desktop](screenshots/dashboard-desktop-1.png)(screenshots/dashboard-desktop-2.png)
+![Dashboard Desktop](screenshots/dashboard-desktop-1.png)![](screenshots/dashboard-desktop-2.png)
 
 ### Appointments Table (Desktop View)
 ![Appointments Table Desktop](screenshots/appointments-table-desktop.png)
 
 ### Create Appointment Services (Desktop View)
-![Create Appointment Services Desktop](screenshots/create-appointment-services-desktop-1.png)(screenshots/create-appointment-services-desktop-1.png)
+![Create Appointment Services Desktop](screenshots/create-appointment-services-desktop-1.png)![](screenshots/create-appointment-services-desktop-1.png)
 
 ## 🚧 Status: In Active Development
 - 85% Frontend Complete (Responsive design fully implemented)
